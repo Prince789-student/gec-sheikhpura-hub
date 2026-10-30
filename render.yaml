@@ -12,3 +12,5 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: ADMIN_EMAIL
+        value: pk3334238@gmail.com
