@@ -1,0 +1,272 @@
+[
+  {
+    "page": "index.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "college-info.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "admissions.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "academics.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "community.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "rooms-pg.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "food-tiffin.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "explore-nearby.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "transport.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "emergency.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "marketplace.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "student-tools.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "placement.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "notices.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "campus-directory.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "lost-found.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "submit-listing.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "about.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "contact.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "dashboard.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "login.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "admin.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "saved-items.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "community-guidelines.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "privacy.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "terms.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  },
+  {
+    "page": "404.html",
+    "status": 200,
+    "desktopOverflow": false,
+    "mobileOverflow": false,
+    "errorsCount": 0,
+    "localErrors": [],
+    "failedRequests": [],
+    "brokenLinks": []
+  }
+]

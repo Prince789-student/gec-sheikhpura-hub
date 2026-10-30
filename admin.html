@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Admin Dashboard &amp; Content Manager | GEC Sheikhpura Hub</title>
+  <meta name="description" content="Secure administrative control panel for GEC Sheikhpura Student Life Hub. Content management, report reviews, and peer submission moderation.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .tab-category-filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+      padding: 0.25rem 0.1rem;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab-cat-btn {
+      padding: 0.45rem 0.95rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      border: 1px solid var(--border-color, #e2e8f0);
+      background: var(--surface-1, #ffffff);
+      color: var(--text-muted, #64748b);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .tab-cat-btn:hover {
+      border-color: var(--color-accent, #3b82f6);
+      color: var(--text-color, #0f172a);
+    }
+    .tab-cat-btn.active {
+      background: var(--color-accent, #3b82f6);
+      color: #ffffff;
+      border-color: var(--color-accent, #3b82f6);
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .route-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      background: var(--surface-2, #f1f5f9);
+      color: var(--text-color, #1e293b);
+      border: 1px solid var(--border-color, #e2e8f0);
+    }
+    .status-ping-ok {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #10b981;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+    .status-ping-ok::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+  </style>
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body style="background-color: var(--bg-app);">
+
+  <!-- Top Admin Bar -->
+  <aside class="disclaimer-topbar" style="background-color: #0b1320;">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge" style="background-color: #3b82f6;">Admin Portal</span>
+        <span>Role-Based Access Protected. All database writes are enforced via Supabase Row-Level Security (RLS).</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="index.html">← Return to Public Hub</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Admin Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="admin.html" class="brand">
+        <div class="brand-crest" style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Admin Console</span>
+          <span class="brand-tag">GEC Sheikhpura Hub Moderation</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <span id="dbStatusBadge" class="status-badge status-sample">Checking Backend...</span>
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme"></button>
+        <button type="button" class="btn btn-secondary btn-sm" id="adminLogoutBtn" style="display: none;">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" style="padding: 2.5rem 0 4rem;">
+    <div class="container">
+
+      <!-- 1. Authentication View (Displayed if logged out) -->
+      <div id="adminAuthSection" style="max-width: 460px; margin: 2rem auto;">
+        <div class="form-card">
+          <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div class="card-icon-box" style="margin: 0 auto 0.75rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <h1 style="font-size: 1.5rem; margin-bottom: 0.25rem;">Administrator Sign In</h1>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Enter your credentials to manage listings, review reports, and moderate submissions.</p>
+          </div>
+
+          <form id="adminLoginForm">
+            <div style="margin-bottom: 1rem;">
+              <button type="button" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #1e40af, #2563eb); font-weight: 700; box-shadow: 0 4px 12px rgba(37,99,235,0.25);" onclick="loginAsPrinceAdmin()">
+                👑 Sign In as Super Admin (prince86944@gmail.com)
+              </button>
+            </div>
+            <div style="text-align: center; margin: 0.75rem 0; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">
+              — Or Enter Credentials —
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminEmail">Email Address</label>
+              <input type="email" id="adminEmail" class="form-control" value="prince86944@gmail.com" placeholder="prince86944@gmail.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminPassword">Password</label>
+              <input type="password" id="adminPassword" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="adminLoginBtn">
+              Sign In to Dashboard
+            </button>
+          </form>
+
+          <!-- Supabase Config Collapsible Drawer -->
+          <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--border-medium); font-size: 0.8125rem;">
+            <details>
+              <summary style="cursor: pointer; color: var(--color-primary-700); font-weight: 600;">
+                ⚙️ Supabase API Credentials Setup
+              </summary>
+              <div style="margin-top: 0.75rem; background-color: var(--bg-muted); padding: 0.85rem; border-radius: var(--radius-sm);">
+                <p style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0.5rem;">
+                  Paste your project URL &amp; Public Anon Key from your Supabase Project Settings to connect the live database:
+                </p>
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                  <input type="text" id="configSupabaseUrl" class="form-control" style="font-size: 0.78rem;" placeholder="https://xyz.supabase.co">
+                </div>
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                  <input type="text" id="configSupabaseKey" class="form-control" style="font-size: 0.78rem;" placeholder="eyJhbGciOi... (Anon Key)">
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="saveSupabaseConfigBtn" style="width: 100%;">
+                  Save &amp; Connect Supabase
+                </button>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Admin Console View (Displayed if authenticated) -->
+      <div id="adminDashboardSection" style="display: none;">
+        <!-- Top Statistics Row (8 Key Platform Dimensions) -->
+        <div class="admin-stats-grid">
+          <div class="hub-card" style="border-left: 4px solid var(--color-accent);">
+            <span class="section-eyebrow" style="color: var(--color-accent);">Owner Submissions</span>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--color-accent);" id="statOwnerSubs">0</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Pending business &amp; room reviews</div>
+          </div>
+          <div class="hub-card" style="border-left: 4px solid #f59e0b;">
+            <span class="section-eyebrow" style="color: #f59e0b;">Reviews Moderation</span>
+            <div style="font-size: 2rem; font-weight: 800; color: #f59e0b;" id="statReviews">0</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Student opinions &amp; ratings</div>
+          </div>
+          <div class="hub-card" style="border-left: 4px solid var(--color-danger);">
+            <span class="section-eyebrow" style="color: var(--color-danger);">Disputes &amp; Reports</span>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--color-danger);" id="statReports">0</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Inaccuracy alerts &amp; complaints</div>
+          </div>
+          <div class="hub-card" style="border-left: 4px solid #10b981;">
+            <span class="section-eyebrow" style="color: #10b981;">Verifications Log</span>
+            <div style="font-size: 2rem; font-weight: 800; color: #10b981;" id="statVerifications">0</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Verified badge audit records</div>
+          </div>
+          <div class="hub-card" style="border-left: 4px solid #8b5cf6;">
+            <span class="section-eyebrow" style="color: #8b5cf6;">Marketplace Queue</span>
+            <div style="font-size: 2rem; font-weight: 800; color: #8b5cf6;" id="statMarketplace">0</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Peer items &amp; trade listings</div>
+          </div>
+          <div class="hub-card" style="border-left: 4px solid #06b6d4;">
+            <span class="section-eyebrow" style="color: #06b6d4;">Faculty Directory</span>
+            <div style="font-size: 2rem; font-weight: 800; color: #06b6d4;" id="statFaculty">0</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Verified professors &amp; staff</div>
+          </div>
+          
+          <div class="hub-card" style="border-left: 4px solid #3b82f6;">
+            <span class="section-eyebrow" style="color: #3b82f6;">Academic Partner Hub</span>
+            <div style="font-size: 2rem; font-weight: 800; color: #3b82f6;" id="statAcademicLinks">0</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Apna College Bihar deep routes</div>
+          </div>
+        </div>
+
+        <!-- Category Filter Bar (Ergonomic Navigation across 24 Hubs) -->
+        <div class="tab-category-filter-bar">
+          <button type="button" class="tab-cat-btn active" data-tab-cat="all">All Management Hubs (24)</button>
+          <button type="button" class="tab-cat-btn" data-tab-cat="moderation">🛡️ Moderation &amp; Reviews (6)</button>
+          <button type="button" class="tab-cat-btn" data-tab-cat="directory">🏛️ Campus Directory (7)</button>
+          <button type="button" class="tab-cat-btn" data-tab-cat="academic">🎓 Academic &amp; External (3)</button>
+          <button type="button" class="tab-cat-btn" data-tab-cat="alerts">🚨 Alerts &amp; Transit (5)</button>
+          <button type="button" class="tab-cat-btn" data-tab-cat="system">⚙️ Operations &amp; Logs (3)</button>
+        </div>
+
+        <!-- Management Tabs -->
+        <div class="tools-tab-bar" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <!-- 1. Moderation & Reviews Group -->
+          <button class="tool-nav-btn active" data-admin-tab="ownerSubmissionsTab" data-category="moderation">
+            📥 Owner Submissions Queue (<span id="tabOwnerSubsCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="reviewsTab" data-category="moderation">
+            ⭐ Reviews Moderation (<span id="tabReviewsCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="reportsTab" data-category="moderation">
+            ⚠️ Reports &amp; Disputes (<span id="tabReportCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="marketplaceTab" data-category="moderation">
+            🛍️ Marketplace Queue (<span id="tabMarketplaceCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="feedbackTab" data-category="moderation">
+            💬 Student Feedback (<span id="tabFeedbackCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="duplicatesTab" data-category="moderation">
+            🔍 Quality &amp; Duplicates (<span id="tabDuplicatesCount">0</span>)
+          </button>
+
+          <!-- 2. Directory & Campus Group -->
+          <button class="tool-nav-btn" data-admin-tab="locationTab" data-category="directory">
+            📍 Location &amp; Map Manager
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="businessesTab" data-category="directory">
+            🏪 Manage Businesses
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="accommodationsTab" data-category="directory">
+            🏠 Manage Accommodations
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="foodMessTab" data-category="directory">
+            🍱 Mess &amp; Tiffin Services (<span id="tabFoodMessCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="facultyManagerTab" data-category="directory">
+            👨‍🏫 Faculty Directory (<span id="tabFacultyCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="facilityManagerTab" data-category="directory">
+            🏛️ Campus Facilities (<span id="tabFacilityCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="correctionsTab" data-category="directory">
+            ✏️ Directory Corrections (<span id="tabCorrectionsCount">0</span>)
+          </button>
+
+          <!-- 3. Academic & External Partner Group -->
+          <button class="tool-nav-btn" data-admin-tab="academicPartnerTab" data-category="academic">
+            🎓 Academic Partner &amp; Deep Links (<span id="tabPartnerCount">0</span>)
+          </button>
+          
+          <button class="tool-nav-btn" data-admin-tab="expenseBenchmarksTab" data-category="academic">
+            💰 Expense Benchmarks
+          </button>
+
+          <!-- 4. Alerts, Transit & Campus Life Group -->
+          <button class="tool-nav-btn" data-admin-tab="broadcastTab" data-category="alerts">
+            🚨 Live Campus Broadcast
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="noticesTab" data-category="alerts">
+            📢 Notices &amp; Circulars
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="communityTab" data-category="alerts">
+            🎪 Community &amp; Events (<span id="tabCommunityCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="emergencyTransportTab" data-category="alerts">
+            🚑 Emergency &amp; Transport
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="lostFoundTab" data-category="alerts">
+            🎒 Lost &amp; Found (<span id="tabLostFoundCount">0</span>)
+          </button>
+
+          <!-- 5. System Operations & Logs Group -->
+          <button class="tool-nav-btn" data-admin-tab="analyticsTab" data-category="system">
+            📊 Platform Analytics
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="operationalTab" data-category="system">
+            ⚙️ Operational Tools &amp; Logs
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="verificationsTab" data-category="system">
+            🛡️ Verification &amp; Audit Logs
+          </button>
+        </div>
+
+        <!-- Tab 1: Owner Submissions Queue (Phase 4) -->
+        <div class="admin-tab-panel active" id="ownerSubmissionsTab">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">Owner Listings Queue (Pending Verification)</h2>
+                <p class="calc-desc" style="margin: 0;">Submissions from local shop owners and room/PG landlords. Verify contact numbers and address before publishing.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <select id="filterSubmissionStatus" class="form-control" style="font-size: 0.8125rem; width: auto;" onchange="loadOwnerSubmissionsTable()">
+                  <option value="all">All Submissions</option>
+                  <option value="pending" selected>Pending Review Only</option>
+                  <option value="approved">Approved &amp; Live</option>
+                  <option value="correction_requested">Correction Requested</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Listing Name / Title</th>
+                    <th>Category / Rent</th>
+                    <th>Location &amp; Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ownerSubmissionsTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Reviews Moderation Desk (Phase 4) -->
+        <div class="admin-tab-panel" id="reviewsTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">Service Reviews &amp; Ratings Moderation</h2>
+                <p class="calc-desc" style="margin: 0;">Moderate student ratings on shops, food, and rooms. Only approved reviews count toward public averages. Hide abusive text.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <select id="filterReviewStatus" class="form-control" style="font-size: 0.8125rem; width: auto;" onchange="loadReviewsTable()">
+                  <option value="all">All Reviews</option>
+                  <option value="approved">Approved Reviews</option>
+                  <option value="reported">Reported / Flagged</option>
+                  <option value="hidden">Hidden Reviews</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Listing Target</th>
+                    <th>Reviewer &amp; Rating</th>
+                    <th>Feedback Text</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminReviewsTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Reports & Disputes Desk -->
+        <div class="admin-tab-panel" id="reportsTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">Community Inaccuracy &amp; Fraud Reports</h2>
+                <p class="calc-desc" style="margin: 0;">Investigate user disputes regarding wrong numbers, closed shops, unavailable rooms, or price discrepancy.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <select id="filterReportStatus" class="form-control" style="font-size: 0.8125rem; width: auto;" onchange="loadReportsTable()">
+                  <option value="all">All Reports</option>
+                  <option value="pending" selected>Pending Review</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Listing Name</th>
+                    <th>Issue Type</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Verification Records & Audit Logs (Phase 4) -->
+        <div class="admin-tab-panel" id="verificationsTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">Active Verification Records</h2>
+                <p class="calc-desc" style="margin: 0;">Verified badges accurately reflect what was checked (phone call, physical visit, student feedback).</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="showNewVerificationModal()">+ Log New Verification</button>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Verified Date</th>
+                    <th>Listing Title</th>
+                    <th>Check Method</th>
+                    <th>Badge Assigned</th>
+                    <th>Reviewer &amp; Notes</th>
+                    <th>Next Review Due</th>
+                  </tr>
+                </thead>
+                <tbody id="verificationsTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="calc-card">
+            <h2 class="calc-title">Moderator Action Audit Trail</h2>
+            <p class="calc-desc">Full immutable log of administrative approvals, rejections, reviews moderation, and status changes.</p>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                    <th>Target Type &amp; ID</th>
+                    <th>Reason / Justification</th>
+                    <th>Moderator</th>
+                  </tr>
+                </thead>
+                <tbody id="moderationLogsTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Manage Businesses -->
+        <div class="admin-tab-panel" id="businessesTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h2 class="calc-title" style="margin: 0;">Local Business Directory Management</h2>
+              <button type="button" class="btn btn-primary btn-sm" id="addNewBusinessBtn">+ Add New Business</button>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Business Name</th>
+                    <th>Category</th>
+                    <th>Distance from Gate</th>
+                    <th>Phone</th>
+                    <th>Verification</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminBusinessesTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 6: Manage Accommodations -->
+        <div class="admin-tab-panel" id="accommodationsTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h2 class="calc-title" style="margin: 0;">Student Housing Listings Management</h2>
+              <button type="button" class="btn btn-primary btn-sm" id="addNewRoomBtn">+ Add Accommodation</button>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Type / Gender</th>
+                    <th>Monthly Rent</th>
+                    <th>Distance</th>
+                    <th>Owner Contact</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminRoomsTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Marketplace Moderation Queue (Phase 5) -->
+        <div class="admin-tab-panel" id="marketplaceTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">Student Marketplace Moderation</h2>
+                <p class="calc-desc" style="margin: 0;">Audit student physical item listings. Verify genuine student pricing and ensure no copyrighted digital materials or exam notes.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <select id="filterMarketplaceAdminStatus" class="form-control" style="font-size: 0.8125rem; width: auto;" onchange="loadAdminMarketplaceTable()">
+                  <option value="all">All Marketplace Listings</option>
+                  <option value="approved">Approved &amp; Live</option>
+                  <option value="pending">Pending Review Only</option>
+                  <option value="rejected">Rejected / Suspended</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Item Title</th>
+                    <th>Category</th>
+                    <th>Price &amp; Condition</th>
+                    <th>Seller &amp; Location</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminMarketplaceTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 7: Manage Notices -->
+        <div class="admin-tab-panel" id="noticesTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h2 class="calc-title" style="margin: 0;">Publish &amp; Archive Notices</h2>
+              <button type="button" class="btn btn-primary btn-sm" id="addNewNoticeBtn">+ Publish Notice</button>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Published Date</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminNoticesTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Location & Map Manager (Phase 6) -->
+        <div class="admin-tab-panel" id="locationTab">
+          <div class="grid-cards-2" style="gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Panel A: College Reference Point Calibration -->
+            <div class="calc-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                  <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">🏛️ College Reference Point Calibration</h2>
+                  <p class="calc-desc" style="margin: 0;">Configure the official GEC Sheikhpura campus entrance coordinates used for all straight-line distance calculations.</p>
+                </div>
+                <span class="status-badge status-verified">Active Origin</span>
+              </div>
+
+              <form id="campusRefForm" onsubmit="handleSaveCampusReference(event)">
+                <div class="form-group">
+                  <label class="form-label" for="refPointName">Reference Landmark Name *</label>
+                  <input type="text" id="refPointName" class="form-control" value="GEC Sheikhpura - Bajidpur Main Gate" required>
+                </div>
+                <div class="grid-cards-2" style="gap: 0.75rem;">
+                  <div class="form-group">
+                    <label class="form-label" for="refPointLat">Latitude (° N) *</label>
+                    <input type="number" step="0.000001" id="refPointLat" class="form-control" value="25.1380" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="refPointLng">Longitude (° E) *</label>
+                    <input type="number" step="0.000001" id="refPointLng" class="form-control" value="85.8640" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="refPointAddress">Campus Entrance Address *</label>
+                  <input type="text" id="refPointAddress" class="form-control" value="Bajidpur, Near Police Line, Sheikhpura, Bihar 811105" required>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Saved to database &amp; synced across map calculations</span>
+                  <button type="submit" class="btn btn-primary btn-sm">Save Calibration</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Panel B: Location Verification Guidance -->
+            <div class="calc-card">
+              <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">🛡️ Coordinate Verification Directives</h2>
+              <p class="calc-desc" style="margin: 0 0 1rem 0;">To uphold Hallmark anti-slop accuracy, follow these strict geographic standards:</p>
+              <ul style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; padding-left: 1.25rem; margin-bottom: 1rem;">
+                <li><strong>Never Fabricate Coordinates:</strong> Never guess a shop's location. If unverified, mark as "unverified" so the system labels it "Distance unavailable".</li>
+                <li><strong>Separate Straight-line vs Road:</strong> Haversine calculations give as-the-crow-flies distance. Do not label it as walking/driving road distance.</li>
+                <li><strong>Public User Privacy:</strong> Public users browse from campus by default. User coordinates are never stored or logged.</li>
+              </ul>
+              <div style="background: var(--bg-muted); padding: 0.85rem; border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-main);">
+                📍 <strong>Verified Landmarks:</strong>
+                Bajidpur Campus Gate (25.1380, 85.8640) • Sheikhpura Station SHK (25.1480, 85.8550) • Thana Chowk (25.1430, 85.8595) • Bus Terminal (25.1440, 85.8610).
+              </div>
+            </div>
+          </div>
+
+          <!-- Coordinate Audit Queue -->
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0;">Unverified / Missing Coordinates Queue</h3>
+                <p class="calc-desc" style="margin: 0;">Listings awaiting latitude/longitude validation before appearing on the interactive map.</p>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Listing Name</th>
+                    <th>Category</th>
+                    <th>Reported Address</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="unverifiedCoordsTableBody">
+                  <!-- Populated via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Community, Events & Clubs Moderation (Phase 7) -->
+        <div class="admin-tab-panel" id="communityTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">🎪 Campus Life &amp; Events Moderation Queue</h2>
+                <p class="calc-desc" style="margin: 0;">Review student-proposed college events, club suggestions, sports activities, and announcements before public listing.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadCommunityModerationTables()">🔄 Refresh Queue</button>
+              </div>
+            </div>
+
+            <div class="filter-pills" style="margin-bottom: 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-sm btn-outline active" id="commFilterEventsBtn" onclick="filterCommunityAdminTab('events')">Events Queue</button>
+              <button class="btn btn-sm btn-outline" id="commFilterClubsBtn" onclick="filterCommunityAdminTab('clubs')">Club Proposals</button>
+              <button class="btn btn-sm btn-outline" id="commFilterAnnounceBtn" onclick="filterCommunityAdminTab('announcements')">Announcements</button>
+            </div>
+
+            <!-- Table A: Events Queue -->
+            <div id="commEventsSection">
+              <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--color-primary-800);">📅 Proposed &amp; Pending Events</h3>
+              <div class="table-responsive">
+                <table class="hub-table">
+                  <thead>
+                    <tr>
+                      <th>Event Title</th>
+                      <th>Category</th>
+                      <th>Date &amp; Time (IST)</th>
+                      <th>Venue</th>
+                      <th>Organizer &amp; Capacity</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminEventsTableBody">
+                    <!-- Populated via admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Table B: Club Proposals -->
+            <div id="commClubsSection" style="display: none; margin-top: 1rem;">
+              <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--color-primary-800);">🤝 Proposed Student Clubs &amp; Societies</h3>
+              <div class="table-responsive">
+                <table class="hub-table">
+                  <thead>
+                    <tr>
+                      <th>Club Name</th>
+                      <th>Category</th>
+                      <th>Focus Activities</th>
+                      <th>Schedule / Location</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminClubsTableBody">
+                    <!-- Populated via admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Table C: Announcements Queue -->
+            <div id="commAnnouncementsSection" style="display: none; margin-top: 1rem;">
+              <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--color-primary-800);">📢 Community Announcements &amp; Notices</h3>
+              <div class="table-responsive">
+                <table class="hub-table">
+                  <thead>
+                    <tr>
+                      <th>Title &amp; Notice</th>
+                      <th>Category</th>
+                      <th>Published / Expires</th>
+                      <th>Submitter ID</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminAnnouncementsTableBody">
+                    <!-- Populated via admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Privacy-Conscious Platform Analytics (Phase 8) -->
+        <div class="admin-tab-panel" id="analyticsTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">📊 Privacy-Conscious Platform Analytics</h2>
+                <p class="calc-desc" style="margin: 0;">
+                  Live aggregate metrics derived directly from the application database. No intrusive third-party cookies or raw IP tracking.
+                </p>
+                <div style="font-size: 0.78rem; color: var(--text-subtle); margin-top: 0.35rem;">
+                  🕒 Date Range: <span id="anDateRangeLabel">All-time to present</span> • Generated: <span id="anTimestampLabel">Just now</span>
+                </div>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminAnalyticsDashboard()">
+                🔄 Refresh Analytics
+              </button>
+            </div>
+
+            <!-- Top Summary Metrics Grid -->
+            <div class="analytics-grid-4">
+              <div class="analytics-card" style="border-left: 4px solid var(--color-primary-600);">
+                <span class="section-eyebrow" style="color: var(--color-primary-600);">Total Published Directory</span>
+                <div class="analytics-metric-num" id="anTotalDirectory">--</div>
+                <div style="font-size: 0.775rem; color: var(--text-muted);">
+                  <span id="anBusinessesCount">0</span> Local Shops • <span id="anAccommodationsCount">0</span> Student Rooms/PG
+                </div>
+              </div>
+
+              <div class="analytics-card" style="border-left: 4px solid #10b981;">
+                <span class="section-eyebrow" style="color: #10b981;">Marketplace Volume</span>
+                <div class="analytics-metric-num" id="anMarketplaceTotal">--</div>
+                <div style="font-size: 0.775rem; color: var(--text-muted);">
+                  <span id="anMktAvailable">0</span> Available • <span id="anMktSold">0</span> Re-homed/Sold
+                </div>
+              </div>
+
+              <div class="analytics-card" style="border-left: 4px solid #f59e0b;">
+                <span class="section-eyebrow" style="color: #f59e0b;">Campus Life &amp; Events</span>
+                <div class="analytics-metric-num" id="anEventsTotal">--</div>
+                <div style="font-size: 0.775rem; color: var(--text-muted);">
+                  <span id="anEventsUpcoming">0</span> Upcoming • <span id="anClubsActive">0</span> Active Clubs
+                </div>
+              </div>
+
+              <div class="analytics-card" style="border-left: 4px solid var(--color-danger);">
+                <span class="section-eyebrow" style="color: var(--color-danger);">Moderation Queue</span>
+                <div class="analytics-metric-num" id="anPendingModerationTotal">--</div>
+                <div style="font-size: 0.775rem; color: var(--text-muted);">
+                  <span id="anPendingSubs">0</span> Submissions • <span id="anPendingReports">0</span> Reports
+                </div>
+              </div>
+            </div>
+
+            <!-- Category & Distribution Breakdowns -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+              <!-- Left: Local Shops Breakdown -->
+              <div class="hub-card" style="padding: 1.25rem; border: 1px solid var(--border-light); background: var(--bg-surface); border-radius: var(--radius-sm);">
+                <h4 style="font-size: 0.95rem; margin: 0 0 1rem 0; color: var(--text-main); font-weight: 700;">
+                  🏪 Local Directory by Category
+                </h4>
+                <div id="anBusinessCategoryBars">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Right: Accommodations & Marketplace Breakdown -->
+              <div class="hub-card" style="padding: 1.25rem; border: 1px solid var(--border-light); background: var(--bg-surface); border-radius: var(--radius-sm);">
+                <h4 style="font-size: 0.95rem; margin: 0 0 1rem 0; color: var(--text-main); font-weight: 700;">
+                  🏠 Student Living &amp; Marketplace Health
+                </h4>
+                <div id="anLivingMarketplaceBars">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Moderation Velocity & Quality Metrics -->
+            <div class="hub-card" style="padding: 1.25rem; border: 1px solid var(--border-light); background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+              <h4 style="font-size: 0.95rem; margin: 0 0 1rem 0; color: var(--text-main); font-weight: 700;">
+                🛡️ Moderation Velocity &amp; Action Distribution
+              </h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div style="background: var(--bg-muted); padding: 0.75rem 1rem; border-radius: var(--radius-xs);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Total Moderation Actions</div>
+                  <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);" id="anTotalActions">--</div>
+                </div>
+                <div style="background: var(--bg-muted); padding: 0.75rem 1rem; border-radius: var(--radius-xs);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">In-App Notifications Sent</div>
+                  <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);" id="anNotifsTracked">--</div>
+                </div>
+                <div style="background: var(--bg-muted); padding: 0.75rem 1rem; border-radius: var(--radius-xs);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Notification Read Rate</div>
+                  <div style="font-size: 1.35rem; font-weight: 800; color: #10b981;" id="anNotifReadRate">--%</div>
+                </div>
+              </div>
+              <div id="anModerationActionsBreakdown" style="font-size: 0.8125rem; color: var(--text-muted);">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Honest Privacy & Platform Status Card -->
+            <div style="padding: 1rem 1.25rem; background: var(--bg-muted); border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+              <strong style="color: var(--text-main); display: block; margin-bottom: 0.25rem;">🔒 Privacy-First Data Collection Statement</strong>
+              GEC Sheikhpura Student Life Hub strictly adheres to privacy safeguards: No IP addresses, precise user geolocation histories, or device fingerprints are logged. Academic resources are solely hosted on <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary-700); font-weight: 600;">Apna College Bihar</a>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Operational Tools & System Health (Phase 8) -->
+        <div class="admin-tab-panel" id="operationalTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">⚙️ Operational Status &amp; Diagnostics</h2>
+                <p class="calc-desc" style="margin: 0;">
+                  Live infrastructure status, database health, sanitized error logs, and backup verification.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary btn-sm" id="btnRunMaintenance" onclick="triggerSafeAutomations()" style="background: var(--color-primary-600); border-color: var(--color-primary-600);">
+                  ▶️ Run Platform Maintenance Routine
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="exportDatabaseSnapshot()">
+                  💾 Export JSON Snapshot
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminOperationalTools()">
+                  🔄 Refresh Status
+                </button>
+              </div>
+            </div>
+
+            <!-- Health Matrix Cards -->
+            <div class="analytics-grid-4">
+              <div class="analytics-card">
+                <span class="section-eyebrow">Database Connection</span>
+                <div style="font-size: 1.15rem; font-weight: 700; margin: 0.35rem 0;" id="opDbStatusLabel">Checking...</div>
+                <span id="opDbModeBadge" class="status-badge status-sample">Detecting</span>
+              </div>
+
+              <div class="analytics-card">
+                <span class="section-eyebrow">Database Schema</span>
+                <div style="font-size: 1.15rem; font-weight: 700; margin: 0.35rem 0;">Phase 8 Ready</div>
+                <span class="status-badge status-verified">Indexes &amp; RLS Verified</span>
+              </div>
+
+              <div class="analytics-card">
+                <span class="section-eyebrow">Disaster Recovery</span>
+                <div style="font-size: 1.15rem; font-weight: 700; margin: 0.35rem 0;">BACKUP_RECOVERY.md</div>
+                <span class="status-badge status-verified">Recovery Guide Active</span>
+              </div>
+
+              <div class="analytics-card">
+                <span class="section-eyebrow">PWA Service Worker</span>
+                <div style="font-size: 1.15rem; font-weight: 700; margin: 0.35rem 0;">gec-hub-cache-v3</div>
+                <span class="status-badge status-verified">Offline Cache Active</span>
+              </div>
+            </div>
+
+            <!-- Queue Depths -->
+            <div class="hub-card" style="padding: 1.25rem; border: 1px solid var(--border-light); background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+              <h4 style="font-size: 0.95rem; margin: 0 0 1rem 0; color: var(--text-main); font-weight: 700;">
+                📬 Active Queue Depths Across All Services
+              </h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+                <div style="padding: 0.75rem; border: 1px solid var(--border-light); border-radius: var(--radius-xs); background: var(--bg-muted);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Owner Submissions</div>
+                  <div style="font-size: 1.3rem; font-weight: 800; color: var(--color-primary-600);" id="opQueueSubs">0</div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid var(--border-light); border-radius: var(--radius-xs); background: var(--bg-muted);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Student Reviews</div>
+                  <div style="font-size: 1.3rem; font-weight: 800; color: #f59e0b;" id="opQueueReviews">0</div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid var(--border-light); border-radius: var(--radius-xs); background: var(--bg-muted);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Dispute Reports</div>
+                  <div style="font-size: 1.3rem; font-weight: 800; color: var(--color-danger);" id="opQueueReports">0</div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid var(--border-light); border-radius: var(--radius-xs); background: var(--bg-muted);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Marketplace Flagged</div>
+                  <div style="font-size: 1.3rem; font-weight: 800; color: #8b5cf6;" id="opQueueMkt">0</div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid var(--border-light); border-radius: var(--radius-xs); background: var(--bg-muted);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Club Proposals</div>
+                  <div style="font-size: 1.3rem; font-weight: 800; color: #10b981;" id="opQueueClubs">0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Safe Automation & Listing Freshness (Phase 10) -->
+            <div class="hub-card" style="padding: 1.25rem; border: 1px solid var(--border-light); background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h4 style="font-size: 0.95rem; margin: 0 0 0.15rem 0; color: var(--text-main); font-weight: 700;">
+                    🤖 Safe Idempotent Platform Automation &amp; Directory Freshness
+                  </h4>
+                  <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">
+                    Automated low-risk routines: auto-expire past notices/announcements, mark concluded events, and flag stale rooms (&gt;45d) and businesses (&gt;90d) for review without destructive unverified deletions.
+                  </p>
+                </div>
+              </div>
+              <div id="automationSummaryBox" style="font-size: 0.8125rem; color: var(--text-muted); background: var(--bg-muted); padding: 0.75rem 1rem; border-radius: var(--radius-xs); line-height: 1.6;">
+                Status: Ready to execute on demand. Click "▶️ Run Platform Maintenance Routine" above to trigger an audit and cleanup cycle.
+              </div>
+            </div>
+
+            <!-- Runtime Feature Flags Controller (Phase 10) -->
+            <div class="hub-card" style="padding: 1.25rem; border: 1px solid var(--border-light); background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+              <h4 style="font-size: 0.95rem; margin: 0 0 0.25rem 0; color: var(--text-main); font-weight: 700;">
+                🚩 Platform Feature Flags (Runtime Toggles)
+              </h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0 0 1rem 0;">
+                Control rollouts and experimental modules safely without code redeployments.
+              </p>
+              <div id="adminFeatureFlagsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Centralized Sanitized Error & Activity Logs -->
+            <div class="hub-card" style="padding: 1.25rem; border: 1px solid var(--border-light); background: var(--bg-surface); border-radius: var(--radius-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h4 style="font-size: 0.95rem; margin: 0 0 0.15rem 0; color: var(--text-main); font-weight: 700;">
+                    📋 Sanitized Operational Event Logs
+                  </h4>
+                  <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">
+                    Ring-buffered diagnostic events. All tokens, passwords, and phone numbers are strictly redacted.
+                  </p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <select id="filterLogLevel" class="form-control" style="font-size: 0.75rem; width: auto; padding: 0.2rem 0.5rem;" onchange="renderOperationalLogs()">
+                    <option value="ALL">All Levels</option>
+                    <option value="INFO">INFO Only</option>
+                    <option value="WARN">WARN Only</option>
+                    <option value="ERROR">ERROR Only</option>
+                  </select>
+                  <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="clearOperationalLogs()">
+                    Clear Logs
+                  </button>
+                </div>
+              </div>
+
+              <div class="operational-log-box" id="operationalLogBox">
+                <!-- Dynamically populated from Logger -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Student Feedback & Corrections (Phase 9) -->
+        <div class="admin-tab-panel" id="feedbackTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">💬 Student Feedback &amp; Suggestions Desk</h2>
+                <p class="calc-desc" style="margin: 0;">Review student suggestions for missing services, incorrect details, outdated room availability, or accessibility reports.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <select id="feedbackCategoryFilter" class="form-control" style="font-size: 0.8125rem; width: auto; height: 36px;" onchange="loadAdminStudentFeedback()">
+                  <option value="all">All Categories</option>
+                  <option value="missing_service">Missing Local Service</option>
+                  <option value="incorrect_details">Incorrect Listing Details</option>
+                  <option value="room_availability">Outdated Room Vacancy</option>
+                  <option value="map_location">Incorrect Map Location</option>
+                  <option value="marketplace_issue">Marketplace Issue</option>
+                  <option value="event_info">Event Information</option>
+                  <option value="accessibility">Accessibility &amp; Usability</option>
+                  <option value="bug_broken">Bug / Broken Page</option>
+                  <option value="feature_suggestion">Feature Suggestion</option>
+                </select>
+                <select id="feedbackStatusFilter" class="form-control" style="font-size: 0.8125rem; width: auto; height: 36px;" onchange="loadAdminStudentFeedback()">
+                  <option value="all">All Statuses</option>
+                  <option value="pending" selected>Pending Review</option>
+                  <option value="reviewing">Reviewing</option>
+                  <option value="planned">Planned</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed / Resolved</option>
+                  <option value="declined">Declined</option>
+                </select>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminStudentFeedback()">🔄 Refresh</button>
+              </div>
+            </div>
+
+            <!-- Feedback Queue Container -->
+            <div id="adminFeedbackListContainer">
+              <p style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading student feedback queue...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Quality & Duplicate Detection (Phase 10) -->
+        <div class="admin-tab-panel" id="duplicatesTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">🔍 Duplicate &amp; Data-Quality Inspector</h2>
+                <p class="calc-desc" style="margin: 0;">Automated similarity analysis matching normalized names, phone numbers, and categories. Review potential duplicate submissions and resolve safely without destructive loss.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminDuplicatesTable()">🔄 Rescan Directory</button>
+              </div>
+            </div>
+
+            <!-- Duplicates Container -->
+            <div id="adminDuplicatesContainer">
+              <p style="text-align: center; color: var(--text-muted); padding: 2rem;">Scanning for duplicate listings...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Official Portal Vault (51 Links across 8 Tabs) -->
+        <div class="admin-tab-panel" id="officialPortalTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">🏛️ Official GEC Sheikhpura Portal Header Vault</h2>
+                <p class="calc-desc" style="margin: 0;">Manage, update, and audit all 51 authentic portal links extracted directly from gecsheikhpura.ac.in across all 8 tabs.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary btn-sm" onclick="openAddOfficialLinkModal()">+ Add Portal Link</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadOfficialPortalVault()">🔄 Refresh Vault</button>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;" id="adminVaultTabPills">
+              <!-- Filter pills for tabs -->
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Official Header Tab</th>
+                    <th>Link Title / Label</th>
+                    <th>Destination URL</th>
+                    <th>Live Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminOfficialVaultTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Campus Emergency Broadcast & Banner Alert -->
+        <div class="admin-tab-panel" id="broadcastTab" style="display: none;">
+          <div class="calc-card" style="margin-bottom: 1.5rem;">
+            <h2 class="calc-title" style="margin: 0 0 0.25rem 0;">🚨 Live Campus Broadcast &amp; Alert Banner Controller</h2>
+            <p class="calc-desc" style="margin: 0 0 1.25rem 0;">Publish high-priority announcement banners across the top of all public pages (Home, Notices, College Info).</p>
+
+            <form id="campusBroadcastForm" onsubmit="handleSaveBroadcastAlert(event)">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding: 0.75rem 1rem; background: var(--bg-muted); border-radius: var(--radius-sm);">
+                <input type="checkbox" id="broadcastActive" style="width: 20px; height: 20px; cursor: pointer;">
+                <label for="broadcastActive" style="font-weight: 700; cursor: pointer; color: var(--text-main);">
+                  Enable Live Campus Broadcast Banner (Active on Public Hub)
+                </label>
+              </div>
+
+              <div class="grid-cards-2" style="gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="broadcastLevel">Alert Priority Level *</label>
+                  <select id="broadcastLevel" class="form-control" required>
+                    <option value="info">🔵 Information (Normal Blue)</option>
+                    <option value="warning" selected>🟡 Advisory / Important (Warm Amber)</option>
+                    <option value="danger">🔴 Urgent / Emergency (High-Contrast Red)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="broadcastLinkLabel">Action Button Text</label>
+                  <input type="text" id="broadcastLinkLabel" class="form-control" placeholder="e.g. View Circular → or Learn More">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="broadcastMessage">Banner Announcement Message *</label>
+                <textarea id="broadcastMessage" class="form-control" rows="3" placeholder="e.g. 📢 BEU Semester Examinations: Examination form submission portal is now open. Verify dues at academic section." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="broadcastLinkUrl">Target Link URL</label>
+                <input type="text" id="broadcastLinkUrl" class="form-control" placeholder="e.g. notices.html or https://beu-bih.ac.in/">
+              </div>
+
+              <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+                <button type="submit" class="btn btn-primary btn-sm">Save &amp; Update Live Banner</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="previewBroadcastBanner()">Preview Banner</button>
+              </div>
+            </form>
+
+            <div id="broadcastPreviewContainer" style="margin-top: 1.5rem; display: none;">
+              <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 0.5rem;">Live Appearance Preview:</h4>
+              <div id="broadcastPreviewBox"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Emergency & Transport Directory Manager -->
+        <div class="admin-tab-panel" id="emergencyTransportTab" style="display: none;">
+          <div class="grid-cards-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+            <!-- Panel 1: Emergency & Medical Directory -->
+            <div class="calc-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h3 class="calc-title" style="margin: 0;">🚑 Medical &amp; Emergency Directory</h3>
+                  <p class="calc-desc" style="margin: 0;">Verified emergency helplines, Sadar hospital, and local pharmacies.</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openAddEmergencyModal()">+ Add Contact</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="hub-table">
+                  <thead>
+                    <tr>
+                      <th>Service Name</th>
+                      <th>Number</th>
+                      <th>Availability</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminEmergencyTableBody">
+                    <!-- Injected via admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Panel 2: Transport & Timetables -->
+            <div class="calc-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h3 class="calc-title" style="margin: 0;">🚌 Train &amp; Bus Transit Timetable</h3>
+                  <p class="calc-desc" style="margin: 0;">Sheikhpura station trains and local Bajidpur auto/bus schedules.</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openAddTransportModal()">+ Add Transit Route</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="hub-table">
+                  <thead>
+                    <tr>
+                      <th>Route / Destination</th>
+                      <th>Mode &amp; Service</th>
+                      <th>Timings / Frequencies</th>
+                      <th>Fare</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminTransportTableBody">
+                    <!-- Injected via admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 3: 🛺 Verified Campus Auto & Toto Drivers Manager (Full Super Admin CRUD) -->
+          <div class="calc-card" style="margin-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                  <span>🛺 Verified Campus Auto &amp; E-Rickshaw (Toto) Drivers</span>
+                  <span class="badge" style="background: #10b981; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px;">ACTIVE DIRECTORY</span>
+                </h3>
+                <p class="calc-desc" style="margin: 0;">Add, update, or remove verified drivers, phone numbers, stands, and routes visible on transport.html.</p>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openAddAutoDriverModal()">+ Add Auto Driver</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Driver Name</th>
+                    <th>Vehicle</th>
+                    <th>Phone / WhatsApp</th>
+                    <th>Stand Location</th>
+                    <th>Route</th>
+                    <th>Timings / Specialty</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminAutoDriverTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Lost & Found Moderation (Phase 11) -->
+        <div class="admin-tab-panel" id="lostFoundTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0;">🎒 Lost &amp; Found Moderation Desk</h3>
+                <p class="calc-desc" style="margin: 0;">Review student reports, monitor flags, investigate dispute claims, and archive returned belongings.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <select id="adminLfStatusFilter" class="form-control" style="width: auto; font-size: 0.8125rem;" onchange="loadAdminLostFoundTable()">
+                  <option value="all">All Statuses</option>
+                  <option value="lost">Lost</option>
+                  <option value="found">Found</option>
+                  <option value="claim_pending">Claims Pending</option>
+                  <option value="returned">Returned</option>
+                  <option value="archived">Archived</option>
+                </select>
+                <a href="lost-found.html" target="_blank" class="btn btn-secondary btn-sm">Open Public Desk ↗</a>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Type &amp; Title</th>
+                    <th>Category</th>
+                    <th>Date &amp; Location</th>
+                    <th>Reporter Info (Private)</th>
+                    <th>Status</th>
+                    <th>Flags</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminLostFoundTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Faculty Directory Manager (Phase 11) -->
+        <div class="admin-tab-panel" id="facultyManagerTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0;">👨‍🏫 Verified Faculty Directory Manager</h3>
+                <p class="calc-desc" style="margin: 0;">Official faculty room allocations, designations, and verified office visiting hours.</p>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openAddFacultyModal()">+ Add Faculty Member</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Faculty Name &amp; Designation</th>
+                    <th>Department</th>
+                    <th>Room Number</th>
+                    <th>Building &amp; Floor</th>
+                    <th>Official Office Hours</th>
+                    <th>Public Contact</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminFacultyTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Campus Facilities Manager (Phase 11) -->
+        <div class="admin-tab-panel" id="facilityManagerTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0;">🏛️ Campus Rooms &amp; Facilities Manager</h3>
+                <p class="calc-desc" style="margin: 0;">Manage academic classrooms, laboratories, workshop wings, and student amenities at the Bajidpur campus.</p>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openAddFacilityModal()">+ Add Campus Facility</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Facility Name</th>
+                    <th>Category</th>
+                    <th>Room / Identification</th>
+                    <th>Building &amp; Floor</th>
+                    <th>Map Coordinates</th>
+                    <th>Visiting Hours</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminFacilityTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Student Directory Corrections Queue (Phase 11) -->
+        <div class="admin-tab-panel" id="correctionsTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0;">✏️ Student Directory Corrections Queue</h3>
+                <p class="calc-desc" style="margin: 0;">Audit crowd-sourced updates for faculty room reassignments and new campus facilities. Approving an item automatically updates the live directory.</p>
+              </div>
+              <select id="adminCorrectionStatusFilter" class="form-control" style="width: auto; font-size: 0.8125rem;" onchange="loadAdminCorrectionsTable()">
+                <option value="all">All Submissions</option>
+                <option value="pending" selected>Pending Review Only</option>
+                <option value="approved">Approved &amp; Applied</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Type &amp; Target Record</th>
+                    <th>Proposed Updates</th>
+                    <th>Student Submitter</th>
+                    <th>Reason / Audit Notes</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminCorrectionsTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Phase 12 Official Website Crawler & Source-Synced Vault -->
+        <!-- Tab: Academic Partner & Deep-Link Hub (Apna College Bihar) -->
+        <div class="admin-tab-panel" id="academicPartnerTab" style="display: none;">
+          <div class="calc-card">
+            <!-- Header with Partner Badge & Quick Actions -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">Verified Academic Partner</span>
+                  <h3 class="calc-title" style="margin: 0;">🎓 Apna College Bihar Academic Integration Hub</h3>
+                </div>
+                <p class="calc-desc" style="margin: 0; max-width: 820px;">
+                  Audit, inspect, and verify 42+ direct routes linking GEC Sheikhpura students to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 600;">Apna College Bihar ↗</a> for BEU Syllabus, semester PYQs, CGPA calculators, attendance trackers, study notes, mentorship, and admissions.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary btn-sm" id="btnTestPartnerEndpoints" onclick="testPartnerEndpointsHandler()">
+                  ⚡ Ping All 42 Partner Endpoints
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="exportPartnerMatrixHandler('json')">
+                  📥 Export Deep-Link Matrix (JSON)
+                </button>
+                <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" style="color: var(--color-accent);">
+                  Live Partner Portal ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Partner Hub Metrics Cards -->
+            <div class="grid-cards-4" style="gap: 1rem; margin-bottom: 1.5rem;">
+              <div class="hub-card" style="padding: 1rem; border-left: 4px solid var(--color-accent); background: var(--surface-1);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Partner Routes</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-color);" id="adminPartnerRoutesCount">42</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Across 5 academic categories</div>
+              </div>
+              <div class="hub-card" style="padding: 1rem; border-left: 4px solid #10b981; background: var(--surface-1);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Gateway Health</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #10b981;" id="adminPartnerHealthStatus">200 OK</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Production HTTPS secure link</div>
+              </div>
+              <div class="hub-card" style="padding: 1rem; border-left: 4px solid #8b5cf6; background: var(--surface-1);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Total In-Hub Citations</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #8b5cf6;" id="adminPartnerCitationsCount">195</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">In tools, admissions, academics</div>
+              </div>
+              <div class="hub-card" style="padding: 1rem; border-left: 4px solid #f59e0b; background: var(--surface-1);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Academic Separation</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #f59e0b;">Strict Enforced</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Zero local syllabus duplication</div>
+              </div>
+            </div>
+
+            <!-- Global Callout Banner Configuration -->
+            <div style="background: var(--surface-2); padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+              <h4 style="margin: 0 0 0.5rem 0; font-size: 0.95rem;">📢 Global Academic Callout Banner Controls</h4>
+              <p style="margin: 0 0 1rem 0; font-size: 0.8125rem; color: var(--text-muted);">Configure the Apna College Bihar helper banner shown to students across dashboard, admissions, and student tools pages.</p>
+              <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 600;">
+                  <input type="checkbox" id="chkPartnerBannerActive" checked onchange="togglePartnerBannerHandler(this.checked)">
+                  Show Partner Banner on Public Hub
+                </label>
+                <div style="flex: 1; min-width: 250px;">
+                  <input type="text" id="txtPartnerBannerAnnouncement" class="form-control" style="font-size: 0.8125rem;" value="Notes, syllabus, PYQs, mentorship, study groups aur complete academic preparation ke liye Apna College Bihar visit karein." placeholder="Banner message...">
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="savePartnerBannerSettings()">Save Banner Config</button>
+              </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; background: var(--surface-2); padding: 0.75rem; border-radius: 8px;">
+              <div style="flex: 1; min-width: 200px;">
+                <input type="text" id="searchPartnerRoutes" class="form-control" placeholder="Search by route, tool name, or module..." oninput="filterPartnerRoutesTable()">
+              </div>
+              <div style="min-width: 180px;">
+                <select id="filterPartnerCategory" class="form-control" onchange="filterPartnerRoutesTable()">
+                  <option value="all">All Modules (42)</option>
+                  <option value="academics">Academics &amp; Study Notes</option>
+                  <option value="calculators">Calculators &amp; Student Tools</option>
+                  <option value="admissions">Admissions &amp; Cutoffs</option>
+                  <option value="community">Community &amp; Mentorship</option>
+                  <option value="career">Career, Jobs &amp; GATE</option>
+                  <option value="regulations">University Rules &amp; DRCC</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Deep-Link Matrix Table -->
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Module / Tool Name</th>
+                    <th>Apna College Bihar Route</th>
+                    <th>Category</th>
+                    <th>Linked In Hub</th>
+                    <th>Gateway Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="partnerRoutesTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Student Living-Expense Benchmarks Manager -->
+        <div class="admin-tab-panel" id="expenseBenchmarksTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge badge-primary" style="background: rgba(59, 130, 246, 0.15); color: var(--color-accent); font-weight: 700;">Living Cost Standards</span>
+                  <h3 class="calc-title" style="margin: 0;">💰 Sheikhpura Student Living-Expense Benchmarks</h3>
+                </div>
+                <p class="calc-desc" style="margin: 0; max-width: 820px;">
+                  Define and update benchmark monthly costs for student life in Bajidpur / Sheikhpura. These benchmarks set initial defaults for the Student Budget Calculator and guide new 1st-year students and parents on anticipated monthly expenses.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="resetExpenseBenchmarksToDefaults()">
+                  ↺ Reset Defaults
+                </button>
+                <a href="student-tools.html#expense" target="_blank" class="btn btn-ghost btn-sm" style="color: var(--color-accent);">
+                  Public Calculator ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Form: Config Benchmarks -->
+            <form id="expenseBenchmarksForm" onsubmit="handleSaveExpenseBenchmarks(event)">
+              <div class="grid-cards-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                <!-- Left: Cost Parameters -->
+                <div>
+                  <h4 style="font-size: 0.95rem; margin-top: 0; margin-bottom: 0.75rem; color: var(--text-color);">Monthly Baseline Rates (₹ INR)</h4>
+                  <div class="form-group">
+                    <label class="form-label" for="benchRentSingle">Average Room Rent (Single Room / PG, ₹/month) *</label>
+                    <input type="number" id="benchRentSingle" class="form-control" value="2500" min="500" step="100" required oninput="recalcBenchmarkSummary()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="benchRentShared">Average Room Rent (Double Sharing, ₹/month) *</label>
+                    <input type="number" id="benchRentShared" class="form-control" value="1600" min="500" step="100" required oninput="recalcBenchmarkSummary()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="benchMess">Student Mess &amp; Tiffin Service (2 Meals/Day, ₹/month) *</label>
+                    <input type="number" id="benchMess" class="form-control" value="2400" min="500" step="100" required oninput="recalcBenchmarkSummary()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="benchRecharge">Electricity Sub-meter &amp; Mobile/Wi-Fi Recharge (₹/month) *</label>
+                    <input type="number" id="benchRecharge" class="form-control" value="450" min="100" step="50" required oninput="recalcBenchmarkSummary()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="benchStationery">Xerox, Printout &amp; Academic Stationery (₹/month) *</label>
+                    <input type="number" id="benchStationery" class="form-control" value="300" min="50" step="50" required oninput="recalcBenchmarkSummary()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="benchTravel">Local E-Rickshaw / Auto Transit (Bajidpur-Town, ₹/month) *</label>
+                    <input type="number" id="benchTravel" class="form-control" value="350" min="50" step="50" required oninput="recalcBenchmarkSummary()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="benchPersonal">Laundry, Grooming &amp; Daily Sundries (₹/month) *</label>
+                    <input type="number" id="benchPersonal" class="form-control" value="400" min="50" step="50" required oninput="recalcBenchmarkSummary()">
+                  </div>
+                </div>
+
+                <!-- Right: Computed Summaries & Audit Note -->
+                <div style="display: flex; flex-direction: column; justify-content: space-between;">
+                  <div>
+                    <h4 style="font-size: 0.95rem; margin-top: 0; margin-bottom: 0.75rem; color: var(--text-color);">Projected Campus Expenditure</h4>
+                    
+                    <div style="background: var(--surface-1); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;">
+                      <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Single Room Day-Scholar Estimate</div>
+                      <div style="font-size: 2.2rem; font-weight: 800; color: var(--color-accent); line-height: 1.1; margin: 0.35rem 0;" id="benchTotalSingleMonthly">₹6,400 / mo</div>
+                      <div style="font-size: 0.8125rem; color: var(--text-muted);">Annual: <strong id="benchTotalSingleAnnual">₹76,800 / year</strong></div>
+                    </div>
+
+                    <div style="background: var(--surface-1); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;">
+                      <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Shared Room Economical Estimate</div>
+                      <div style="font-size: 2.2rem; font-weight: 800; color: #10b981; line-height: 1.1; margin: 0.35rem 0;" id="benchTotalSharedMonthly">₹5,500 / mo</div>
+                      <div style="font-size: 0.8125rem; color: var(--text-muted);">Annual: <strong id="benchTotalSharedAnnual">₹66,000 / year</strong></div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label" for="benchAuditRemarks">Benchmark Revision Note (Reason for change) *</label>
+                      <textarea id="benchAuditRemarks" class="form-control" rows="3" placeholder="e.g. Adjusted average rent to reflect new Bajidpur 2026 student constructions and e-rickshaw fare revision." required></textarea>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Publish New Benchmarks</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <!-- Benchmark Revision History Table -->
+            <h4 style="font-size: 1rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">📜 Living Cost Benchmarking Audit History</h4>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Revision Date</th>
+                    <th>Single Est.</th>
+                    <th>Shared Est.</th>
+                    <th>Mess Baseline</th>
+                    <th>Authorized By</th>
+                    <th>Audit Remarks</th>
+                  </tr>
+                </thead>
+                <tbody id="benchmarksAuditHistoryTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Food, Mess & Dining Services Manager -->
+        <div class="admin-tab-panel" id="foodMessTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">Hostel &amp; Off-Campus Dining</span>
+                  <h3 class="calc-title" style="margin: 0;">🍱 Student Mess, Tiffin &amp; Dining Services Manager</h3>
+                </div>
+                <p class="calc-desc" style="margin: 0; max-width: 820px;">
+                  Manage verified student mess providers, tiffin delivery services, campus canteens, and Bajidpur dining spots. Maintain accurate monthly rates, daily trial costs, delivery coverage, and phone numbers.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary btn-sm" onclick="openFoodMessModal()">
+                  + Add New Mess / Tiffin Service
+                </button>
+                <a href="food-tiffin.html" target="_blank" class="btn btn-ghost btn-sm" style="color: var(--color-accent);">
+                  Public Dining Page ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; background: var(--surface-2); padding: 0.75rem; border-radius: 8px;">
+              <div style="flex: 1; min-width: 220px;">
+                <input type="text" id="searchFoodMessAdmin" class="form-control" placeholder="Search by name, address, or phone..." oninput="filterFoodMessTable()">
+              </div>
+              <div style="min-width: 180px;">
+                <select id="filterFoodMessType" class="form-control" onchange="filterFoodMessTable()">
+                  <option value="all">All Service Types</option>
+                  <option value="tiffin">Tiffin Delivery</option>
+                  <option value="mess">Sit-in Student Mess</option>
+                  <option value="canteen">Campus Canteen / Stalls</option>
+                </select>
+              </div>
+              <div style="min-width: 160px;">
+                <select id="filterFoodMessVerified" class="form-control" onchange="filterFoodMessTable()">
+                  <option value="all">All Status</option>
+                  <option value="verified">Verified Only</option>
+                  <option value="unverified">Unverified / Pending</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Table of Food Services -->
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Service Name &amp; Address</th>
+                    <th>Type &amp; Diet</th>
+                    <th>Monthly Plan (₹)</th>
+                    <th>Per Meal / Trial</th>
+                    <th>Campus Delivery</th>
+                    <th>Owner Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="foodMessTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Phase: Add / Edit Food & Mess Service Modal -->
+  <div class="modal-overlay" id="foodMessModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="foodMessModalTitle">Add Mess / Tiffin Service</h3>
+        <button type="button" class="modal-close-btn" onclick="closeFoodMessModal()">✕</button>
+      </div>
+      <form id="foodMessForm" onsubmit="handleFoodMessSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="foodMessEditId">
+          <div class="form-group">
+            <label class="form-label" for="foodMessName">Provider / Mess Name *</label>
+            <input type="text" id="foodMessName" class="form-control" placeholder="e.g. Maa Annapurna Student Mess" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="foodMessType">Service Type *</label>
+              <select id="foodMessType" class="form-control" required>
+                <option value="Tiffin Delivery">Tiffin Delivery to Hostel</option>
+                <option value="Sit-in Mess">Sit-in Student Mess</option>
+                <option value="Campus Canteen">Campus Canteen / Stall</option>
+                <option value="Dhaba / Restaurant">Local Dhaba / Eatery</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="foodMessDiet">Diet Specialization *</label>
+              <select id="foodMessDiet" class="form-control" required>
+                <option value="Veg & Egg Option">Veg &amp; Egg Option</option>
+                <option value="Pure Veg">Pure Veg Only</option>
+                <option value="Veg & Non-Veg">Veg &amp; Non-Veg</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="foodMessMonthlyPrice">Monthly Rate (₹) *</label>
+              <input type="number" id="foodMessMonthlyPrice" class="form-control" placeholder="2400" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="foodMessSingleMealPrice">Single Meal / Trial Price (₹)</label>
+              <input type="number" id="foodMessSingleMealPrice" class="form-control" placeholder="50" value="50">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="foodMessAddress">Address / Location *</label>
+            <input type="text" id="foodMessAddress" class="form-control" placeholder="e.g. Bajidpur Mor, Sheikhpura" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="foodMessPhone">Contact Phone *</label>
+              <input type="text" id="foodMessPhone" class="form-control" placeholder="+91-94302XXXXX" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="foodMessHours">Operating Hours</label>
+              <input type="text" id="foodMessHours" class="form-control" placeholder="e.g. Lunch: 12-2 PM | Dinner: 8-10 PM" value="Lunch: 12:30-2:00 PM | Dinner: 7:45-9:30 PM">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="foodMessMenu">Daily / Weekly Menu Details</label>
+            <input type="text" id="foodMessMenu" class="form-control" placeholder="e.g. 4 Roti, Rice, Dal, 2 Sabzi, Salad, Special dish on Sunday">
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 1rem; font-size: 0.875rem;">
+                <input type="checkbox" id="foodMessDelivery" checked>
+                Delivers to GEC Campus Gate / Hostel
+              </label>
+            </div>
+            <div class="form-group">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 1rem; font-size: 0.875rem;">
+                <input type="checkbox" id="foodMessVerified" checked>
+                Mark as Verified &amp; Trusted
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeFoodMessModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Mess Provider</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Business Modal -->
+  <div class="modal-overlay" id="businessModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add / Edit Business</h3>
+        <button type="button" class="modal-close-btn" id="closeBusinessModal">✕</button>
+      </div>
+      <form id="businessForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="busName">Business Name</label>
+            <input type="text" id="busName" class="form-control" placeholder="e.g. Maa Durga Stationery &amp; Xerox" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="busCategory">Category</label>
+            <select id="busCategory" class="form-control" required>
+              <option value="stationery">Stationery &amp; Photocopy</option>
+              <option value="grocery">Grocery &amp; Dairy</option>
+              <option value="repair">Mobile &amp; Laptop Repair</option>
+              <option value="salon">Salon &amp; Grooming</option>
+              <option value="laundry">Laundry &amp; Ironing</option>
+              <option value="bank">Banks &amp; ATMs</option>
+              <option value="medical">Pharmacies &amp; Clinics</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="busAddress">Address</label>
+            <input type="text" id="busAddress" class="form-control" placeholder="e.g. Bajidpur Police Line Mor" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="busDistance">Distance from Campus (km)</label>
+              <input type="number" step="0.05" id="busDistance" class="form-control" placeholder="0.5" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="busPhone">Verified Phone</label>
+              <input type="text" id="busPhone" class="form-control" placeholder="+91-94302XXXXX">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="busHours">Operating Hours</label>
+            <input type="text" id="busHours" class="form-control" placeholder="e.g. 7:30 AM - 9:00 PM">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="busServices">Services (Comma separated)</label>
+            <input type="text" id="busServices" class="form-control" placeholder="Photocopy, Spiral binding, BEU exam form">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" id="cancelBusinessBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Business</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 4: Submission Inspection & Moderation Modal -->
+  <div class="modal-overlay" id="submissionInspectModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="inspectModalTitle">Inspect Owner Listing Submission</h3>
+        <button type="button" class="modal-close-btn" id="closeInspectModal" onclick="closeSubmissionInspectModal()">✕</button>
+      </div>
+      <div class="modal-body" id="inspectModalBody">
+        <!-- Content rendered dynamically via admin.js -->
+      </div>
+      <div class="modal-footer" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeSubmissionInspectModal()">Close</button>
+        <div style="display: flex; gap: 0.5rem;" id="inspectActionButtons">
+          <!-- Action buttons injected via admin.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4: Resolve Report Modal -->
+  <div class="modal-overlay" id="resolveReportModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Resolve Community Inaccuracy Report</h3>
+        <button type="button" class="modal-close-btn" onclick="closeResolveReportModal()">✕</button>
+      </div>
+      <form id="resolveReportForm" onsubmit="handleResolveReportSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="resolveReportId">
+          <div class="form-group">
+            <label class="form-label">Reported Listing</label>
+            <input type="text" id="resolveListingTitle" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Report Issue</label>
+            <div id="resolveReportDesc" style="background: var(--bg-muted); padding: 0.75rem; border-radius: var(--radius-xs); font-size: 0.85rem; color: var(--text-main);"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="resolveResolutionNote">Resolution / Correction Taken *</label>
+            <textarea id="resolveResolutionNote" class="form-control" rows="3" placeholder="e.g. Verified and updated phone number with owner, or confirmed room is still available." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeResolveReportModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Mark Resolved &amp; Save Note</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 4: Log New Verification Modal -->
+  <div class="modal-overlay" id="newVerificationModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Listing Verification Audit</h3>
+        <button type="button" class="modal-close-btn" onclick="closeNewVerificationModal()">✕</button>
+      </div>
+      <form id="newVerificationForm" onsubmit="handleNewVerificationSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="verifListingTitle">Listing Title / Name *</label>
+            <input type="text" id="verifListingTitle" class="form-control" placeholder="e.g. Maa Annapurna Student Mess" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="verifListingType">Listing Type *</label>
+              <select id="verifListingType" class="form-control" required>
+                <option value="business">Local Business / Shop</option>
+                <option value="accommodation">Accommodation / PG</option>
+                <option value="food">Mess / Tiffin Service</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="verifType">Verification Method *</label>
+              <select id="verifType" class="form-control" required>
+                <option value="phone_call">Phone Call with Owner</option>
+                <option value="physical_inspection">Physical On-Site Visit</option>
+                <option value="document_check">Document / Rent Slip Check</option>
+                <option value="student_feedback">Multi-Student Peer Feedback</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="verifBadgeLabel">Public Badge Label Assigned *</label>
+            <select id="verifBadgeLabel" class="form-control" required>
+              <option value="Owner Contact Confirmed">Owner Contact Confirmed</option>
+              <option value="Physical Inspection Verified">Physical Inspection Verified</option>
+              <option value="Phone &amp; Identity Verified">Phone &amp; Identity Verified</option>
+              <option value="Rate &amp; Availability Checked">Rate &amp; Availability Checked</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="verifNotes">Internal Audit Notes (Private to moderators) *</label>
+            <textarea id="verifNotes" class="form-control" rows="3" placeholder="What evidence was inspected? State exact findings..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeNewVerificationModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Verification Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 10: Resolve Student Feedback Modal -->
+  <div class="modal-overlay" id="resolveFeedbackModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Resolve Student Feedback / Request</h3>
+        <button type="button" class="modal-close-btn" onclick="closeResolveFeedbackModal()">✕</button>
+      </div>
+      <form id="resolveFeedbackForm" onsubmit="handleResolveFeedbackSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="feedbackModalItemId">
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <input type="text" id="feedbackModalCat" class="form-control" readonly style="font-size: 0.85rem;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="feedbackModalStatus">Lifecycle Status *</label>
+              <select id="feedbackModalStatus" class="form-control" required style="font-size: 0.85rem; font-weight: 600;">
+                <option value="pending">Pending</option>
+                <option value="reviewing">Reviewing</option>
+                <option value="planned">Planned (Added to roadmap)</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed / Resolved</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Student Feedback / Description</label>
+            <div id="feedbackModalDesc" style="background: var(--bg-muted); padding: 0.75rem; border-radius: var(--radius-xs); font-size: 0.85rem; color: var(--text-main); max-height: 120px; overflow-y: auto;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="feedbackModalResolution">Public Resolution Summary (Visible to Student on their Dashboard)</label>
+            <textarea id="feedbackModalResolution" class="form-control" rows="2" placeholder="e.g. Added phone number for Maa Durga Xerox and verified with shop owner. Thank you!"></textarea>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">The submitting student will see this note directly in their profile under 'My Feedback &amp; Requests'.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="feedbackModalNotes">Internal Moderator Notes (Private to Administrators)</label>
+            <textarea id="feedbackModalNotes" class="form-control" rows="2" placeholder="Private moderation context, audit log, or internal notes. Never visible to students."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeResolveFeedbackModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Update Status &amp; Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 11: Add / Edit Accommodation Modal -->
+  <div class="modal-overlay" id="accommodationModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Student Accommodation Listing</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAccommodationModal()">✕</button>
+      </div>
+      <form id="accommodationForm" onsubmit="handleAccommodationSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="accTitle">Property Title *</label>
+            <input type="text" id="accTitle" class="form-control" placeholder="e.g. Bajidpur Green Valley Residency (Double Sharing)" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="accType">Type *</label>
+              <select id="accType" class="form-control" required>
+                <option value="PG / Student Room">PG / Student Room</option>
+                <option value="Hostel / PG">Hostel / PG (with Mess)</option>
+                <option value="Single Room">Single Room</option>
+                <option value="Flat / 2BHK">Flat / Independent</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="accGender">Gender Preference *</label>
+              <select id="accGender" class="form-control" required>
+                <option value="Boys">Boys Only</option>
+                <option value="Girls">Girls Only</option>
+                <option value="Any">Any / Family</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="accRent">Monthly Rent (₹) *</label>
+              <input type="number" id="accRent" class="form-control" placeholder="2200" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="accDeposit">Security Deposit (₹)</label>
+              <input type="number" id="accDeposit" class="form-control" placeholder="2000" value="2000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="accAddress">Address &amp; Landmark *</label>
+            <input type="text" id="accAddress" class="form-control" placeholder="e.g. Bajidpur Village, Behind Police Line" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="accOwnerName">Owner / Caretaker Name</label>
+              <input type="text" id="accOwnerName" class="form-control" placeholder="e.g. Shri R. Sharma">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="accPhone">Contact Phone *</label>
+              <input type="text" id="accPhone" class="form-control" placeholder="+91-94318XXXXX" required>
+            </div>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="accDistance">Distance from Campus (km)</label>
+              <input type="number" step="0.05" id="accDistance" class="form-control" placeholder="0.5" value="0.5">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="accElectricity">Electricity Policy</label>
+              <input type="text" id="accElectricity" class="form-control" placeholder="Sub-meter ₹8/unit or Included" value="Sub-meter ₹8/unit">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAccommodationModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save &amp; Publish Accommodation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 11: Publish New Notice Modal -->
+  <div class="modal-overlay" id="publishNoticeModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Publish Official Notice / Circular</h3>
+        <button type="button" class="modal-close-btn" onclick="closePublishNoticeModal()">✕</button>
+      </div>
+      <form id="publishNoticeForm" onsubmit="handlePublishNoticeSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="noticeTitle">Notice Title *</label>
+            <input type="text" id="noticeTitle" class="form-control" placeholder="e.g. BEU B.Tech 4th Semester Supplementary Exam Schedule" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="noticeCategory">Category *</label>
+              <select id="noticeCategory" class="form-control" required>
+                <option value="examination">📝 Examination &amp; Form Filling</option>
+                <option value="activities">🚀 Activities, SIHE &amp; Hackathon</option>
+                <option value="recruitment">👥 Walk-in Recruitment &amp; Tenders</option>
+                <option value="admission">🎓 Admissions &amp; UGEAC</option>
+                <option value="academic">📜 Academic, Degree &amp; Migration</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="noticeDate">Publication Date *</label>
+              <input type="date" id="noticeDate" class="form-control" required>
+            </div>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="noticeSource">Source Name</label>
+              <input type="text" id="noticeSource" class="form-control" placeholder="e.g. Examination Section / Principal Office" value="Official GEC Sheikhpura Cell">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="noticeLink">Circular Link / Document URL</label>
+              <input type="text" id="noticeLink" class="form-control" placeholder="https://www.gecsheikhpura.ac.in/...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="noticeSummary">Summary Description *</label>
+            <textarea id="noticeSummary" class="form-control" rows="3" placeholder="Key details, submission deadlines, instructions, and who should apply..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closePublishNoticeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Publish Notice to Live Board</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 11: Add Official Portal Link Modal -->
+  <div class="modal-overlay" id="officialLinkModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Official Portal Link (Vault)</h3>
+        <button type="button" class="modal-close-btn" onclick="closeOfficialLinkModal()">✕</button>
+      </div>
+      <form id="officialLinkForm" onsubmit="handleOfficialLinkSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="vaultTabSelect">Target Header Tab *</label>
+            <select id="vaultTabSelect" class="form-control" required>
+              <option value="about-us">🏛️ About Us (Governance, Principal Desk, Committees)</option>
+              <option value="academics">🎓 Academics (Syllabus, Regulations, Calendar)</option>
+              <option value="department">🏢 Department (CSE, CE, ME, EE, ECE, Science)</option>
+              <option value="training-placement">💼 Training &amp; Placement (TPO, Recruiter, MOUs)</option>
+              <option value="facilities">🛠️ Facilities &amp; Services (Hostels, Library, Wi-Fi)</option>
+              <option value="activities">🚀 Activities &amp; Startup (SIHE, SIH, Clubs, IIC)</option>
+              <option value="approval">📜 Approvals (AICTE, BEU Affiliation, EoA)</option>
+              <option value="login">🔐 Official Logins (Faculty, Attendance, CMS)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="vaultLinkLabel">Link Label / Committee / Document Name *</label>
+            <input type="text" id="vaultLinkLabel" class="form-control" placeholder="e.g. Women Grievance Cell / Internal Complaint Committee" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="vaultLinkUrl">Official Portal URL *</label>
+            <input type="url" id="vaultLinkUrl" class="form-control" placeholder="https://www.gecsheikhpura.ac.in/..." required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeOfficialLinkModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Add to Portal Vault</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 11: Add Emergency Contact Modal -->
+  <div class="modal-overlay" id="emergencyModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Emergency / Medical Contact</h3>
+        <button type="button" class="modal-close-btn" onclick="closeEmergencyModal()">✕</button>
+      </div>
+      <form id="emergencyForm" onsubmit="handleEmergencySubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="emName">Contact / Service Name *</label>
+            <input type="text" id="emName" class="form-control" placeholder="e.g. Sadar Hospital Sheikhpura Blood Bank Desk" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="emNumber">Phone Number / Helpline *</label>
+            <input type="text" id="emNumber" class="form-control" placeholder="e.g. 06341-223102 or 102" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="emCategory">Category *</label>
+              <select id="emCategory" class="form-control" required>
+                <option value="Medical & Ambulance">Medical &amp; Ambulance</option>
+                <option value="Police & Emergency">Police &amp; Emergency</option>
+                <option value="Hospital">Hospital / Clinic</option>
+                <option value="Pharmacy">Pharmacy / Medicine</option>
+                <option value="Anti-Ragging">Anti-Ragging / Student Welfare</option>
+                <option value="Fire Station">Fire Station</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="emAvailability">Availability Hours</label>
+              <input type="text" id="emAvailability" class="form-control" placeholder="e.g. 24x7 Emergency" value="24x7 Free">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeEmergencyModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Phase 11: Add Transport Route Modal -->
+  <div class="modal-overlay" id="transportModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Transit / Train / Bus Route</h3>
+        <button type="button" class="modal-close-btn" onclick="closeTransportModal()">✕</button>
+      </div>
+      <form id="transportForm" onsubmit="handleTransportSubmit(event)">
+        <div class="modal-body">
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="trMode">Transit Mode *</label>
+              <select id="trMode" class="form-control" required>
+                <option value="Train">🚆 Indian Railways Train</option>
+                <option value="Bus">🚌 State / Private Bus</option>
+                <option value="Auto">🛺 Shared Auto-Rickshaw</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="trFare">Approximate Fare *</label>
+              <input type="text" id="trFare" class="form-control" placeholder="e.g. ₹15 - ₹35" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="trRoute">Route / Destination *</label>
+            <input type="text" id="trRoute" class="form-control" placeholder="e.g. Sheikhpura (SHK) ⇄ Patna Jn (PNBE)" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="trNumber">Train Number / Service Name</label>
+            <input type="text" id="trNumber" class="form-control" placeholder="e.g. 03261 MEMU / BSRTC Express" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="trTimings">Timings &amp; Frequency *</label>
+            <input type="text" id="trTimings" class="form-control" placeholder="e.g. 06:15 AM, 09:40 AM, 04:30 PM (Daily)" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeTransportModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Route</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add/Edit Faculty Member (Phase 11) -->
+  <div class="modal-overlay" id="adminFacultyModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="adminFacultyModalTitle">Add / Edit Faculty Member</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAdminFacultyModal()">✕</button>
+      </div>
+      <form id="adminFacultyForm" onsubmit="handleAdminFacultySubmit(event)">
+        <input type="hidden" id="adminFacId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="adminFacName">Faculty Full Name *</label>
+            <input type="text" id="adminFacName" class="form-control" placeholder="e.g. Dr. Rajesh Kumar" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="adminFacDept">Department *</label>
+              <input type="text" id="adminFacDept" class="form-control" placeholder="e.g. Computer Science &amp; Engineering" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminFacDesignation">Designation *</label>
+              <input type="text" id="adminFacDesignation" class="form-control" placeholder="e.g. Head of Department (HOD)" required>
+            </div>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="adminFacRoom">Official Room Number</label>
+              <input type="text" id="adminFacRoom" class="form-control" placeholder="e.g. Room 202 (or leave empty if Not verified)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminFacFloor">Floor</label>
+              <input type="text" id="adminFacFloor" class="form-control" placeholder="e.g. 2nd Floor">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminFacBuilding">Building / Block</label>
+            <input type="text" id="adminFacBuilding" class="form-control" placeholder="e.g. Academic Complex">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminFacOfficeHours">Official Office / Visiting Hours</label>
+            <input type="text" id="adminFacOfficeHours" class="form-control" placeholder="e.g. Mon-Fri: 10:00 AM - 12:00 PM">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminFacContact">Public Institutional Contact</label>
+            <input type="text" id="adminFacContact" class="form-control" placeholder="e.g. hod.cse@gecsheikhpura.ac.in">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminFacStatus">Verification Status</label>
+            <select id="adminFacStatus" class="form-control">
+              <option value="verified" selected>Verified Official</option>
+              <option value="unverified">Community Submitted / Unverified</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminFacultyModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Faculty Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add/Edit Campus Facility (Phase 11) -->
+  <div class="modal-overlay" id="adminFacilityModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="adminFacilityModalTitle">Add / Edit Campus Facility</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAdminFacilityModal()">✕</button>
+      </div>
+      <form id="adminFacilityForm" onsubmit="handleAdminFacilitySubmit(event)">
+        <input type="hidden" id="adminFacilId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="adminFacilName">Facility / Room Name *</label>
+            <input type="text" id="adminFacilName" class="form-control" placeholder="e.g. Central Computing Center Hall 1" required>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="adminFacilCategory">Category *</label>
+              <select id="adminFacilCategory" class="form-control" required>
+                <option value="administrative">Administrative Office</option>
+                <option value="labs_workshops">Laboratory / Workshop</option>
+                <option value="classrooms">Academic Classroom</option>
+                <option value="library_study">Library &amp; Study Hall</option>
+                <option value="amenities">Amenity / Canteen / SIHE</option>
+                <option value="hostels">Student Hostel Block</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminFacilRoom">Room Number / Identification</label>
+              <input type="text" id="adminFacilRoom" class="form-control" placeholder="e.g. Room 205">
+            </div>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="adminFacilBuilding">Building / Block</label>
+              <input type="text" id="adminFacilBuilding" class="form-control" placeholder="e.g. Academic Complex">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminFacilFloor">Floor</label>
+              <input type="text" id="adminFacilFloor" class="form-control" placeholder="e.g. 2nd Floor">
+            </div>
+          </div>
+          <div class="grid-cards-2" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="adminFacilLat">Verified Latitude</label>
+              <input type="number" step="0.000001" id="adminFacilLat" class="form-control" placeholder="e.g. 25.1382">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminFacilLng">Verified Longitude</label>
+              <input type="number" step="0.000001" id="adminFacilLng" class="form-control" placeholder="e.g. 85.8641">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminFacilAccessibility">Accessibility &amp; Ramp Information</label>
+            <input type="text" id="adminFacilAccessibility" class="form-control" placeholder="e.g. 2nd Floor West Wing, Elevator Access">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminFacilHours">Public Opening / Operating Hours</label>
+            <input type="text" id="adminFacilHours" class="form-control" placeholder="e.g. 9:00 AM - 5:00 PM (Mon-Sat)">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminFacilityModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Facility Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Admin Claims Review Modal (Phase 11) -->
+  <div class="modal-overlay" id="adminLfClaimsModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="adminLfClaimsTitle">Review Claims for Item</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAdminLfClaimsModal()">✕</button>
+      </div>
+      <div class="modal-body" id="adminLfClaimsBody">
+        <!-- Injected via admin.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminLfClaimsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Admin Page Inspection & Status Review Modal (Phase 12) -->
+  <div class="modal-overlay" id="adminCrawlDetailModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="adminCrawlModalTitle">Inspect Discovered Page</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAdminCrawlDetailModal()">✕</button>
+      </div>
+      <form id="adminCrawlReviewForm" onsubmit="handleAdminCrawlReviewSubmit(event)">
+        <div class="modal-body" id="adminCrawlModalBody">
+          <!-- Populated by admin.js -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminCrawlDetailModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Audit Decisions</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Run Incremental Crawler Sync Job (Phase 12) -->
+  <div class="modal-overlay" id="adminRunCrawlModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 560px;">
+      <div class="modal-header">
+        <h3 class="modal-title">⚡ Trigger Incremental Website Sync</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAdminRunCrawlModal()">✕</button>
+      </div>
+      <form id="adminRunCrawlForm" onsubmit="handleAdminRunCrawlSubmit(event)">
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Initiate a polite recursive crawl against <code>https://www.gecsheikhpura.ac.in/</code>. Rate-limited at 800ms between requests, concurrency max 2, with SHA-256 hash comparison for change detection.
+          </p>
+
+          <div class="grid-cards-2" style="gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="crawlJobScope">Crawl Scope</label>
+              <select id="crawlJobScope" class="form-control" style="font-size: 0.85rem;">
+                <option value="incremental" selected>Incremental Sync (Check changes)</option>
+                <option value="full">Full Re-Discovery</option>
+                <option value="notices_only">Notices &amp; Circulars Only</option>
+                <option value="documents_only">Public Documents (PDFs) Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="crawlJobMaxPages">Max Pages to Inspect</label>
+              <input type="number" id="crawlJobMaxPages" class="form-control" value="60" min="5" max="150" style="font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="grid-cards-2" style="gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="crawlJobMaxDepth">Max Recursive Depth</label>
+              <input type="number" id="crawlJobMaxDepth" class="form-control" value="3" min="1" max="5" style="font-size: 0.85rem;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="crawlJobDelay">Polite Delay (ms)</label>
+              <input type="number" id="crawlJobDelay" class="form-control" value="800" min="500" max="3000" style="font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="alert-subtle" style="font-size: 0.775rem; background: var(--surface-2); padding: 0.6rem; border-radius: 6px;">
+            🔒 <strong>Strict Boundary Enforcement:</strong> Login portals and protected student portals are recorded as <code>restricted</code> without scraping credentials. Academic preparation materials are routed exclusively to Apna College Bihar.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAdminRunCrawlModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm" id="btnSubmitRunCrawl">Start Sync Job</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Verified Auto & Toto Driver -->
+  <div class="modal-overlay" id="adminAutoDriverModal" role="dialog" aria-modal="true" style="display: none;">
+    <div class="modal-dialog" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="autoDriverModalTitle">🛺 Add Verified Auto / Toto Driver</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAddAutoDriverModal()">✕</button>
+      </div>
+      <form id="adminAutoDriverForm" onsubmit="handleSaveAutoDriverSubmit(event)">
+        <input type="hidden" id="autoDriverId">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="autoDriverName">Driver Full Name *</label>
+            <input type="text" id="autoDriverName" class="form-control" placeholder="e.g. Pappu Kumar" required>
+          </div>
+
+          <div class="grid-cards-2" style="gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label class="form-label" for="autoDriverPhone">Phone / Calling Number *</label>
+              <input type="tel" id="autoDriverPhone" class="form-control" placeholder="e.g. +91-94302-55222" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="autoDriverVehicle">Vehicle Type *</label>
+              <select id="autoDriverVehicle" class="form-control">
+                <option value="E-Rickshaw (Toto)" selected>E-Rickshaw (Toto)</option>
+                <option value="Auto Rickshaw (Diesel/CNG)">Auto Rickshaw (Diesel/CNG)</option>
+                <option value="24x7 Night Emergency Toto">24x7 Night Emergency Toto</option>
+                <option value="College Gate Reserve Toto">College Gate Reserve Toto</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="autoDriverStand">Stand / Stoppage Location *</label>
+            <input type="text" id="autoDriverStand" class="form-control" placeholder="e.g. Bajidpur Main Gate / Station Stand" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="autoDriverRoute">Primary Operational Route *</label>
+            <input type="text" id="autoDriverRoute" class="form-control" placeholder="e.g. Bajidpur Campus ↔ Sheikhpura Railway Station" required>
+          </div>
+
+          <div class="grid-cards-2" style="gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label class="form-label" for="autoDriverTimings">Operating Timings</label>
+              <input type="text" id="autoDriverTimings" class="form-control" placeholder="e.g. 6:00 AM – 9:30 PM (or 24x7)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="autoDriverFare">Fare Details</label>
+              <input type="text" id="autoDriverFare" class="form-control" placeholder="e.g. ₹15 Sharing / ₹80 Reserve">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="autoDriverSpecialty">Special Note / Emergency Badge</label>
+            <input type="text" id="autoDriverSpecialty" class="form-control" placeholder="e.g. Night Station Pickup, Emergency on-call">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAddAutoDriverModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm" id="btnSaveAutoDriver">Save Driver</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script src="assets/js/data.js?v=13.0"></script>
+  <script src="assets/js/crawled-data.js?v=13.0"></script>
+  <script src="assets/js/supabase-config.js?v=13.0"></script>
+  <script src="assets/js/logger.js?v=13.0"></script>
+  <script src="assets/js/db-service.js?v=13.0"></script>
+  <script src="assets/js/app.js?v=13.0"></script>
+  <script src="assets/js/admin.js?v=13.0"></script>
+<script>
+  // Automatic purge of legacy demo/seed items from browser localStorage
+  (function() {
+    const PURGE_KEY = 'gec_purged_mock_v16';
+    if (!localStorage.getItem(PURGE_KEY)) {
+      const wipeKeys = [
+        'gec_food_services_override',
+        'gec_accommodations_override',
+        'gec_businesses_override',
+        'gec_unverified_coords',
+        'gec_student_feedback_queue',
+        'gec_custom_faculty',
+        'gec_faculty',
+        'gec_custom_facilities',
+        'gec_facilities',
+        'gec_community_events',
+        'gec_student_clubs',
+        'gec_sports_activities',
+        'gec_community_announcements',
+        'gec_reports_queue',
+        'gec_service_reviews',
+        'gec_verifications',
+        'gec_marketplace_listings',
+        'gec_published_businesses',
+        'gec_published_accommodations'
+      ];
+      wipeKeys.forEach(function(k) {
+        try { localStorage.setItem(k, JSON.stringify([])); } catch(e) {}
+      });
+      try {
+        localStorage.removeItem('gec_official_crawls');
+        localStorage.removeItem('gec_crawl_stats');
+        localStorage.setItem(PURGE_KEY, 'true');
+      } catch(e) {}
+    } else {
+      const mockCheckList = ['gec_sports_activities', 'gec_student_clubs', 'gec_community_events', 'gec_community_announcements'];
+      const mockKeywords = ['weekend friendly', 'evening doubles', 'volleyball team', 'blitz chess', 'aarohan', 'natraj', 'shaurya'];
+      mockCheckList.forEach(function(k) {
+        try {
+          const val = localStorage.getItem(k);
+          if (val && mockKeywords.some(mk => val.toLowerCase().includes(mk))) {
+            localStorage.setItem(k, JSON.stringify([]));
+          }
+        } catch(e) {}
+      });
+    }
+  })();
+</script>
+  <script src="components/footer.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+  "name": "GEC Sheikhpura Student Life Hub",
+  "short_name": "GEC Hub",
+  "description": "Unofficial campus life, local services, accommodations, student marketplace & offline emergency directory for GEC Sheikhpura.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0a192f",
+  "orientation": "portrait-primary",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "assets/images/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/images/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explore Nearby Map",
+      "short_name": "Map",
+      "description": "Find verified shops, stationery, and repair near Bajidpur campus",
+      "url": "explore-nearby.html",
+      "icons": [{ "src": "assets/images/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Student Marketplace",
+      "short_name": "Marketplace",
+      "description": "Buy, sell, or exchange cycles, calculators, books and hostel items",
+      "url": "marketplace.html",
+      "icons": [{ "src": "assets/images/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Rooms & PG Rentals",
+      "short_name": "Rooms",
+      "description": "Student rooms and hostels around Bajidpur",
+      "url": "rooms-pg.html",
+      "icons": [{ "src": "assets/images/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Emergency & Medical",
+      "short_name": "Emergency",
+      "description": "Hospital, ambulance, and 24x7 police contact numbers",
+      "url": "emergency.html",
+      "icons": [{ "src": "assets/images/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["education", "lifestyle", "shopping", "utilities"]
+}

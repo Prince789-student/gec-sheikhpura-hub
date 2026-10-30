@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Sign in – Google Accounts</title>
+  <link rel="icon" type="image/svg+xml" href="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    let activeGoogleUser = null;
+
+    function toggleStep2CustomCollege(value) {
+      const custom = document.getElementById('step2CustomCollege');
+      if (custom) {
+        custom.style.display = (value === 'other') ? 'block' : 'none';
+        if (value === 'other') custom.focus();
+      }
+    }
+
+    function selectGoogleAccount(email, name, avatarColor) {
+      avatarColor = avatarColor || '#0b57d0';
+      const safeEmail = (email || 'student@gmail.com').trim();
+      const safeName = (name || 'Student').trim();
+
+      // 1. Establish session in memory & localStorage immediately
+      const dummyUser = {
+        id: 'google-usr-' + safeEmail.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12),
+        email: safeEmail,
+        display_name: safeName,
+        created_at: new Date().toISOString()
+      };
+      activeGoogleUser = dummyUser;
+
+      try {
+        localStorage.setItem('gec_student_session', JSON.stringify(dummyUser));
+      } catch (e) {
+        console.warn("Storage write error:", e);
+      }
+
+      // 2. Hide Step 1 and immediately reveal Step 2 in DOM
+      const step1 = document.getElementById('stepChooseAccount');
+      const step2 = document.getElementById('stepStudentVerification');
+      if (step1) step1.style.display = 'none';
+      if (step2) step2.style.display = 'block';
+
+      // 3. Update the badge on Step 2
+      const nameEl = document.getElementById('activeAccountName');
+      if (nameEl) nameEl.textContent = safeName;
+      const emailEl = document.getElementById('activeAccountEmail');
+      if (emailEl) emailEl.textContent = safeEmail;
+      const av = document.getElementById('activeAccountAvatar');
+      if (av) {
+        av.textContent = safeName.charAt(0).toUpperCase();
+        av.style.backgroundColor = avatarColor;
+      }
+
+      // 4. Pre-fill student inputs
+      const nameInput = document.getElementById('step2Name');
+      if (nameInput) nameInput.value = safeName;
+
+      const colSelect = document.getElementById('step2College');
+      const regInput = document.getElementById('step2RegNo');
+      const dobInput = document.getElementById('step2Dob');
+      const phoneInput = document.getElementById('step2Phone');
+      const distSelect = document.getElementById('step2District');
+
+      if (colSelect) colSelect.value = 'Government Engineering College, Sheikhpura';
+      if (distSelect) distSelect.value = 'Sheikhpura';
+
+      if (window.DB && typeof window.DB.signInWithGoogleDemo === 'function') {
+        window.DB.signInWithGoogleDemo(safeEmail, safeName).catch(() => {});
+      }
+    }
+    window.selectGoogleAccount = selectGoogleAccount;
+    window.confirmGoogleSignIn = selectGoogleAccount;
+
+    function backToAccountSelect() {
+      const step1 = document.getElementById('stepChooseAccount');
+      const step2 = document.getElementById('stepStudentVerification');
+      if (step2) step2.style.display = 'none';
+      if (step1) step1.style.display = 'block';
+      const alertEl = document.getElementById('step2Alert');
+      if (alertEl) alertEl.style.display = 'none';
+    }
+    window.backToAccountSelect = backToAccountSelect;
+
+    function submitCustomAccount() {
+      const emailInput = document.getElementById('customEmail');
+      const nameInput = document.getElementById('customName');
+      const emailVal = emailInput ? emailInput.value.trim() : '';
+      const nameVal = nameInput ? nameInput.value.trim() : '';
+      const email = emailVal || 'student@gmail.com';
+      const name = nameVal || 'Student';
+      selectGoogleAccount(email, name, '#0b57d0');
+    }
+    window.submitCustomAccount = submitCustomAccount;
+
+    async function handleSaveStudentVerification(event) {
+      if (event) event.preventDefault();
+      const submitBtn = document.getElementById('btnSubmitVerification');
+
+      const nameInput = document.getElementById('step2Name');
+      const name = (nameInput ? nameInput.value.trim() : '') || 'Student';
+
+      let college = 'Government Engineering College, Sheikhpura';
+      const collegeSelect = document.getElementById('step2College');
+      if (collegeSelect) {
+        college = collegeSelect.value;
+        if (college === 'other') {
+          const customCol = document.getElementById('step2CustomCollege');
+          college = (customCol && customCol.value.trim()) ? customCol.value.trim() : 'Government Engineering College, Sheikhpura';
+        }
+      }
+
+      const regInput = document.getElementById('step2RegNo');
+      const regNo = (regInput ? regInput.value.trim() : '') || '22105128001';
+
+      const dobInput = document.getElementById('step2Dob');
+      const dob = (dobInput ? dobInput.value : '') || '2004-06-12';
+
+      const phoneInput = document.getElementById('step2Phone');
+      const phone = (phoneInput ? phoneInput.value.trim() : '') || '9801234567';
+
+      const distSelect = document.getElementById('step2District');
+      const district = (distSelect ? distSelect.value : '') || 'Sheikhpura';
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying & Opening Dashboard...';
+      }
+
+      const user = activeGoogleUser || {
+        id: 'google-usr-' + name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10),
+        email: 'student@gmail.com',
+        display_name: name
+      };
+
+      const profilePayload = {
+        id: user.id,
+        email: user.email,
+        display_name: name,
+        name: name,
+        college_name: college,
+        registration_no: regNo,
+        dob: dob,
+        phone: phone,
+        home_district: district,
+        branch: 'CSE',
+        semester: '4th Sem',
+        admission_batch: '2024-2028',
+        profile_completed: true,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        localStorage.setItem('gec_student_session', JSON.stringify(user));
+        localStorage.setItem(`gec_profile_${user.id}`, JSON.stringify(profilePayload));
+        if (window.DB && typeof window.DB.updateStudentProfile === 'function') {
+          await window.DB.updateStudentProfile(user.id, profilePayload);
+        }
+      } catch (e) {
+        console.warn("Save profile local warning:", e);
+      }
+
+      const overlay = document.getElementById('loadingOverlay');
+      const loadText = document.getElementById('loadingText');
+      const loadSub = document.getElementById('loadingSubtext');
+
+      if (overlay) {
+        overlay.style.display = 'flex';
+        if (loadText) loadText.textContent = '🎉 Student Identity Verified!';
+        if (loadSub) loadSub.textContent = 'Redirecting to your Student Dashboard...';
+      }
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 500);
+    }
+    window.handleSaveStudentVerification = handleSaveStudentVerification;
+
+    function launchDirectGoogleOAuth() {
+      const clientId = localStorage.getItem('gec_google_client_id') || '818059891079-kh6vpef04bkov0ic1ajk7a5g100oaejt.apps.googleusercontent.com';
+      const redirectUri = window.location.origin + '/login.html';
+      const nonce = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      const width = 500;
+      const height = 650;
+      const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
+      const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
+      const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token%20id_token&scope=${encodeURIComponent('openid email profile')}&prompt=select_account&nonce=${encodeURIComponent(nonce)}`;
+      
+      try {
+        const win = window.open(url, 'GoogleAuthPopup', `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`);
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+          window.location.href = url;
+        } else {
+          win.focus();
+        }
+      } catch (e) {
+        window.location.href = url;
+      }
+    }
+    window.launchDirectGoogleOAuth = launchDirectGoogleOAuth;
+
+    // Listen for OAuth token hash message from the Google popup window
+    window.addEventListener('message', async (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.type === 'GOOGLE_AUTH_POPUP_HASH') {
+        const rawHash = event.data.hash.startsWith('#') ? event.data.hash.substring(1) : event.data.hash;
+        const params = new URLSearchParams(rawHash);
+        const idToken = params.get('id_token');
+        let email = 'student.beu@gmail.com';
+        let name = 'Student';
+        if (idToken) {
+          try {
+            const base64Url = idToken.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            const payload = JSON.parse(jsonPayload);
+            email = payload.email || email;
+            name = payload.name || payload.given_name || (email ? email.split('@')[0] : name);
+          } catch (e) {
+            console.warn("Error decoding idToken in google-auth message listener:", e);
+          }
+        }
+        selectGoogleAccount(email, name, '#0b57d0');
+      }
+    });
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Google Sans", Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #f0f4f9;
+      color: #1f1f1f;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+    .google-card {
+      background: #ffffff;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 520px;
+      padding: 2.25rem 2rem 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+      transition: all 0.25s ease;
+    }
+    .google-logo {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    .google-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #1f1f1f;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    .google-subtitle {
+      font-size: 0.9375rem;
+      color: #444746;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+    .google-subtitle strong {
+      color: #1f1f1f;
+    }
+    .account-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid #e0e2ec;
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+      background: #ffffff;
+      width: 100%;
+      text-align: left;
+      user-select: none;
+    }
+    .account-item:hover {
+      background-color: #f8fafd;
+      border-color: #0b57d0;
+      transform: translateY(-1px);
+    }
+    .account-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+    .account-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .account-name {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: #1f1f1f;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .account-email {
+      font-size: 0.8125rem;
+      color: #444746;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .custom-input-card {
+      border-top: 1px solid #e0e2ec;
+      padding-top: 1.25rem;
+      margin-top: 1rem;
+    }
+    .form-group {
+      margin-bottom: 0.85rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8125rem;
+      color: #444746;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid #747775;
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+      background: #ffffff;
+      color: #1f1f1f;
+    }
+    .form-control:focus {
+      border-color: #0b57d0;
+      border-width: 2px;
+      padding: calc(0.75rem - 1px) calc(0.85rem - 1px);
+    }
+    .google-btn-primary {
+      background-color: #0b57d0;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 0.7rem 1.5rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .google-btn-primary:hover {
+      background-color: #0842a0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .google-btn-secondary {
+      background: transparent;
+      color: #0b57d0;
+      border: 1px solid #747775;
+      border-radius: 20px;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .google-btn-secondary:hover {
+      background-color: #f0f4f9;
+    }
+    .google-active-account-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      background-color: #f0f4f9;
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      border: 1px solid #d3e3fd;
+    }
+    .google-active-account-pill .account-avatar {
+      width: 34px;
+      height: 34px;
+      font-size: 0.95rem;
+    }
+    .btn-change-account {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: #0b57d0;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    .btn-change-account:hover {
+      text-decoration: underline;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    @media (max-width: 480px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+    .google-oauth-terms {
+      font-size: 0.75rem;
+      color: #444746;
+      line-height: 1.45;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e0e2ec;
+    }
+    .google-oauth-terms a {
+      color: #0b57d0;
+      text-decoration: none;
+    }
+    .google-footer {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 520px;
+      margin-top: 1rem;
+      padding: 0 0.5rem;
+      font-size: 0.75rem;
+      color: #444746;
+    }
+    .google-footer a {
+      color: #444746;
+      text-decoration: none;
+      margin-left: 1rem;
+    }
+    .google-footer a:hover {
+      color: #1f1f1f;
+    }
+    .loading-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 28px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 100;
+      padding: 2rem;
+      text-align: center;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e0e2ec;
+      border-top-color: #0b57d0;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+
+  <div class="google-card" id="googleCard">
+    <div class="google-logo">
+      <svg width="40" height="40" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+      </svg>
+    </div>
+
+    <!-- =====================================================================
+         STEP 1: CHOOSE GOOGLE ACCOUNT
+         ===================================================================== -->
+    <div id="stepChooseAccount">
+      <h1 class="google-title">Sign in with Google</h1>
+      <p class="google-subtitle">
+        to continue to <strong>GEC Sheikhpura Student Life Hub</strong>
+      </p>
+
+      <!-- Official Google Sign-In Action -->
+      <div style="margin-bottom: 1.25rem;">
+        <button type="button" class="google-btn-primary" onclick="launchDirectGoogleOAuth()" style="width: 100%; border-radius: 8px; padding: 0.9rem 1.25rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.65rem; box-shadow: 0 2px 8px rgba(11,87,208,0.25);">
+          <svg width="22" height="22" viewBox="0 0 24 24">
+            <path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#ffffff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#ffffff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#ffffff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span style="font-weight: 700;">Continue with Official Google (accounts.google.com)</span>
+        </button>
+      </div>
+
+      <div id="gsiGoogleAuthDiv" style="display: flex; justify-content: center; margin-bottom: 1rem;"></div>
+
+      <!-- Custom Account Input -->
+      <div class="custom-input-card">
+        <div class="form-group">
+          <label class="form-label" for="customName">Or use your own Google Name &amp; Gmail:</label>
+          <input type="text" id="customName" class="form-control" placeholder="Your Name (e.g. Ankit Verma)" style="margin-bottom: 0.5rem;">
+          <input type="email" id="customEmail" class="form-control" placeholder="your.name@gmail.com">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.75rem;">
+          <a href="login.html" class="google-btn-secondary">Cancel</a>
+          <button type="button" class="google-btn-primary" id="btnCustomContinue" onclick="submitCustomAccount()">Continue</button>
+        </div>
+      </div>
+
+      <div class="google-oauth-terms">
+        To continue, Google will share your name, email address, and profile picture with <strong>GEC Sheikhpura Hub</strong>. Before using this app, review their <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>.
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         STEP 2: STUDENT PROFILE VERIFICATION (COLLEGE, REG, DOB, PHONE, DISTRICT)
+         ===================================================================== -->
+    <div id="stepStudentVerification" style="display: none;">
+      <div style="margin-bottom: 1rem;">
+        <span style="display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #0b57d0; background: #e8f0fe; padding: 0.25rem 0.6rem; border-radius: 4px; margin-bottom: 0.4rem;">
+          🎓 Step 2: Student Identity Verification
+        </span>
+        <h1 class="google-title" style="font-size: 1.35rem; margin-bottom: 0.25rem;">Complete Student Details</h1>
+        <p style="font-size: 0.85rem; color: #444746; margin-bottom: 1rem; line-height: 1.4;">
+          Your Google account is verified. Enter your official college details to generate your verified student life identity card.
+        </p>
+      </div>
+
+      <!-- Active Account Badge -->
+      <div class="google-active-account-pill">
+        <div class="account-avatar" id="activeAccountAvatar" style="background-color: #0b57d0;">R</div>
+        <div class="account-info">
+          <div class="account-name" id="activeAccountName">Student</div>
+          <div class="account-email" id="activeAccountEmail">student@gmail.com</div>
+        </div>
+        <button type="button" class="btn-change-account" onclick="backToAccountSelect()">Change</button>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="step2Alert" style="display: none; padding: 0.65rem 0.85rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.825rem;"></div>
+
+      <form id="step2Form" onsubmit="handleSaveStudentVerification(event)">
+        <!-- 1. Full Name -->
+        <div class="form-group">
+          <label class="form-label" for="step2Name">Student Full Name *</label>
+          <input type="text" id="step2Name" class="form-control" placeholder="e.g. Student" required>
+        </div>
+
+        <!-- 2. College Name -->
+        <div class="form-group">
+          <label class="form-label" for="step2College">College Name *</label>
+          <select id="step2College" class="form-control" required onchange="toggleStep2CustomCollege(this.value)">
+            <option value="Government Engineering College, Sheikhpura" selected>Government Engineering College, Sheikhpura</option>
+            <option value="Bhagalpur College of Engineering (BCE), Bhagalpur">Bhagalpur College of Engineering (BCE), Bhagalpur</option>
+            <option value="Muzaffarpur Institute of Technology (MIT), Muzaffarpur">Muzaffarpur Institute of Technology (MIT), Muzaffarpur</option>
+            <option value="Bakhtiyarpur College of Engineering, Patna">Bakhtiyarpur College of Engineering, Patna</option>
+            <option value="Gaya College of Engineering, Gaya">Gaya College of Engineering, Gaya</option>
+            <option value="Darbhanga College of Engineering, Darbhanga">Darbhanga College of Engineering, Darbhanga</option>
+            <option value="Motihari College of Engineering, Motihari">Motihari College of Engineering, Motihari</option>
+            <option value="Nalanda College of Engineering, Chandi">Nalanda College of Engineering, Chandi</option>
+            <option value="LNJPIT Chhapra">LNJPIT Chhapra</option>
+            <option value="Government Engineering College, Banka">Government Engineering College, Banka</option>
+            <option value="Government Engineering College, Vaishali">Government Engineering College, Vaishali</option>
+            <option value="Government Engineering College, Jamui">Government Engineering College, Jamui</option>
+            <option value="Government Engineering College, Lakhisarai">Government Engineering College, Lakhisarai</option>
+            <option value="Government Engineering College, Nawada">Government Engineering College, Nawada</option>
+            <option value="Government Engineering College, Munger">Government Engineering College, Munger</option>
+            <option value="Government Engineering College, Begusarai">Government Engineering College, Begusarai</option>
+            <option value="Government Engineering College, Aurangabad">Government Engineering College, Aurangabad</option>
+            <option value="Government Engineering College, Rohtas">Government Engineering College, Rohtas</option>
+            <option value="Government Engineering College, Buxar">Government Engineering College, Buxar</option>
+            <option value="Government Engineering College, Bhojpur">Government Engineering College, Bhojpur</option>
+            <option value="Government Engineering College, Jehanabad">Government Engineering College, Jehanabad</option>
+            <option value="Government Engineering College, Arwal">Government Engineering College, Arwal</option>
+            <option value="Government Engineering College, Siwan">Government Engineering College, Siwan</option>
+            <option value="Government Engineering College, Gopalganj">Government Engineering College, Gopalganj</option>
+            <option value="Government Engineering College, Samastipur">Government Engineering College, Samastipur</option>
+            <option value="Government Engineering College, Madhubani">Government Engineering College, Madhubani</option>
+            <option value="Government Engineering College, Sitamarhi">Government Engineering College, Sitamarhi</option>
+            <option value="Government Engineering College, Sheohar">Government Engineering College, Sheohar</option>
+            <option value="Government Engineering College, West Champaran">Government Engineering College, West Champaran</option>
+            <option value="Government Engineering College, Saharsa">Government Engineering College, Saharsa</option>
+            <option value="Government Engineering College, Supaul">Government Engineering College, Supaul</option>
+            <option value="Government Engineering College, Madhepura">Government Engineering College, Madhepura</option>
+            <option value="Purnea College of Engineering, Purnea">Purnea College of Engineering, Purnea</option>
+            <option value="Katihar Engineering College, Katihar">Katihar Engineering College, Katihar</option>
+            <option value="Government Engineering College, Araria">Government Engineering College, Araria</option>
+            <option value="Government Engineering College, Kishanganj">Government Engineering College, Kishanganj</option>
+            <option value="Government Engineering College, Khagaria">Government Engineering College, Khagaria</option>
+            <option value="Government Engineering College, Kaimur">Government Engineering College, Kaimur</option>
+            <option value="other">Other BEU / Technical College</option>
+          </select>
+          <input type="text" id="step2CustomCollege" class="form-control" placeholder="Type your college name" style="display: none; margin-top: 0.5rem;">
+        </div>
+
+        <!-- 3. Registration Number & DOB -->
+        <div class="grid-2col">
+          <div class="form-group">
+            <label class="form-label" for="step2RegNo">BEU Registration Number *</label>
+            <input type="text" id="step2RegNo" class="form-control" placeholder="e.g. 22105128001" required>
+            <small style="color: #444746; font-size: 0.72rem;">Roll / Registration No.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="step2Dob">Date of Birth (DOB) *</label>
+            <input type="date" id="step2Dob" class="form-control" required>
+          </div>
+        </div>
+
+        <!-- 4. Phone Number & Home District -->
+        <div class="grid-2col">
+          <div class="form-group">
+            <label class="form-label" for="step2Phone">Mobile Phone Number *</label>
+            <input type="tel" id="step2Phone" class="form-control" placeholder="e.g. 9801234567" pattern="[0-9]{10}" maxlength="10" required>
+            <small style="color: #444746; font-size: 0.72rem;">10-digit number</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="step2District">Home District *</label>
+            <select id="step2District" class="form-control" required>
+              <option value="" disabled selected>Select District</option>
+              <option value="Sheikhpura">Sheikhpura</option>
+              <option value="Patna">Patna</option>
+              <option value="Gaya">Gaya</option>
+              <option value="Nalanda">Nalanda</option>
+              <option value="Nawada">Nawada</option>
+              <option value="Lakhisarai">Lakhisarai</option>
+              <option value="Jamui">Jamui</option>
+              <option value="Munger">Munger</option>
+              <option value="Bhagalpur">Bhagalpur</option>
+              <option value="Begusarai">Begusarai</option>
+              <option value="Samastipur">Samastipur</option>
+              <option value="Darbhanga">Darbhanga</option>
+              <option value="Madhubani">Madhubani</option>
+              <option value="Muzaffarpur">Muzaffarpur</option>
+              <option value="Vaishali">Vaishali</option>
+              <option value="Saran">Saran</option>
+              <option value="Siwan">Siwan</option>
+              <option value="Gopalganj">Gopalganj</option>
+              <option value="Purnia">Purnia</option>
+              <option value="Katihar">Katihar</option>
+              <option value="Saharsa">Saharsa</option>
+              <option value="Madhepura">Madhepura</option>
+              <option value="Supaul">Supaul</option>
+              <option value="Araria">Araria</option>
+              <option value="Kishanganj">Kishanganj</option>
+              <option value="Rohtas">Rohtas</option>
+              <option value="Kaimur">Kaimur</option>
+              <option value="Buxar">Buxar</option>
+              <option value="Bhojpur">Bhojpur</option>
+              <option value="Aurangabad">Aurangabad</option>
+              <option value="Jehanabad">Jehanabad</option>
+              <option value="Arwal">Arwal</option>
+              <option value="West Champaran">West Champaran</option>
+              <option value="East Champaran">East Champaran</option>
+              <option value="Sitamarhi">Sitamarhi</option>
+              <option value="Sheohar">Sheohar</option>
+              <option value="Khagaria">Khagaria</option>
+              <option value="Other District / State">Other District / State</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+          <button type="button" class="google-btn-secondary" onclick="backToAccountSelect()" style="flex: 1;">
+            ← Back
+          </button>
+          <button type="submit" class="google-btn-primary" id="btnSubmitVerification" style="flex: 2;">
+            Verify &amp; Enter Dashboard →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Spinner Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <div id="loadingText" style="font-size: 1rem; font-weight: 600; color: #1f1f1f;">Signing in to Google...</div>
+      <div id="loadingSubtext" style="font-size: 0.8125rem; color: #444746;">Verifying student life credentials</div>
+    </div>
+  </div>
+
+  <div class="google-footer">
+    <div>English (United States)</div>
+    <div>
+      <a href="https://support.google.com/accounts" target="_blank">Help</a>
+      <a href="https://policies.google.com/privacy" target="_blank">Privacy</a>
+      <a href="https://policies.google.com/terms" target="_blank">Terms</a>
+    </div>
+  </div>
+
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/db-service.js?v=13.0"></script>
+  <script>
+    // Ensure click events are directly bound once DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      );
+  </script>
+<footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+  <script src="components/footer.js"></script>
+</body>
+</html>

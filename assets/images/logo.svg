@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <!-- Academic Engineering Shield Base -->
+  <path d="M24 4L7 10.5V23.5C7 34 14.5 42 24 44.5C33.5 42 41 34 41 23.5V10.5L24 4Z" fill="#0f2744" stroke="#d97706" stroke-width="2" stroke-linejoin="round"/>
+  
+  <!-- Subtle Internal Geometry -->
+  <path d="M24 5V43" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <path d="M8 23.5H40" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+
+  <!-- Engineering Cog / Gear -->
+  <circle cx="24" cy="24" r="8.5" fill="#0a192f" stroke="#ffffff" stroke-width="2"/>
+  <path d="M24 12V15M24 33V36M12 24H15M33 24H36M15.5 15.5L17.6 17.6M30.4 30.4L32.5 32.5M15.5 32.5L17.6 30.4M30.4 17.6L32.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Academic Torch / Star in Center -->
+  <polygon points="24,19 25.5,22.5 29,22.5 26,24.5 27.5,28 24,25.8 20.5,28 22,24.5 19,22.5 22.5,22.5" fill="#d97706"/>
+</svg>

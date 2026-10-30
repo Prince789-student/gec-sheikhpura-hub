@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: gec-sheikhpura-backend
+    env: node
+    plan: free
+    region: singapore
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

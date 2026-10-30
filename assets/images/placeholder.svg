@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="#f1f5f9"/>
+  <circle cx="160" cy="110" r="20" fill="#94a3b8"/>
+  <path d="M120 210l50-60 40 40 60-80 50 100H120z" fill="#cbd5e1"/>
+  <text x="50%" y="250" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#64748b">Student Marketplace Listing</text>
+</svg>
+

@@ -1,0 +1,314 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Offline Mode | GEC Sheikhpura Student Life Hub</title>
+  <meta name="description" content="Offline assistance and emergency contacts for GEC Sheikhpura students.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+
+  <aside class="disclaimer-topbar">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge" style="background-color: var(--color-warning); color: #fff;">Offline Mode</span>
+        <span>Displaying cached emergency contacts and offline utilities.</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+          📚 Apna College Bihar — Academic Portal ↗
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand">
+        <div class="brand-crest">
+          <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="30" height="30">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
+          <span class="brand-tag">Student Life &amp; Offline Directory</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="window.location.reload()">
+          🔄 Reconnect
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="container" style="padding: 3rem 1rem; max-width: 800px; margin: 0 auto;">
+      <div class="calc-card" style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📡</div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.75rem;">
+          You Are Currently Offline
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; max-width: 600px; margin: 0 auto 1.5rem auto;">
+          Your internet connection appears to be unavailable. Essential emergency helplines, campus administration contacts, and local cached bookmarks remain available below.
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-primary" onclick="window.location.reload()">
+            🔄 Check Connection &amp; Retry
+          </button>
+          <a href="saved-items.html" class="btn btn-secondary">
+            📑 View Saved Bookmarks
+          </a>
+        </div>
+      </div>
+
+      <!-- Critical Offline Contacts -->
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">
+        🚨 Essential Sheikhpura Contacts (Offline Cache)
+      </h2>
+      
+      <div class="grid-cards-2" style="margin-bottom: 2rem;">
+        <div class="hub-card" style="border-left: 4px solid var(--color-danger);">
+          <span class="section-eyebrow" style="color: var(--color-danger);">24x7 Emergency Casualty</span>
+          <h3 style="font-size: 1.1rem; margin: 0.25rem 0;">Sadar Hospital Sheikhpura</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            District government hospital, 3.8 km from Bajidpur campus.
+          </p>
+          <div style="font-weight: 700; font-family: var(--font-mono); font-size: 1rem; margin-bottom: 0.5rem;">
+            📞 <a href="tel:06341223233" style="color: var(--color-primary-700);">06341-223233</a> / <a href="tel:102" style="color: var(--color-primary-700);">102</a>
+          </div>
+        </div>
+
+        <div class="hub-card" style="border-left: 4px solid #0284c7;">
+          <span class="section-eyebrow" style="color: #0284c7;">Police &amp; Law Order</span>
+          <h3 style="font-size: 1.1rem; margin: 0.25rem 0;">Sheikhpura Thana &amp; ERSS</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Central helpline &amp; town police station at Thana Chowk.
+          </p>
+          <div style="font-weight: 700; font-family: var(--font-mono); font-size: 1rem; margin-bottom: 0.5rem;">
+            📞 <a href="tel:112" style="color: var(--color-primary-700);">112</a> / <a href="tel:06341223225" style="color: var(--color-primary-700);">06341-223225</a>
+          </div>
+        </div>
+
+        <div class="hub-card" style="border-left: 4px solid #10b981;">
+          <span class="section-eyebrow" style="color: #10b981;">Ambulance</span>
+          <h3 style="font-size: 1.1rem; margin: 0.25rem 0;">Free State Ambulance Service</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Toll-free emergency dispatch for Sheikhpura district.
+          </p>
+          <div style="font-weight: 700; font-family: var(--font-mono); font-size: 1rem; margin-bottom: 0.5rem;">
+            📞 <a href="tel:108" style="color: var(--color-primary-700);">108</a>
+          </div>
+        </div>
+
+        <div class="hub-card" style="border-left: 4px solid var(--color-accent);">
+          <span class="section-eyebrow" style="color: var(--color-accent);">Campus Office</span>
+          <h3 style="font-size: 1.1rem; margin: 0.25rem 0;">GEC Sheikhpura Campus Office</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Bajidpur Campus administrative inquiries and gate.
+          </p>
+          <div style="font-weight: 700; font-family: var(--font-mono); font-size: 1rem; margin-bottom: 0.5rem;">
+            📞 <a href="tel:+917783822790" style="color: var(--color-primary-700);">+91-7783822790</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="background-color: var(--bg-muted); border-radius: var(--radius-md); padding: 1rem; font-size: 0.825rem; color: var(--text-muted); line-height: 1.5;">
+        ℹ️ <strong>Offline Limitations:</strong> Interactive map tiles, real-time seller inquiries, new marketplace listings, and live Google Maps route directions require an active internet connection. As soon as connectivity returns, all live features will resume automatically.
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script>
+    // Monitor online/offline network events
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+  <script src="components/footer.js"></script>
+</body>
+</html>

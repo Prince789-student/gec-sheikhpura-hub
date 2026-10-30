@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Faculty, Room &amp; Campus Directory | GEC Sheikhpura Hub</title>
+  <meta name="description" content="Verified faculty directory, department HODs, academic room numbers, laboratories, library, and campus facilities at Government Engineering College, Sheikhpura (Bajidpur campus).">
+  <link rel="canonical" href="https://gecsheikhpurahub.in/campus-directory.html">
+  <meta property="og:title" content="Faculty, Room &amp; Campus Directory | GEC Sheikhpura Hub">
+  <meta property="og:description" content="Search verified faculty office hours, room locations, campus labs, workshops, and facilities at GEC Sheikhpura.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gecsheikhpurahub.in/campus-directory.html">
+  <meta property="og:image" content="https://gecsheikhpurahub.in/assets/images/icons/icon-512.png">
+  <meta name="theme-color" content="#0a192f">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+
+  <style>
+    /* Campus Directory Custom Aesthetics */
+    .dir-hero {
+      background: linear-gradient(135deg, rgba(10, 25, 47, 0.95), rgba(30, 41, 59, 0.98));
+      color: #fff;
+      padding: 3rem 1rem 2.5rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .dir-main-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .dir-main-tab-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 0.75rem 1.25rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 44px;
+      transition: all 0.2s ease;
+    }
+    .dir-main-tab-btn:hover, .dir-main-tab-btn.active {
+      background: var(--color-accent);
+      color: #0a192f;
+      border-color: var(--color-accent);
+    }
+    .dir-filter-strip {
+      background: var(--surface-1);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .dir-chips-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+      scrollbar-width: thin;
+    }
+    .dir-chip {
+      background: var(--surface-2);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 0.45rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .dir-chip:hover, .dir-chip.active {
+      background: var(--color-accent);
+      color: #0a192f;
+      border-color: var(--color-accent);
+    }
+    .dir-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+    .directory-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background: var(--surface-1);
+      border: 1px solid var(--border-color);
+    }
+    .directory-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+    }
+    .directory-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--surface-2);
+      gap: 0.75rem;
+    }
+    .dir-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin: 0;
+      line-height: 1.3;
+    }
+    .dir-designation {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .dir-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .dir-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--surface-3, #f1f5f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .dir-details-list {
+      padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      font-size: 0.85rem;
+    }
+    .dir-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .dir-label {
+      color: var(--text-muted);
+      min-width: 100px;
+      font-size: 0.775rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .dir-val {
+      color: var(--text-color);
+      text-align: right;
+      word-break: break-word;
+    }
+    .dir-contact-link {
+      color: var(--color-accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .dir-contact-link:hover {
+      text-decoration: underline;
+    }
+    .directory-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      background: var(--surface-2);
+      border-top: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .status-unverified {
+      background: rgba(148, 163, 184, 0.2);
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+  </style>
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+
+  <!-- Top Unofficial Disclaimer Bar -->
+  <aside class="disclaimer-topbar">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge">Campus Directory</span>
+        <span>Verified Faculty Chambers &amp; Bajidpur Campus Facility Navigation</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+          📚 Apna College Bihar — Academic Notes ↗
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand">
+        <div class="brand-crest">
+          <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="30" height="30">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
+          <span class="brand-tag">Student Community &amp; Campus Life</span>
+        </div>
+      </a>
+
+            <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link ">Home</a>
+        <a href="college-info.html" class="nav-link ">College Info</a>
+        <a href="admissions.html" class="nav-link ">Admissions</a>
+        
+        <!-- Academics Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Academics
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <div style="padding: 0.35rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent);">BEU Academic Hub</div>
+            <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="dropdown-item">🌐 BEU Result Portal ↗</a>
+            <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="dropdown-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+            <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="dropdown-item">📝 Previous Year Questions (PYQs) ↗</a>
+            <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="dropdown-item">📋 BEU B.Tech Syllabus ↗</a>
+            <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="dropdown-item">🧮 SGPA / CGPA Calculator ↗</a>
+            <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="dropdown-item">⏱️ 75% Attendance Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="dropdown-item">👥 Free Senior Mentorship ↗</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="academics.html" class="dropdown-item" style="font-weight: 700; color: var(--color-primary-700);">🏛️ GEC Sheikhpura Academic Overview</a>
+          </div>
+        </div>
+
+        <!-- Campus Life Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger active" aria-haspopup="true">
+            Campus Life
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">🎪 Student Community &amp; Events</a>
+            <a href="community.html?tab=events" class="dropdown-item">📅 College Events Directory</a>
+            <a href="community.html?tab=clubs" class="dropdown-item">🤝 Clubs &amp; Societies</a>
+            <a href="community.html?tab=sports" class="dropdown-item">⚽ Sports &amp; Recreation</a>
+            <a href="community.html?tab=announcements" class="dropdown-item">📢 Campus Announcements</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="campus-directory.html" class="dropdown-item">🏛️ Faculty &amp; Room Directory</a>
+            <a href="lost-found.html" class="dropdown-item">🎒 Lost &amp; Found Desk</a>
+            <a href="submit-listing.html" class="dropdown-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room (Owner)</a>
+          </div>
+        </div>
+
+        <!-- Marketplace Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Marketplace
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="rooms-pg.html" class="dropdown-item">🏠 Rooms &amp; PG Rentals</a>
+            <a href="food-tiffin.html" class="dropdown-item">🍱 Food &amp; Tiffin Services</a>
+            <a href="explore-nearby.html" class="dropdown-item">🏪 Explore Nearby Shops</a>
+            <a href="explore-nearby.html?cat=laundry" class="dropdown-item">🧺 Laundry &amp; Ironing Services</a>
+            <a href="transport.html" class="dropdown-item">🚌 Transport &amp; Bus/Train</a>
+            <a href="emergency.html" class="dropdown-item">🚑 Medical &amp; Emergency</a>
+          </div>
+        </div>
+
+        <a href="student-tools.html" class="nav-link ">Student Tools</a>
+        <a href="placement.html" class="nav-link ">Placements</a>
+        <a href="notices.html" class="nav-link ">Notices</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="saved-items.html" class="btn-bookmark-nav" title="Saved Items in My Hub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span class="badge-count" id="bookmarkCountBadge" style="display: none;">0</span>
+        </a>
+        <a href="login.html" class="btn-account-nav" id="headerUserBtn" title="Student Sign In / Dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span class="user-nav-label" id="headerUserLabel" style="font-size:0.8rem; font-weight:600; margin-left:4px;">Sign In</span>
+        </a>
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme"></button>
+        <button type="button" class="mobile-toggle-btn" id="mobileNavToggle" aria-label="Open navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+
+    <!-- Directory Hero -->
+    <section class="dir-hero">
+      <div style="max-width: 760px;">
+        <span class="badge badge-success" style="margin-bottom: 0.75rem; text-transform: uppercase;">Phase 11 Campus Discovery</span>
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.2;">
+          Campus Directory &amp; Room Finder
+        </h1>
+        <p style="font-size: 1rem; color: #cbd5e1; margin-bottom: 1.5rem; line-height: 1.5;">
+          Find verified administrative offices, HOD chambers, academic departments, laboratories, library wings, SIHE incubation center, and student facilities across the GEC Sheikhpura Bajidpur campus.
+        </p>
+
+        <!-- Top Main Tabs Switcher -->
+        <div class="dir-main-tabs">
+          <button type="button" class="dir-main-tab-btn active" data-dir-tab="faculty">
+            👨‍🏫 Verified Faculty Directory
+          </button>
+          <button type="button" class="dir-main-tab-btn" data-dir-tab="facilities">
+            📍 Campus Rooms &amp; Facilities
+          </button>
+          <a href="lost-found.html" class="dir-main-tab-btn" style="text-decoration: none; border-color: rgba(245, 158, 11, 0.4);">
+            🎒 Lost &amp; Found Desk &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Institutional Truth-in-Data Notice -->
+    <div class="alert-box" style="background: var(--surface-1); border-left: 4px solid #10b981; margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px;">
+      <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+        <span style="font-size: 1.5rem;">🛡️</span>
+        <div style="font-size: 0.875rem;">
+          <strong>Official Record Notice:</strong>
+          Directory information is compiled directly from institutional rosters of Government Engineering College, Sheikhpura. Personal contact numbers and private emails are strictly excluded for privacy protection. Any missing room numbers or schedules are explicitly marked as <code>Not verified</code>.
+        </div>
+      </div>
+    </div>
+
+    <!-- Academic Platform Separation Banner (Apna College Bihar) -->
+    <div class="apna-college-banner" style="margin-bottom: 1.75rem; padding: 1.25rem 1.5rem; background: linear-gradient(135deg, rgba(234, 88, 12, 0.05) 0%, rgba(255, 255, 255, 1) 100%); border: 1px solid rgba(234, 88, 12, 0.25); border-radius: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase;">
+          <span>📚 Dedicated Branch Academic Portals</span>
+        </div>
+        <h3 style="font-size: 1.15rem; margin: 0.25rem 0 0.2rem; color: var(--color-primary-900);">Department Notes, AICTE Syllabus &amp; Solved PYQs</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 0.5rem;">
+          Faculty notes, lab manuals, and previous year exam questions are hosted on <strong>Apna College Bihar</strong>. Select your branch:
+        </p>
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <a href="https://www.apnacollegebihar.online/notes/cse" target="_blank" rel="noopener noreferrer" class="tag" style="background: var(--bg-surface); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 600; text-decoration: none;">💻 CSE Notes ↗</a>
+          <a href="https://www.apnacollegebihar.online/notes/civil" target="_blank" rel="noopener noreferrer" class="tag" style="background: var(--bg-surface); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 600; text-decoration: none;">🏗️ Civil Notes ↗</a>
+          <a href="https://www.apnacollegebihar.online/notes/ee" target="_blank" rel="noopener noreferrer" class="tag" style="background: var(--bg-surface); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 600; text-decoration: none;">⚡ Electrical Notes ↗</a>
+          <a href="https://www.apnacollegebihar.online/notes/me" target="_blank" rel="noopener noreferrer" class="tag" style="background: var(--bg-surface); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 600; text-decoration: none;">⚙️ Mechanical Notes ↗</a>
+          <a href="https://www.apnacollegebihar.online/notes/ece" target="_blank" rel="noopener noreferrer" class="tag" style="background: var(--bg-surface); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 600; text-decoration: none;">📡 ECE Notes ↗</a>
+          <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="tag" style="background: var(--bg-surface); border: 1px solid var(--border-light); font-size: 0.75rem; font-weight: 600; text-decoration: none;">📄 BEU PYQs ↗</a>
+        </div>
+      </div>
+      <div>
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="background-color: var(--color-accent); border-color: var(--color-accent); font-weight: 700;">
+          Visit Apna College Bihar ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         SECTION 1: VERIFIED FACULTY DIRECTORY
+         ====================================================================== -->
+    <section id="facultyDirectorySection">
+      <!-- Search & Filters Strip -->
+      <div class="dir-filter-strip">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="position: relative; flex: 1; min-width: 250px;">
+            <input type="text" id="facultySearchInput" class="form-control" placeholder="Search by faculty name, designation, department, or room #..." style="padding-left: 2.25rem;">
+            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">🔍</span>
+          </div>
+          <span id="facultyCountStats" style="font-size: 0.875rem; color: var(--text-muted); font-weight: 600;">Loading faculty...</span>
+        </div>
+
+        <!-- Department Filter Chips -->
+        <div>
+          <div class="dir-chips-scroll">
+            <button class="dir-chip active" data-dept-chip="all">All Departments</button>
+            <button class="dir-chip" data-dept-chip="Administration">Administration &amp; Principal</button>
+            <button class="dir-chip" data-dept-chip="Computer Science">Computer Science &amp; Engg</button>
+            <button class="dir-chip" data-dept-chip="Civil">Civil Engineering</button>
+            <button class="dir-chip" data-dept-chip="Electrical">Electrical Engineering</button>
+            <button class="dir-chip" data-dept-chip="Mechanical">Mechanical Engineering</button>
+            <button class="dir-chip" data-dept-chip="Electronics">Electronics &amp; Comm</button>
+            <button class="dir-chip" data-dept-chip="Mechatronics">Mechatronics</button>
+            <button class="dir-chip" data-dept-chip="Applied Science">ASH &amp; Humanities</button>
+            <button class="dir-chip" data-dept-chip="Placement">TPO Cell</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Faculty Grid -->
+      <div class="dir-grid" id="facultyCardsGrid"></div>
+
+      <!-- Empty State -->
+      <div id="facultyEmptyState" style="display: none; text-align: center; padding: 4rem 1rem; background: var(--surface-1); border-radius: 12px; border: 1px dashed var(--border-color);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🏫</div>
+        <h3 style="margin-bottom: 0.5rem;">No matching faculty members found</h3>
+        <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 1.5rem auto;">
+          We couldn't find any faculty records matching your criteria. Try clearing search keywords or department filters.
+        </p>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 2: CAMPUS ROOMS & FACILITIES DIRECTORY
+         ====================================================================== -->
+    <section id="facilitiesDirectorySection" style="display: none;">
+      <!-- Search & Filters Strip -->
+      <div class="dir-filter-strip">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="position: relative; flex: 1; min-width: 250px;">
+            <input type="text" id="facilitySearchInput" class="form-control" placeholder="Search by facility name, room number, or keyword..." style="padding-left: 2.25rem;">
+            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">🔍</span>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <select id="facilBuildingSelect" class="form-control" style="width: auto; font-size: 0.8125rem;">
+              <option value="all">All Buildings</option>
+              <option value="Academic Complex">Academic Complex</option>
+              <option value="Workshop Block">Workshop Block</option>
+              <option value="Central Courtyard">Central Courtyard</option>
+              <option value="Residential Sector">Residential Sector (Hostels)</option>
+            </select>
+
+            <select id="facilFloorSelect" class="form-control" style="width: auto; font-size: 0.8125rem;">
+              <option value="all">All Floors</option>
+              <option value="Ground Floor">Ground Floor</option>
+              <option value="1st Floor">1st Floor</option>
+              <option value="2nd Floor">2nd Floor</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div>
+          <div class="dir-chips-scroll">
+            <button class="dir-chip active" data-facil-cat="all">All Locations</button>
+            <button class="dir-chip" data-facil-cat="administrative">🏛️ Administrative Block</button>
+            <button class="dir-chip" data-facil-cat="labs_workshops">🔬 Labs &amp; Workshops</button>
+            <button class="dir-chip" data-facil-cat="classrooms">🎓 Classrooms</button>
+            <button class="dir-chip" data-facil-cat="library_study">📚 Central Library</button>
+            <button class="dir-chip" data-facil-cat="amenities">☕ SIHE &amp; Canteen</button>
+            <button class="dir-chip" data-facil-cat="hostels">🏠 Student Hostels</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Facilities Count Stats -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span id="facilitiesCountStats" style="font-size: 0.875rem; color: var(--text-muted); font-weight: 600;">Loading facilities...</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Verified Bajidpur Campus, Sheikhpura (811105)</span>
+      </div>
+
+      <!-- Facilities Grid -->
+      <div class="dir-grid" id="facilitiesCardsGrid"></div>
+
+      <!-- Empty State -->
+      <div id="facilitiesEmptyState" style="display: none; text-align: center; padding: 4rem 1rem; background: var(--surface-1); border-radius: 12px; border: 1px dashed var(--border-color);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📍</div>
+        <h3 style="margin-bottom: 0.5rem;">No matching campus locations found</h3>
+        <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 1.5rem auto;">
+          Try adjusting building or category filters to find the required room or facility.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Modal 1: Suggest Correction Form -->
+  <div class="hub-modal-backdrop" id="dirCorrectionModal">
+    <div class="hub-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Suggest Directory Correction</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('dirCorrectionModal')">&times;</button>
+      </div>
+      <form id="dirCorrectionForm">
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Notice an updated room number, relocated lab, or changed office schedule? Submit your correction for administrator verification.
+          </p>
+
+          <div style="font-size: 0.875rem; font-weight: 700; color: var(--color-accent); margin-bottom: 1rem;" id="corrTargetLabel">
+            Target Record
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="corrProposedRoom">Proposed / Updated Room Number</label>
+            <input type="text" id="corrProposedRoom" class="form-control" placeholder="e.g. Room 204 or Workshop Lab 2">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="corrProposedHours">Proposed Office / Opening Hours</label>
+            <input type="text" id="corrProposedHours" class="form-control" placeholder="e.g. Mon-Fri: 10:00 AM - 1:00 PM">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="corrReason">Reason &amp; Verification Proof *</label>
+            <textarea id="corrReason" class="form-control" rows="3" placeholder="Provide evidence: e.g. Notice pinned on department board dated Oct 2026, or official circular..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="corrSubmitterContact">Your Name &amp; Contact (For verification audit) *</label>
+            <input type="text" id="corrSubmitterContact" class="form-control" placeholder="Your name and student email/roll" required>
+          </div>
+
+          <div class="alert-subtle" style="font-size: 0.775rem; background: var(--surface-2); padding: 0.6rem; border-radius: 6px;">
+            🛡️ <strong>Integrity Guarantee:</strong> Updates are reviewed against official administrative circulars prior to publication. No unverified rumors will be approved.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('dirCorrectionModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Submit Correction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Campus Map & Walking Directions -->
+  <div class="hub-modal-backdrop" id="campusMapModal">
+    <div class="hub-modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="mapModalTitle">📍 Campus Location</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('campusMapModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="mapModalDetails"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('campusMapModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Shareable QR Modal -->
+  <div class="hub-modal-backdrop" id="campusQrModal">
+    <div class="hub-modal-card" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="qrModalTitle">📲 Share QR Code</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('campusQrModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="qrModalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('campusQrModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Footer -->
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- Core Scripts -->
+  <script src="assets/js/data.js?v=8.0"></script>
+  <script src="assets/js/supabase-config.js?v=8.0"></script>
+  <script src="assets/js/logger.js?v=8.0"></script>
+  <script src="assets/js/db-service.js?v=8.0"></script>
+  <script src="assets/js/app.js?v=8.0"></script>
+  <script src="assets/js/campus-directory.js?v=8.0"></script>
+  <script src="components/footer.js"></script>
+</body>
+</html>

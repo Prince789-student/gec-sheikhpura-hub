@@ -1,0 +1,32 @@
+{
+  "stats": {
+    "discovered": 237,
+    "fetched": 33,
+    "parsed": 30,
+    "approved": 30,
+    "duplicates": 0,
+    "restricted": 0,
+    "failed": 3,
+    "startTime": "2026-10-28T02:37:02.893Z",
+    "endTime": "2026-10-28T02:37:33.811Z"
+  },
+  "discoveredCount": 30,
+  "documentsCount": 0,
+  "errors": [
+    {
+      "url": "https://www.gecsheikhpura.ac.in/approval/naac/",
+      "status": 404,
+      "error": "Non-200 status"
+    },
+    {
+      "url": "https://www.gecsheikhpura.ac.in/approval/aishe/",
+      "status": 404,
+      "error": "Non-200 status"
+    },
+    {
+      "url": "https://www.gecsheikhpura.ac.in/about-us/allotment-and-surrender-report/",
+      "status": 404,
+      "error": "Non-200 status"
+    }
+  ]
+}

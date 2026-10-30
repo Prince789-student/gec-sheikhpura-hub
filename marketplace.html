@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Student Marketplace in Sheikhpura | GEC Student Life Hub</title>
+  <meta name="description" content="Buy, sell, and exchange second-hand engineering drafters, scientific calculators, cycles, coolers, and student essentials near GEC Sheikhpura.">
+  <link rel="canonical" href="https://gecsheikhpurahub.in/marketplace.html">
+  <meta property="og:title" content="Student Second-Hand Marketplace | GEC Sheikhpura Hub">
+  <meta property="og:description" content="Peer-to-peer exchange of drafters, cycles, books, study tables, and electronics for GEC Sheikhpura students.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gecsheikhpurahub.in/marketplace.html">
+  <meta property="og:image" content="https://gecsheikhpurahub.in/assets/images/icons/icon-512.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#0a192f">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Core Design Tokens & Component Styles -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+  <!-- Clean LocalStorage Cache for Marketplace -->
+  <script>
+    (function() {
+      try {
+        var key = 'gec_marketplace_listings';
+        var items = JSON.parse(localStorage.getItem(key) || '[]');
+        if (items && items.length > 0) {
+          var realItems = items.filter(function(it) {
+            return it.id && !it.id.startsWith('mkt-seed-');
+          });
+          localStorage.setItem(key, JSON.stringify(realItems));
+        }
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- 1. Top Informational Bar -->
+  <aside class="disclaimer-topbar" role="complementary" aria-label="Official Disclaimer">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge">Unofficial Student Portal</span>
+        <span>Campus life, student marketplace, and local community services in Sheikhpura.</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+          📚 Apna College Bihar (Notes &amp; PYQs) ↗
+        </a>
+        <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">
+          🏛️ Official Site (gecsheikhpura.ac.in) ↗
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 2. Primary Navigation Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-container">
+      <!-- Brand Logo -->
+      <a href="index.html" class="brand" aria-label="GEC Sheikhpura Student Life Hub Homepage">
+        <div class="brand-crest">
+          <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="32" height="32">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
+          <span class="brand-tag">Student Life &amp; Local Services</span>
+        </div>
+      </a>
+
+            <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link ">Home</a>
+        <a href="college-info.html" class="nav-link ">College Info</a>
+        <a href="admissions.html" class="nav-link ">Admissions</a>
+        
+        <!-- Academics Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Academics
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <div style="padding: 0.35rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent);">BEU Academic Hub</div>
+            <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="dropdown-item">🌐 BEU Result Portal ↗</a>
+            <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="dropdown-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+            <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="dropdown-item">📝 Previous Year Questions (PYQs) ↗</a>
+            <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="dropdown-item">📋 BEU B.Tech Syllabus ↗</a>
+            <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="dropdown-item">🧮 SGPA / CGPA Calculator ↗</a>
+            <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="dropdown-item">⏱️ 75% Attendance Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="dropdown-item">👥 Free Senior Mentorship ↗</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="academics.html" class="dropdown-item" style="font-weight: 700; color: var(--color-primary-700);">🏛️ GEC Sheikhpura Academic Overview</a>
+          </div>
+        </div>
+
+        <!-- Campus Life Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Campus Life
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">🎪 Student Community &amp; Events</a>
+            <a href="community.html?tab=events" class="dropdown-item">📅 College Events Directory</a>
+            <a href="community.html?tab=clubs" class="dropdown-item">🤝 Clubs &amp; Societies</a>
+            <a href="community.html?tab=sports" class="dropdown-item">⚽ Sports &amp; Recreation</a>
+            <a href="community.html?tab=announcements" class="dropdown-item">📢 Campus Announcements</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="campus-directory.html" class="dropdown-item">🏛️ Faculty &amp; Room Directory</a>
+            <a href="lost-found.html" class="dropdown-item">🎒 Lost &amp; Found Desk</a>
+            <a href="submit-listing.html" class="dropdown-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room (Owner)</a>
+          </div>
+        </div>
+
+        <!-- Marketplace Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger active" aria-haspopup="true">
+            Marketplace
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="rooms-pg.html" class="dropdown-item">🏠 Rooms &amp; PG Rentals</a>
+            <a href="food-tiffin.html" class="dropdown-item">🍱 Food &amp; Tiffin Services</a>
+            <a href="explore-nearby.html" class="dropdown-item">🏪 Explore Nearby Shops</a>
+            <a href="explore-nearby.html?cat=laundry" class="dropdown-item">🧺 Laundry &amp; Ironing Services</a>
+            <a href="transport.html" class="dropdown-item">🚌 Transport &amp; Bus/Train</a>
+            <a href="emergency.html" class="dropdown-item">🚑 Medical &amp; Emergency</a>
+          </div>
+        </div>
+
+        <a href="student-tools.html" class="nav-link ">Student Tools</a>
+        <a href="placement.html" class="nav-link ">Placements</a>
+        <a href="notices.html" class="nav-link ">Notices</a>
+      </nav>
+
+      <!-- Action Controls -->
+      <div class="header-actions">
+        <!-- Bookmark Link -->
+        <a href="saved-items.html" class="btn-bookmark-nav" title="Saved Items & Watchlist in My Hub" aria-label="View Saved Items">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span class="badge-count" id="bookmarkCountBadge" style="display: none;">0</span>
+        </a>
+
+        <!-- Student Account / Dashboard -->
+        <a href="login.html" class="btn-account-nav" id="headerUserBtn" title="Student Sign In / Dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span class="user-nav-label" id="headerUserLabel" style="font-size:0.8rem; font-weight:600; margin-left:4px;">Sign In</span>
+        </a>
+
+        <!-- Theme Toggle -->
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle light/dark theme"></button>
+
+        <!-- Mobile Drawer Toggle -->
+        <button type="button" class="mobile-toggle-btn" id="mobileNavToggle" aria-label="Open mobile navigation" aria-expanded="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. Mobile Navigation Drawer -->
+  <div class="mobile-nav-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <div class="brand">
+          <div class="brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <span class="brand-title">GEC Hub</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+      </div>
+      <div class="drawer-body">
+        <a href="index.html" class="drawer-nav-item">Home</a>
+        <a href="college-info.html" class="drawer-nav-item">College Information</a>
+        <a href="admissions.html" class="drawer-nav-item">Admission &amp; UGEAC</a>
+        
+        <div class="drawer-section-title">Academics &amp; BEU Study Hub</div>
+        <a href="academics.html" class="drawer-nav-item">🏛️ Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🌐 BEU Result Portal ↗</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📝 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📋 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🧮 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">👥 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Campus Life &amp; Community</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Student Community &amp; Events</a>
+        <a href="community.html?tab=events" class="drawer-nav-item">📅 Events Directory</a>
+        <a href="community.html?tab=clubs" class="drawer-nav-item">🤝 Clubs &amp; Societies</a>
+        <a href="community.html?tab=sports" class="drawer-nav-item">⚽ Sports &amp; Recreation</a>
+        <a href="community.html?tab=announcements" class="drawer-nav-item">📢 Campus Announcements</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">🧺 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+
+        <div class="drawer-section-title">Student Resources</div>
+        <a href="student-tools.html" class="drawer-nav-item">Student Tools</a>
+        <a href="placement.html" class="drawer-nav-item">Placements &amp; Internships</a>
+        <a href="notices.html" class="drawer-nav-item">Notice Board</a>
+      </div>
+        <a href="academics.html" class="drawer-nav-item">📚 Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📄 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📊 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🎓 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🤝 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">👕 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+        
+        <div class="drawer-section-title">Campus &amp; College Life</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Community &amp; Events</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Main Page Content -->
+  <main class="main-content">
+
+    <!-- Page Header Hero -->
+    <section class="page-header">
+      <div class="container">
+        <div class="breadcrumbs">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span>Student Marketplace</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+          <div>
+            <h1 class="page-title">Student Marketplace</h1>
+            <p class="page-description">
+              Buy, sell, and exchange useful items around your college community.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="openSellModalBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+              <span>+ Sell an Item</span>
+            </button>
+            <a href="dashboard.html?tab=marketplace" class="btn btn-secondary" id="myListingsBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+              <span>📦 My Listings</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+
+      <!-- ===================================================================
+           APNA COLLEGE BIHAR PLATFORM INTEGRATION BANNER (MANDATORY REQUIREMENT)
+           =================================================================== -->
+      <section class="apna-college-banner" style="margin-bottom: 1.5rem;" aria-label="Apna College Bihar Academic Separation Banner">
+        <div class="apna-college-content">
+          <span class="apna-college-tag">
+            <span>📚 Complete Academic Platform</span>
+          </span>
+          <h2 class="apna-college-title">Looking for notes, syllabus, PYQs, or mentorship?</h2>
+          <p class="apna-college-desc">
+            All BEU semester syllabus, subject notes, previous year question papers, video lectures, and study groups belong to <strong>Apna College Bihar</strong>. (Academic notes and digital PDFs are not sold in this marketplace).
+          </p>
+        </div>
+        <div>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="apna-college-btn">
+            <span>Visit Apna College Bihar</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+        </div>
+      </section>
+
+      <!-- Scam Prevention & Campus Safety Guidance Banner -->
+      <div style="background-color: var(--bg-surface); border: 1px solid var(--border-medium); border-left: 4px solid #f59e0b; border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 0.85rem;">
+        <span style="font-size: 1.5rem; line-height: 1;">🛡️</span>
+        <div>
+          <strong style="color: var(--text-main); font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">
+            Campus Safety &amp; Trust Guidelines:
+          </strong>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.45;">
+            Always inspect physical items in person before paying. Meet in public campus spots (e.g. <strong>GEC Sheikhpura Canteen</strong> or <strong>College Main Gate</strong>). Never send advance token money, and never share OTPs or UPI PINs. Report any suspicious listings immediately.
+          </p>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           MARKETPLACE SEARCH & CATEGORY FILTERING
+           =================================================================== -->
+      <section style="margin-bottom: 2rem;" aria-label="Marketplace Controls">
+        <!-- Search bar -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="position: relative; flex: 1;">
+            <input type="search" id="mktSearchInput" class="form-control" placeholder="Search by item title, brand, or hostel location (e.g. Casio calculator, bicycle, table)..." style="padding-left: 2.75rem; height: 46px; font-size: 0.95rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 1rem; top: 14px; color: var(--text-muted);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+          <button type="button" class="btn btn-secondary" id="mktResetBtn" style="white-space: nowrap; height: 46px;">
+            Reset Filters
+          </button>
+        </div>
+
+        <!-- Category Scroll Pills -->
+        <div class="marketplace-category-scroll" id="categoryPillsContainer" role="tablist" aria-label="Product Categories">
+          <button type="button" class="marketplace-pill-btn active" data-category="all">
+            <span>✨ All Categories</span>
+          </button>
+          <!-- Dynamic Category Pills Injected here -->
+        </div>
+
+        <!-- Filter Sub-bar: Condition, Budget, Sort & Availability -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; background-color: var(--bg-muted); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+          
+          <!-- Condition -->
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label for="filterCondition" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Condition:</label>
+            <select id="filterCondition" class="form-control" style="padding: 0.35rem 0.65rem; font-size: 0.825rem; height: auto;">
+              <option value="all">All Conditions</option>
+              <option value="new">New / Unused</option>
+              <option value="like_new">Like New</option>
+              <option value="good">Good</option>
+              <option value="fair">Fair</option>
+              <option value="for_parts">For Parts</option>
+            </select>
+          </div>
+
+          <!-- Budget Preset -->
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label for="filterPrice" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Budget:</label>
+            <select id="filterPrice" class="form-control" style="padding: 0.35rem 0.65rem; font-size: 0.825rem; height: auto;">
+              <option value="all">Any Price</option>
+              <option value="under_500">Under ₹500</option>
+              <option value="500_2000">₹500 - ₹2,000</option>
+              <option value="2000_5000">₹2,000 - ₹5,000</option>
+              <option value="above_5000">Above ₹5,000</option>
+            </select>
+          </div>
+
+          <!-- Sort Order -->
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label for="filterSort" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Sort By:</label>
+            <select id="filterSort" class="form-control" style="padding: 0.35rem 0.65rem; font-size: 0.825rem; height: auto;">
+              <option value="newest">Recently Added</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
+
+          <!-- Available items only checkbox -->
+          <div style="display: flex; align-items: center; gap: 0.4rem; margin-left: auto;">
+            <input type="checkbox" id="filterAvailableOnly" checked style="cursor: pointer; width: 16px; height: 16px;">
+            <label for="filterAvailableOnly" style="font-size: 0.825rem; font-weight: 600; color: var(--text-main); cursor: pointer;">
+              Available Only
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Filter Count Display -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span id="marketplaceResultsCount" style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted);">
+          Loading active listings...
+        </span>
+        <span style="font-size: 0.8rem; color: var(--text-subtle);">
+          Campus Peer-to-Peer Discovery
+        </span>
+      </div>
+
+      <!-- ===================================================================
+           PRODUCT LISTINGS GRID
+           =================================================================== -->
+      <div class="marketplace-grid" id="marketplaceGrid" aria-live="polite">
+        <!-- Injected via JavaScript -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =======================================================================
+       MODAL 1: ITEM DETAIL & ENQUIRY MODAL
+       ======================================================================= -->
+  <div class="modal-overlay" id="itemDetailModal" role="dialog" aria-modal="true" aria-labelledby="modalDetailTitle" style="display: none;">
+    <div class="modal-dialog" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="status-badge status-sample" id="modalCategoryBadge">Category</span>
+          <span class="marketplace-condition-tag" id="modalConditionBadge" style="position: static;">Condition</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeDetailModalBtn" aria-label="Close details">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Photo carousel/preview -->
+        <div class="marketplace-img-container" style="border-radius: var(--radius-sm); margin-bottom: 1rem; max-height: 280px;">
+          <img src="assets/images/placeholder.svg" id="modalItemPhoto" alt="Product Image" style="object-fit: cover;">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem;">
+          <div>
+            <h2 id="modalDetailTitle" style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); line-height: 1.3;">
+              Item Title
+            </h2>
+            <div id="modalDetailLocation" style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.25rem;">
+              📍 Approximate location
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div class="marketplace-price" id="modalDetailPrice" style="font-size: 1.5rem;">₹0</div>
+            <span class="marketplace-nego-badge" id="modalDetailNego">Negotiable</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div style="background-color: var(--bg-muted); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+          <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 0.5rem;">
+            Item Description &amp; Usage Details
+          </h3>
+          <p id="modalDetailDesc" style="font-size: 0.925rem; color: var(--text-main); line-height: 1.5; margin: 0; white-space: pre-line;">
+            Product description details.
+          </p>
+        </div>
+
+        <!-- Seller & Logistics Meta -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; font-size: 0.85rem;">
+          <div style="border: 1px solid var(--border-light); padding: 0.75rem; border-radius: var(--radius-sm);">
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem;">Seller:</span>
+            <strong id="modalSellerName" style="color: var(--text-main);">Student</strong>
+          </div>
+          <div style="border: 1px solid var(--border-light); padding: 0.75rem; border-radius: var(--radius-sm);">
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem;">Handover Preference:</span>
+            <strong id="modalHandoverPref" style="color: var(--text-main);">Campus Pickup</strong>
+          </div>
+        </div>
+
+        <!-- Buyer Enquiry Box -->
+        <div style="border: 1px solid var(--color-primary-100); background-color: var(--bg-surface); padding: 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1rem;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-primary-900); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>💬 Send Direct Message to Seller</span>
+          </h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+            Your message and contact details will be privately delivered to the seller's hub inbox.
+          </p>
+
+          <form id="enquiryForm" onsubmit="handleSendEnquiry(event)">
+            <input type="hidden" id="enqListingId">
+            <input type="hidden" id="enqSellerId">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <div>
+                <label for="enqBuyerName" class="form-label" style="font-size: 0.8rem;">Your Name *</label>
+                <input type="text" id="enqBuyerName" class="form-control" required placeholder="Enter your full name">
+              </div>
+              <div>
+                <label for="enqBuyerContact" class="form-label" style="font-size: 0.8rem;">Phone / WhatsApp *</label>
+                <input type="text" id="enqBuyerContact" class="form-control" required placeholder="e.g. 9801234567">
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.75rem;">
+              <label for="enqOfferPrice" class="form-label" style="font-size: 0.8rem;">Offer Price (Optional)</label>
+              <input type="number" id="enqOfferPrice" class="form-control" placeholder="Enter custom offer price if negotiating (₹)">
+            </div>
+
+            <div style="margin-bottom: 0.75rem;">
+              <label for="enqMessage" class="form-label" style="font-size: 0.8rem;">Your Message *</label>
+              <textarea id="enqMessage" class="form-control" rows="2" required placeholder="Hi, I am interested in this item. When and where on campus can I inspect it?"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+              <button type="submit" class="btn btn-primary" id="enqSubmitBtn" style="padding: 0.5rem 1.25rem;">
+                Send Enquiry
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer Actions: Safety advice & Report Listing -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 0.85rem;">
+          <span style="font-size: 0.75rem; color: var(--text-subtle);">
+            🔒 Safe campus community exchange
+          </span>
+          <button type="button" class="btn btn-secondary btn-sm" id="reportListingBtn" style="color: var(--color-danger); border-color: var(--color-danger-border);">
+            🚩 Report this Listing
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 2: "SELL AN ITEM" SUBMISSION MODAL
+       ======================================================================= -->
+  <div class="modal-overlay" id="sellItemModal" role="dialog" aria-modal="true" aria-labelledby="modalSellTitle" style="display: none;">
+    <div class="modal-dialog" style="max-width: 620px; max-height: 85vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h2 id="modalSellTitle" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">
+          🛍️ Sell or Exchange an Item
+        </h2>
+        <button type="button" class="modal-close-btn" id="closeSellModalBtn" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Anti-piracy / Platform separation reminder -->
+        <div style="background-color: var(--color-primary-50); border: 1px solid var(--color-primary-100); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.825rem; color: var(--color-primary-900);">
+          ⚠️ <strong>Physical student items only:</strong> Digital PDFs, notes drive links, or copyright study materials are strictly prohibited. Academic syllabus &amp; notes are freely available on <a href="https://www.apnacollegebihar.online/" target="_blank" style="text-decoration: underline; font-weight: 700;">Apna College Bihar</a>.
+        </div>
+
+        <form id="createListingForm" onsubmit="handleCreateListing(event)">
+          <div style="margin-bottom: 1rem;">
+            <label for="sellTitle" class="form-label">Item Title *</label>
+            <input type="text" id="sellTitle" class="form-control" required minlength="5" placeholder="e.g. Wooden Study Desk, Mini Drafter, Bicycle">
+            <span class="form-help">Be specific including brand and model name.</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1rem;">
+            <div>
+              <label for="sellCategory" class="form-label">Category *</label>
+              <select id="sellCategory" class="form-control" required>
+                <option value="">Select Category...</option>
+                <!-- Dynamic categories populated via JS -->
+              </select>
+            </div>
+            <div>
+              <label for="sellCondition" class="form-label">Item Condition *</label>
+              <select id="sellCondition" class="form-control" required>
+                <option value="good">Good (Normal wear, fully functional)</option>
+                <option value="like_new">Like New (Barely used, zero scratches)</option>
+                <option value="new">New (Unopened / Box pack)</option>
+                <option value="fair">Fair (Usable with noticeable cosmetic marks)</option>
+                <option value="for_parts">For Parts / Repair Needed</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1rem;">
+            <div>
+              <label for="sellPrice" class="form-label">Asking Price (₹) *</label>
+              <input type="number" id="sellPrice" class="form-control" required min="0" step="10" placeholder="Enter price in ₹">
+            </div>
+            <div style="display: flex; align-items: flex-end; padding-bottom: 0.5rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer; color: var(--text-main);">
+                <input type="checkbox" id="sellNegotiable" checked style="width: 18px; height: 18px;">
+                <span>Price is Negotiable</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="sellLocation" class="form-label">Approximate Campus Location / Meeting Spot *</label>
+            <input type="text" id="sellLocation" class="form-control" required placeholder="e.g. Boys Hostel Block A / Near College Main Gate">
+            <span class="form-help">Do not disclose private room numbers. Suggest a public campus spot.</span>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="sellDescription" class="form-label">Honest Description &amp; Specifications *</label>
+            <textarea id="sellDescription" class="form-control" rows="3" required minlength="15" placeholder="Mention item age, reason for selling, working condition, accessories included, and any minor defects..."></textarea>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="sellPhotoUrl" class="form-label">Photo Reference / Image URL (Optional)</label>
+            <input type="url" id="sellPhotoUrl" class="form-control" placeholder="https://example.com/item.jpg (or leave empty for category default)">
+            <span class="form-help">Provide a direct image URL. If left empty, an authentic category preview will be used.</span>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="sellPublicPhone" class="form-label">Public Phone Number (Optional)</label>
+            <input type="tel" id="sellPublicPhone" class="form-control" placeholder="10-digit mobile number">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.775rem; margin-top: 0.35rem; color: var(--text-muted); cursor: pointer;">
+              <input type="checkbox" id="sellPhoneConsent">
+              <span>I give consent to show this phone number to interested students on my listing.</span>
+            </label>
+          </div>
+
+          <!-- Anti-fraud & terms consent -->
+          <div style="margin-bottom: 1.25rem; background-color: var(--bg-muted); padding: 0.75rem; border-radius: var(--radius-sm);">
+            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8rem; cursor: pointer; color: var(--text-main);">
+              <input type="checkbox" id="sellTermsConsent" required style="margin-top: 0.15rem;">
+              <span>I certify that this is my lawful physical property, descriptions are accurate, and it does not contain prohibited or digital exam materials.</span>
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn btn-secondary" id="cancelSellBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submitSellBtn">Post Item for Sale</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 3: REPORT LISTING / DISPUTE MODAL (REUSED PHASE 4 SYSTEM)
+       ======================================================================= -->
+  <div class="modal-overlay" id="listingReportModal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle" style="display: none;">
+    <div class="modal-dialog" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="reportModalTitle" style="font-size: 1.15rem; font-weight: 700;">🚩 Report Marketplace Listing</h3>
+        <button type="button" class="modal-close-btn" id="closeReportModalBtn" aria-label="Close report">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="reportListingForm" onsubmit="handleSendReport(event)">
+          <input type="hidden" id="reportListingId">
+          <input type="hidden" id="reportListingTitle">
+          
+          <div style="margin-bottom: 1rem;">
+            <label for="reportIssueType" class="form-label">Issue Category *</label>
+            <select id="reportIssueType" class="form-control" required>
+              <option value="misleading_photos">Misleading Photographs / Condition</option>
+              <option value="price_discrepancy">Price Discrepancy or Hidden Charges</option>
+              <option value="suspected_fraud">Suspected Advance Payment Fraud</option>
+              <option value="prohibited_item">Prohibited / Digital Exam Material</option>
+              <option value="item_unavailable">Item Already Sold / Seller Unavailable</option>
+              <option value="duplicate_listing">Duplicate Listing</option>
+              <option value="inappropriate_content">Inappropriate Content or Spam</option>
+              <option value="other">Other Campus Violation</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="reportDescription" class="form-label">Specific Details *</label>
+            <textarea id="reportDescription" class="form-control" rows="3" required placeholder="Describe what is wrong with this listing. Our student moderation team will investigate."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button type="button" class="btn btn-secondary" id="cancelReportBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submitReportBtn" style="background-color: var(--color-danger); border-color: var(--color-danger);">
+              Submit Report
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Footer -->
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Application Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/data.js?v=13.0"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/logger.js"></script>
+  <script src="assets/js/db-service.js?v=13.0"></script>
+  <script src="assets/js/app.js"></script>
+
+  <!-- Marketplace Interactive Logic -->
+  <script>
+    let activeCategory = 'all';
+    let currentDetailItem = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initMarketplaceCategories();
+      await loadMarketplaceListings();
+      bindMarketplaceEvents();
+    });
+
+    async function initMarketplaceCategories() {
+      const container = document.getElementById('categoryPillsContainer');
+      const sellSelect = document.getElementById('sellCategory');
+      if (!window.DB) return;
+
+      const categories = window.DB.getMarketplaceCategories();
+
+      // Populate pills
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'marketplace-pill-btn';
+        btn.dataset.category = cat.id;
+        btn.innerHTML = `<span>${cat.icon}</span> <span>${escapeHtml(cat.name)}</span>`;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.marketplace-pill-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeCategory = cat.id;
+          loadMarketplaceListings();
+        });
+        container.appendChild(btn);
+
+        // Populate Sell Category Select
+        if (sellSelect) {
+          const opt = document.createElement('option');
+          opt.value = cat.id;
+          opt.textContent = `${cat.icon} ${cat.name}`;
+          sellSelect.appendChild(opt);
+        }
+      });
+
+      // 'All Categories' pill event
+      const allBtn = container.querySelector('[data-category="all"]');
+      if (allBtn) {
+        allBtn.addEventListener('click', () => {
+          document.querySelectorAll('.marketplace-pill-btn').forEach(b => b.classList.remove('active'));
+          allBtn.classList.add('active');
+          activeCategory = 'all';
+          loadMarketplaceListings();
+        });
+      }
+    }
+
+    async function loadMarketplaceListings() {
+      const grid = document.getElementById('marketplaceGrid');
+      const countEl = document.getElementById('marketplaceResultsCount');
+      if (!grid || !window.DB) return;
+
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 3rem 1rem; text-align: center; color: var(--text-muted);">
+          <div class="spinner" style="margin: 0 auto 1rem;"></div>
+          <p>Loading marketplace listings...</p>
+        </div>
+      `;
+
+      // Read filter values
+      const searchEl = document.getElementById('mktSearchInput');
+      const query = (searchEl && searchEl.value ? searchEl.value : '').trim();
+      const condEl = document.getElementById('filterCondition');
+      const condition = (condEl && condEl.value) || 'all';
+      const sortEl = document.getElementById('filterSort');
+      const sort = (sortEl && sortEl.value) || 'newest';
+      const availEl = document.getElementById('filterAvailableOnly');
+      const availableOnly = availEl ? availEl.checked : false;
+      
+      let minPrice = 0;
+      let maxPrice = 100000;
+      const priceEl = document.getElementById('filterPrice');
+      const priceVal = priceEl ? priceEl.value : 'all';
+      if (priceVal === 'under_500') { maxPrice = 500; }
+      else if (priceVal === '500_2000') { minPrice = 500; maxPrice = 2000; }
+      else if (priceVal === '2000_5000') { minPrice = 2000; maxPrice = 5000; }
+      else if (priceVal === 'above_5000') { minPrice = 5000; }
+
+      const res = await window.DB.getMarketplaceListings({
+        category: activeCategory,
+        condition,
+        minPrice,
+        maxPrice,
+        sort,
+        query,
+        status: availableOnly ? 'available' : 'all',
+        limit: 50
+      });
+
+      const items = res.data || [];
+      if (countEl) {
+        countEl.textContent = `Showing ${items.length} active item${items.length === 1 ? '' : 's'}`;
+      }
+
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div class="state-container" style="grid-column: 1 / -1; padding: 3.5rem 1rem; text-align: center;">
+            <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">📦</span>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);">No Listings Found</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 440px; margin: 0 auto 1.25rem;">
+              No items match your current filter criteria. Try resetting filters or post the first listing in this category!
+            </p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('openSellModalBtn').click()">
+              + Post Item for Sale
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = items.map(item => {
+        const isSaved = isBookmarked('marketplace', item.id);
+        const condLabel = formatCondition(item.item_condition);
+        const statusBadge = item.status === 'sold' 
+          ? `<span class="status-badge status-sold" style="position: absolute; bottom: 0.65rem; left: 0.65rem; z-index: 2;">Sold</span>`
+          : (item.status === 'reserved' 
+              ? `<span class="status-badge status-reserved" style="position: absolute; bottom: 0.65rem; left: 0.65rem; z-index: 2;">Reserved</span>` 
+              : '');
+
+        const imgUrl = (item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : 'assets/images/placeholder.svg';
+
+        return `
+          <article class="marketplace-card" data-id="${item.id}">
+            <div class="marketplace-img-container">
+              <span class="marketplace-condition-tag cond-${escapeHtml(item.item_condition)}">${condLabel}</span>
+              <button type="button" class="marketplace-save-btn ${isSaved ? 'active' : ''}" onclick="handleToggleWatchlist('${item.id}', this)" title="${isSaved ? 'Remove from Saved' : 'Save to Watchlist'}" aria-label="Save item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+              </button>
+              <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='assets/images/logo.svg'; this.style.objectFit='contain'; this.style.padding='2rem';">
+              ${statusBadge}
+            </div>
+            
+            <div class="marketplace-content">
+              <div class="marketplace-price-row">
+                <span class="marketplace-price">₹${item.price}</span>
+                ${item.is_negotiable ? '<span class="marketplace-nego-badge">Negotiable</span>' : ''}
+              </div>
+
+              <h3 class="marketplace-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
+              
+              <div class="marketplace-location">
+                <span>📍 ${escapeHtml(item.approximate_location || 'Bajidpur Campus')}</span>
+              </div>
+
+              <div class="marketplace-meta-row">
+                <span>By ${escapeHtml(item.seller_name || 'Student')}</span>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openItemDetail('${item.id}')" style="padding: 0.35rem 0.75rem;">
+                  Details &amp; Contact
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function formatCondition(cond) {
+      const map = {
+        'new': 'Brand New',
+        'like_new': 'Like New',
+        'good': 'Good',
+        'fair': 'Fair',
+        'for_parts': 'For Parts'
+      };
+      return map[cond] || cond;
+    }
+
+    async function openItemDetail(id) {
+      if (!window.DB) return;
+      const item = await window.DB.getMarketplaceListingById(id);
+      if (!item) {
+        showToast('Item details could not be found.');
+        return;
+      }
+
+      currentDetailItem = item;
+      document.getElementById('modalDetailTitle').textContent = item.title;
+      document.getElementById('modalDetailPrice').textContent = `₹${item.price}`;
+      document.getElementById('modalDetailNego').style.display = item.is_negotiable ? 'inline-block' : 'none';
+      document.getElementById('modalDetailLocation').textContent = `📍 ${item.approximate_location || 'GEC Sheikhpura Campus'}`;
+      document.getElementById('modalDetailDesc').textContent = item.description;
+      document.getElementById('modalSellerName').textContent = item.seller_name || 'GEC Student';
+      document.getElementById('modalHandoverPref').textContent = item.pickup_available ? 'Campus Handover / Pickup' : 'Seller Delivery';
+
+      const catBadge = document.getElementById('modalCategoryBadge');
+      if (catBadge) catBadge.textContent = window.DB.getCategoryName(item.category_id);
+
+      const condBadge = document.getElementById('modalConditionBadge');
+      if (condBadge) {
+        condBadge.className = `marketplace-condition-tag cond-${item.item_condition}`;
+        condBadge.textContent = formatCondition(item.item_condition);
+      }
+
+      const photoEl = document.getElementById('modalItemPhoto');
+      if (photoEl) {
+        photoEl.src = (item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : 'assets/images/placeholder.svg';
+      }
+
+      // Populate enquiry form hidden fields
+      document.getElementById('enqListingId').value = item.id;
+      document.getElementById('enqSellerId').value = item.seller_user_id || '';
+      document.getElementById('enqOfferPrice').value = '';
+      document.getElementById('enqMessage').value = `Hi ${item.seller_name || 'there'}, is this "${item.title}" still available? When can I inspect it on campus?`;
+
+      // Auto-fill logged in student details if session exists
+      const session = await window.DB.getStudentSession();
+      if (session) {
+        document.getElementById('enqBuyerName').value = session.display_name || '';
+        document.getElementById('enqBuyerContact').value = session.email || '';
+      }
+
+      // Wire report button
+      const reportBtn = document.getElementById('reportListingBtn');
+      if (reportBtn) {
+        reportBtn.onclick = () => {
+          document.getElementById('itemDetailModal').style.display = 'none';
+          openReportListingModal(item.id, item.title);
+        };
+      }
+
+      document.getElementById('itemDetailModal').style.display = 'flex';
+    }
+
+    function handleToggleWatchlist(itemId, btn) {
+      if (typeof toggleBookmark === 'function') {
+        const added = toggleBookmark('marketplace', { id: itemId, title: 'Marketplace Item' });
+        btn.classList.toggle('active', added);
+        const svg = btn.querySelector('svg');
+        if (svg) svg.setAttribute('fill', added ? 'currentColor' : 'none');
+      }
+    }
+
+    async function handleSendEnquiry(e) {
+      e.preventDefault();
+      const listingId = document.getElementById('enqListingId').value;
+      const sellerId = document.getElementById('enqSellerId').value;
+      const buyerName = document.getElementById('enqBuyerName').value;
+      const buyerContact = document.getElementById('enqBuyerContact').value;
+      const offeredPrice = document.getElementById('enqOfferPrice').value;
+      const message = document.getElementById('enqMessage').value;
+
+      const submitBtn = document.getElementById('enqSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+
+      const session = await window.DB.getStudentSession();
+      const res = await window.DB.submitMarketplaceEnquiry({
+        listingId,
+        sellerId,
+        buyerName,
+        buyerContact,
+        message,
+        offeredPrice: offeredPrice ? parseFloat(offeredPrice) : null,
+        buyerUserId: session ? session.id : null
+      });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Enquiry';
+
+      if (res.success) {
+        showToast('Enquiry sent privately to the seller!');
+        document.getElementById('itemDetailModal').style.display = 'none';
+      } else {
+        alert(res.error || 'Failed to send enquiry. Please check your inputs.');
+      }
+    }
+
+    async function handleCreateListing(e) {
+      e.preventDefault();
+      const title = document.getElementById('sellTitle').value;
+      const category_id = document.getElementById('sellCategory').value;
+      const item_condition = document.getElementById('sellCondition').value;
+      const price = document.getElementById('sellPrice').value;
+      const is_negotiable = document.getElementById('sellNegotiable').checked;
+      const approximate_location = document.getElementById('sellLocation').value;
+      const description = document.getElementById('sellDescription').value;
+      const photoUrl = document.getElementById('sellPhotoUrl').value.trim();
+      const seller_contact_public = document.getElementById('sellPublicPhone').value.trim();
+      const consent_to_publish_contact = document.getElementById('sellPhoneConsent').checked;
+
+      const submitBtn = document.getElementById('submitSellBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting...';
+
+      const session = await window.DB.getStudentSession();
+      const res = await window.DB.createMarketplaceListing({
+        seller_user_id: session ? session.id : 'guest-student',
+        seller_name: session ? session.display_name : 'GEC Student',
+        title,
+        category_id,
+        item_condition,
+        price,
+        is_negotiable,
+        approximate_location,
+        description,
+        image_urls: photoUrl ? [photoUrl] : [],
+        seller_contact_public,
+        consent_to_publish_contact,
+        pickup_available: true
+      });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Post Item for Sale';
+
+      if (res.success) {
+        showToast('🎉 Your item has been listed on the marketplace!');
+        document.getElementById('sellItemModal').style.display = 'none';
+        document.getElementById('createListingForm').reset();
+        await loadMarketplaceListings();
+      } else {
+        alert(res.error || 'Failed to create listing. Please check inputs.');
+      }
+    }
+
+    function openReportListingModal(id, title) {
+      document.getElementById('reportListingId').value = id;
+      document.getElementById('reportListingTitle').value = title;
+      document.getElementById('listingReportModal').style.display = 'flex';
+    }
+
+    async function handleSendReport(e) {
+      e.preventDefault();
+      const listingId = document.getElementById('reportListingId').value;
+      const listingTitle = document.getElementById('reportListingTitle').value;
+      const issueType = document.getElementById('reportIssueType').value;
+      const description = document.getElementById('reportDescription').value;
+
+      const submitBtn = document.getElementById('submitReportBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      const session = await window.DB.getStudentSession();
+      const res = await window.DB.submitListingReport({
+        listing_type: 'marketplace',
+        listing_id: listingId,
+        listing_title: listingTitle,
+        issue_type: issueType,
+        description,
+        reporter_name: session ? session.display_name : 'Concerned Student'
+      });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Report';
+
+      if (res.success) {
+        showToast('Report submitted for moderator review.');
+        document.getElementById('listingReportModal').style.display = 'none';
+        document.getElementById('reportListingForm').reset();
+      } else {
+        alert(res.error || 'Failed to submit report.');
+      }
+    }
+
+    function bindMarketplaceEvents() {
+      // Helper to safely bind event
+      const on = function(id, event, handler) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener(event, handler);
+      };
+
+      // Search with debounce
+      let timer = null;
+      on('mktSearchInput', 'input', function() {
+        clearTimeout(timer);
+        timer = setTimeout(loadMarketplaceListings, 300);
+      });
+
+      on('filterCondition', 'change', loadMarketplaceListings);
+      on('filterPrice', 'change', loadMarketplaceListings);
+      on('filterSort', 'change', loadMarketplaceListings);
+      on('filterAvailableOnly', 'change', loadMarketplaceListings);
+
+      on('mktResetBtn', 'click', function() {
+        const s = document.getElementById('mktSearchInput'); if (s) s.value = '';
+        const c = document.getElementById('filterCondition'); if (c) c.value = 'all';
+        const p = document.getElementById('filterPrice'); if (p) p.value = 'all';
+        const st = document.getElementById('filterSort'); if (st) st.value = 'newest';
+        const a = document.getElementById('filterAvailableOnly'); if (a) a.checked = true;
+        document.querySelectorAll('.marketplace-pill-btn').forEach(b => b.classList.remove('active'));
+        const allBtn = document.querySelector('.marketplace-pill-btn[data-category="all"]');
+        if (allBtn) allBtn.classList.add('active');
+        activeCategory = 'all';
+        loadMarketplaceListings();
+      });
+
+      // Sell Modal open/close
+      on('openSellModalBtn', 'click', function() {
+        const m = document.getElementById('sellItemModal'); if (m) m.style.display = 'flex';
+      });
+      on('closeSellModalBtn', 'click', function() {
+        const m = document.getElementById('sellItemModal'); if (m) m.style.display = 'none';
+      });
+      on('cancelSellBtn', 'click', function() {
+        const m = document.getElementById('sellItemModal'); if (m) m.style.display = 'none';
+      });
+
+      // Detail Modal close
+      on('closeDetailModalBtn', 'click', function() {
+        const m = document.getElementById('itemDetailModal'); if (m) m.style.display = 'none';
+      });
+
+      // Report Modal close
+      on('closeReportModalBtn', 'click', function() {
+        const m = document.getElementById('listingReportModal'); if (m) m.style.display = 'none';
+      });
+      on('cancelReportBtn', 'click', function() {
+        const m = document.getElementById('listingReportModal'); if (m) m.style.display = 'none';
+      });
+
+      // Close modals on background click
+      window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+          e.target.style.display = 'none';
+        }
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+  <script src="components/footer.js"></script>
+</body>
+</html>

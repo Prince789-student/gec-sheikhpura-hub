@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Campus Lost &amp; Found Desk | GEC Sheikhpura Student Hub</title>
+  <meta name="description" content="Report lost or found campus belongings at GEC Sheikhpura. Private ownership claim requests, match suggestions, and privacy protection for student ID cards and keys.">
+  <link rel="canonical" href="https://gecsheikhpurahub.in/lost-found.html">
+  <meta property="og:title" content="Campus Lost &amp; Found Desk | GEC Sheikhpura Hub">
+  <meta property="og:description" content="Report lost belongings, find misplaced items, and verify ownership claims securely on the GEC Sheikhpura Campus.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gecsheikhpurahub.in/lost-found.html">
+  <meta property="og:image" content="https://gecsheikhpurahub.in/assets/images/icons/icon-512.png">
+  <meta name="theme-color" content="#0a192f">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+
+  <style>
+    /* Lost & Found Specific Styling */
+    .lf-hero {
+      background: linear-gradient(135deg, rgba(10, 25, 47, 0.95), rgba(15, 23, 42, 0.98));
+      color: #fff;
+      padding: 3rem 1rem 2.5rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .lf-stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .lf-stat-box {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .lf-stat-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--color-accent);
+      line-height: 1.2;
+    }
+    .lf-stat-lbl {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.25rem;
+    }
+    .lf-filter-strip {
+      background: var(--surface-1);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .lf-cat-chips {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+      scrollbar-width: thin;
+    }
+    .lf-cat-chip {
+      background: var(--surface-2);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 0.45rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .lf-cat-chip:hover, .lf-cat-chip.active {
+      background: var(--color-accent);
+      color: #0a192f;
+      border-color: var(--color-accent);
+    }
+    .lf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+    .lf-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lf-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .lf-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .lf-card-image-box {
+      position: relative;
+      height: 160px;
+      background: var(--surface-3, #f1f5f9);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lf-card-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .lf-category-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      color: #fff;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+    }
+    .lf-card-body {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .lf-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      color: var(--text-color);
+    }
+    .lf-card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .lf-card-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .lf-card-desc {
+      font-size: 0.85rem;
+      color: var(--text-color);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      flex: 1;
+    }
+    .lf-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface-2);
+      border-top: 1px solid var(--border-color);
+      align-items: center;
+    }
+    @keyframes pulseOutline {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    .highlight-pulse {
+      animation: pulseOutline 2s infinite;
+    }
+  </style>
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+
+  <!-- Top Unofficial Disclaimer Bar -->
+  <aside class="disclaimer-topbar">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge">Campus Life</span>
+        <span>GEC Sheikhpura Student Hub &bull; Community Lost &amp; Found Assistance Desk</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+          📚 Apna College Bihar — Syllabus &amp; Notes ↗
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand">
+        <div class="brand-crest">
+          <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="30" height="30">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
+          <span class="brand-tag">Student Community &amp; Campus Life</span>
+        </div>
+      </a>
+
+            <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link ">Home</a>
+        <a href="college-info.html" class="nav-link ">College Info</a>
+        <a href="admissions.html" class="nav-link ">Admissions</a>
+        
+        <!-- Academics Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Academics
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <div style="padding: 0.35rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent);">BEU Academic Hub</div>
+            <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="dropdown-item">🌐 BEU Result Portal ↗</a>
+            <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="dropdown-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+            <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="dropdown-item">📝 Previous Year Questions (PYQs) ↗</a>
+            <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="dropdown-item">📋 BEU B.Tech Syllabus ↗</a>
+            <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="dropdown-item">🧮 SGPA / CGPA Calculator ↗</a>
+            <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="dropdown-item">⏱️ 75% Attendance Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="dropdown-item">👥 Free Senior Mentorship ↗</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="academics.html" class="dropdown-item" style="font-weight: 700; color: var(--color-primary-700);">🏛️ GEC Sheikhpura Academic Overview</a>
+          </div>
+        </div>
+
+        <!-- Campus Life Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger active" aria-haspopup="true">
+            Campus Life
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">🎪 Student Community &amp; Events</a>
+            <a href="community.html?tab=events" class="dropdown-item">📅 College Events Directory</a>
+            <a href="community.html?tab=clubs" class="dropdown-item">🤝 Clubs &amp; Societies</a>
+            <a href="community.html?tab=sports" class="dropdown-item">⚽ Sports &amp; Recreation</a>
+            <a href="community.html?tab=announcements" class="dropdown-item">📢 Campus Announcements</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="campus-directory.html" class="dropdown-item">🏛️ Faculty &amp; Room Directory</a>
+            <a href="lost-found.html" class="dropdown-item">🎒 Lost &amp; Found Desk</a>
+            <a href="submit-listing.html" class="dropdown-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room (Owner)</a>
+          </div>
+        </div>
+
+        <!-- Marketplace Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Marketplace
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="rooms-pg.html" class="dropdown-item">🏠 Rooms &amp; PG Rentals</a>
+            <a href="food-tiffin.html" class="dropdown-item">🍱 Food &amp; Tiffin Services</a>
+            <a href="explore-nearby.html" class="dropdown-item">🏪 Explore Nearby Shops</a>
+            <a href="explore-nearby.html?cat=laundry" class="dropdown-item">🧺 Laundry &amp; Ironing Services</a>
+            <a href="transport.html" class="dropdown-item">🚌 Transport &amp; Bus/Train</a>
+            <a href="emergency.html" class="dropdown-item">🚑 Medical &amp; Emergency</a>
+          </div>
+        </div>
+
+        <a href="student-tools.html" class="nav-link ">Student Tools</a>
+        <a href="placement.html" class="nav-link ">Placements</a>
+        <a href="notices.html" class="nav-link ">Notices</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="saved-items.html" class="btn-bookmark-nav" title="Saved Items in My Hub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span class="badge-count" id="bookmarkCountBadge" style="display: none;">0</span>
+        </a>
+        <a href="login.html" class="btn-account-nav" id="headerUserBtn" title="Student Sign In / Dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span class="user-nav-label" id="headerUserLabel" style="font-size:0.8rem; font-weight:600; margin-left:4px;">Sign In</span>
+        </a>
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme"></button>
+        <button type="button" class="mobile-toggle-btn" id="mobileNavToggle" aria-label="Open navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+
+    <!-- Lost & Found Hero -->
+    <section class="lf-hero">
+      <div style="max-width: 720px;">
+        <span class="badge badge-warning" style="margin-bottom: 0.75rem; text-transform: uppercase;">Phase 11 Campus Utility</span>
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.2;">
+          Campus Lost &amp; Found Desk
+        </h1>
+        <p style="font-size: 1rem; color: #cbd5e1; margin-bottom: 1.5rem; line-height: 1.5;">
+          Misplaced your college ID, calculator, keys, or lab records? Report it immediately or browse items found by students and staff across the Bajidpur campus.
+        </p>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-warning" onclick="openReportLostModal()" style="font-weight: 700; min-height: 44px;">
+            🚨 Report Lost Item
+          </button>
+          <button type="button" class="btn btn-primary" onclick="openReportFoundModal()" style="font-weight: 700; min-height: 44px;">
+            📦 Report Found Item
+          </button>
+          <a href="campus-directory.html" class="btn btn-secondary" style="font-weight: 600; min-height: 44px; display: inline-flex; align-items: center;">
+            🏛️ Campus Directory &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Bar -->
+      <div class="lf-stats-row">
+        <div class="lf-stat-box">
+          <div class="lf-stat-val" id="statLfLost">0</div>
+          <div class="lf-stat-lbl">Items Missing</div>
+        </div>
+        <div class="lf-stat-box">
+          <div class="lf-stat-val" id="statLfFound">0</div>
+          <div class="lf-stat-lbl">Items Found</div>
+        </div>
+        <div class="lf-stat-box">
+          <div class="lf-stat-val" id="statLfPending">0</div>
+          <div class="lf-stat-lbl">Claims Pending</div>
+        </div>
+        <div class="lf-stat-box">
+          <div class="lf-stat-val" id="statLfReturned">0</div>
+          <div class="lf-stat-lbl">Items Returned</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy Shield Banner -->
+    <div class="alert-box" style="background: var(--surface-1); border-left: 4px solid var(--color-accent); margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px;">
+      <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+        <span style="font-size: 1.5rem;">🛡️</span>
+        <div style="font-size: 0.875rem;">
+          <strong>Student Identity &amp; Privacy Shield:</strong>
+          Registration/Roll numbers on college ID cards are automatically masked from the public directory. Private contact details are never exposed to anonymous visitors. Ownership verification must be completed privately before handing items over.
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="lf-filter-strip">
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+        <!-- Search Input -->
+        <div style="position: relative; flex: 1; min-width: 240px;">
+          <input type="text" id="lfSearchInput" class="form-control" placeholder="Search by item name, room, description, or location..." style="padding-left: 2.25rem;">
+          <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">🔍</span>
+        </div>
+
+        <!-- Type Selector -->
+        <div style="display: flex; gap: 0.35rem; background: var(--surface-2); padding: 4px; border-radius: 8px;">
+          <button class="tool-nav-btn active" data-lf-type="all" style="padding: 0.4rem 0.8rem; font-size: 0.8125rem;">All</button>
+          <button class="tool-nav-btn" data-lf-type="lost" style="padding: 0.4rem 0.8rem; font-size: 0.8125rem;">🚨 Lost</button>
+          <button class="tool-nav-btn" data-lf-type="found" style="padding: 0.4rem 0.8rem; font-size: 0.8125rem;">📦 Found</button>
+        </div>
+
+        <!-- Status Filter -->
+        <select id="lfStatusSelect" class="form-control" style="width: auto; font-size: 0.8125rem;">
+          <option value="all">All Statuses</option>
+          <option value="lost">Lost Only</option>
+          <option value="found">Found Only</option>
+          <option value="claim_pending">Claims Under Review</option>
+          <option value="returned">Successfully Returned</option>
+        </select>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div>
+        <div class="lf-cat-chips">
+          <button class="lf-cat-chip active" data-lf-cat="all">All Categories</button>
+          <button class="lf-cat-chip" data-lf-cat="electronics">📱 Electronics &amp; Calculators</button>
+          <button class="lf-cat-chip" data-lf-cat="id_documents">🪪 ID Cards &amp; Documents</button>
+          <button class="lf-cat-chip" data-lf-cat="keys_locks">🔑 Keys &amp; Locks</button>
+          <button class="lf-cat-chip" data-lf-cat="wallets_money">👛 Wallets &amp; Money</button>
+          <button class="lf-cat-chip" data-lf-cat="books_stationary">📚 Books &amp; Records</button>
+          <button class="lf-cat-chip" data-lf-cat="clothing_accessories">👕 Bags &amp; Bottles</button>
+          <button class="lf-cat-chip" data-lf-cat="other">📦 Other</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Reports Stats & Counter -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <span id="lfCountStats" style="font-size: 0.875rem; color: var(--text-muted); font-weight: 600;">Loading reports...</span>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Showing verified campus reports</span>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="lf-grid" id="lfItemsGrid"></div>
+
+    <!-- Empty State -->
+    <div id="lfEmptyState" style="display: none; text-align: center; padding: 4rem 1rem; background: var(--surface-1); border-radius: 12px; border: 1px dashed var(--border-color);">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">🎒</div>
+      <h3 style="margin-bottom: 0.5rem;">No matching lost or found reports</h3>
+      <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 1.5rem auto;">
+        No items match your active search filters. Try clearing your search query or report an item to notify the campus community.
+      </p>
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button class="btn btn-warning btn-sm" onclick="openReportLostModal()">Report Lost Item</button>
+        <button class="btn btn-primary btn-sm" onclick="openReportFoundModal()">Report Found Item</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Modal 1: Report Lost Item -->
+  <div class="hub-modal-backdrop" id="reportLostModal">
+    <div class="hub-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: var(--color-danger);">🚨 Report a Lost Item</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('reportLostModal')">&times;</button>
+      </div>
+      <form id="reportLostForm">
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Provide detailed information. Our intelligent match suggestion engine will check existing found items automatically.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" for="lostTitle">Item Name / Short Title *</label>
+            <input type="text" id="lostTitle" class="form-control" placeholder="e.g. Casio fx-991ES Plus Scientific Calculator" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="lostCategory">Category *</label>
+              <select id="lostCategory" class="form-control" required>
+                <option value="">Select Category</option>
+                <option value="electronics">Electronics &amp; Calculators</option>
+                <option value="id_documents">ID Cards &amp; Documents</option>
+                <option value="keys_locks">Keys &amp; Locks</option>
+                <option value="wallets_money">Wallets &amp; Money</option>
+                <option value="books_stationary">Books &amp; Records</option>
+                <option value="clothing_accessories">Bags &amp; Bottles</option>
+                <option value="other">Other Item</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="lostDate">Date Missing *</label>
+              <input type="date" id="lostDate" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lostLocation">Approximate Campus Location *</label>
+            <input type="text" id="lostLocation" class="form-control" placeholder="e.g. Mechanical Lab Ground Floor, Library Reading Hall" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lostDesc">Detailed Description &amp; Unique Markings *</label>
+            <textarea id="lostDesc" class="form-control" rows="3" placeholder="Describe color, stickers, scratches, or unique features that prove ownership..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lostContact">Private Phone / WhatsApp (Masked from public) *</label>
+            <input type="text" id="lostContact" class="form-control" placeholder="e.g. 98012XXXXX (Visible only to authorized verifiers)" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lostImage">Optional Photo URL</label>
+            <input type="url" id="lostImage" class="form-control" placeholder="https://... (Optional image for visual identification)">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('reportLostModal')">Cancel</button>
+          <button type="submit" class="btn btn-danger btn-sm">Submit Lost Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Report Found Item -->
+  <div class="hub-modal-backdrop" id="reportFoundModal">
+    <div class="hub-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: var(--color-accent);">📦 Report a Found Item</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('reportFoundModal')">&times;</button>
+      </div>
+      <form id="reportFoundForm">
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Found an item on campus? Help return it to its owner. You can keep it safely or deposit it at the Campus Security Desk.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" for="foundTitle">Item Name / Summary *</label>
+            <input type="text" id="foundTitle" class="form-control" placeholder="e.g. Blue Titan Water Bottle, Set of 3 Keys with Bike Keychain" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="foundCategory">Category *</label>
+              <select id="foundCategory" class="form-control" required>
+                <option value="">Select Category</option>
+                <option value="electronics">Electronics &amp; Calculators</option>
+                <option value="id_documents">ID Cards &amp; Documents</option>
+                <option value="keys_locks">Keys &amp; Locks</option>
+                <option value="wallets_money">Wallets &amp; Money</option>
+                <option value="books_stationary">Books &amp; Records</option>
+                <option value="clothing_accessories">Bags &amp; Bottles</option>
+                <option value="other">Other Item</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="foundDate">Date Found *</label>
+              <input type="date" id="foundDate" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="foundLocation">Where did you find it? *</label>
+            <input type="text" id="foundLocation" class="form-control" placeholder="e.g. Near Canteen Benches, Computer Center Hall 2" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="foundDesc">Description (Do not reveal secret details!) *</label>
+            <textarea id="foundDesc" class="form-control" rows="3" placeholder="Provide general description. Keep secret passwords/inner markings confidential for claim verification." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="foundContact">Your Contact / Safe Custody Location *</label>
+            <input type="text" id="foundContact" class="form-control" placeholder="e.g. Deposited at Security Desk Room 002, or WhatsApp 9801XXXXXX" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="foundImage">Optional Photo URL</label>
+            <input type="url" id="foundImage" class="form-control" placeholder="https://... (Clear photo of the item)">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('reportFoundModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Publish Found Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Claim This Item -->
+  <div class="hub-modal-backdrop" id="claimItemModal">
+    <div class="hub-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🔐 Private Ownership Claim</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('claimItemModal')">&times;</button>
+      </div>
+      <form id="claimItemForm">
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            To prevent fraud, your verification proof is submitted <strong>privately</strong> only to the item finder and campus moderators.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" for="claimProofDetails">Ownership Proof &amp; Verification Details *</label>
+            <textarea id="claimProofDetails" class="form-control" rows="4" placeholder="Provide specific non-public details: exact serial number, lock code, lock screen wallpaper, name written inside, scratch on corner, or contents of wallet..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="claimContactPrivate">Your Phone Number / College Email *</label>
+            <input type="text" id="claimContactPrivate" class="form-control" placeholder="Phone or email to coordinate verification handover" required>
+          </div>
+
+          <div class="alert-subtle" style="font-size: 0.8rem; background: var(--surface-2); padding: 0.6rem; border-radius: 6px;">
+            ⚠️ <strong>Handover Rule:</strong> Meet only at well-lit public campus locations (e.g. College Security Desk, Central Courtyard, or Dean Office).
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('claimItemModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Submit Private Claim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Review Claims List -->
+  <div class="hub-modal-backdrop" id="claimsReviewModal">
+    <div class="hub-modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Ownership Claims for this Item</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('claimsReviewModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Verify the submitted proof against the physical item. Once you approve a claim, the item will be officially recorded as <strong>RETURNED</strong>.
+        </p>
+        <div id="claimsReviewList"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('claimsReviewModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Match Suggestions -->
+  <div class="hub-modal-backdrop" id="matchesModal">
+    <div class="hub-modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="matchesModalTitle">🔍 Potential Matches Found</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('matchesModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="matchesModalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('matchesModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Flag / Inappropriate Post -->
+  <div class="hub-modal-backdrop" id="flagItemModal">
+    <div class="hub-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: var(--color-danger);">🚩 Report Suspicious Report</h3>
+        <button type="button" class="btn-modal-close" onclick="closeModal('flagItemModal')">&times;</button>
+      </div>
+      <form id="flagItemForm">
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Help keep the campus hub safe. If this report contains false information, spam, sensitive unmasked personal documents, or harassment, let the moderation team know.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" for="flagReason">Reason for Reporting *</label>
+            <select id="flagReason" class="form-control" required>
+              <option value="Sensitive personal information or Aadhaar exposed">Sensitive personal ID/Aadhaar unmasked</option>
+              <option value="Fake or fraudulent report">Fake or fraudulent report</option>
+              <option value="Inappropriate or offensive text/image">Inappropriate or offensive language/image</option>
+              <option value="Item already claimed or returned">Item already claimed or returned</option>
+              <option value="Other campus guideline violation">Other campus guideline violation</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('flagItemModal')">Cancel</button>
+          <button type="submit" class="btn btn-danger btn-sm">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Standard Footer -->
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- Core Scripts -->
+  <script src="assets/js/data.js?v=8.0"></script>
+  <script src="assets/js/supabase-config.js?v=8.0"></script>
+  <script src="assets/js/logger.js?v=8.0"></script>
+  <script src="assets/js/db-service.js?v=8.0"></script>
+  <script src="assets/js/app.js?v=8.0"></script>
+  <script src="assets/js/lost-found.js?v=8.0"></script>
+  <script src="components/footer.js"></script>
+</body>
+</html>

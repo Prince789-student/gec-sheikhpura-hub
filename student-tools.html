@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Student Living &amp; Financial Tools | GEC Sheikhpura Hub</title>
+  <meta name="description" content="Campus living utilities: Monthly living-expense planner, room comparison matrix, BEU SGPA/CGPA conversion, and direct gateway to Apna College Bihar academic tools.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="disclaimer-topbar">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge">Campus Living Utilities</span>
+        <span>Everyday budgeting, accommodation comparison &amp; living expense management.</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+          📚 Apna College Bihar — Complete Study Platform ↗
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand">
+        <div class="brand-crest">
+          <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="30" height="30">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
+          <span class="brand-tag">Student Life &amp; Campus Guide</span>
+        </div>
+      </a>
+
+            <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link ">Home</a>
+        <a href="college-info.html" class="nav-link ">College Info</a>
+        <a href="admissions.html" class="nav-link ">Admissions</a>
+        
+        <!-- Academics Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Academics
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <div style="padding: 0.35rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent);">BEU Academic Hub</div>
+            <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="dropdown-item">🌐 BEU Result Portal ↗</a>
+            <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="dropdown-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+            <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="dropdown-item">📝 Previous Year Questions (PYQs) ↗</a>
+            <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="dropdown-item">📋 BEU B.Tech Syllabus ↗</a>
+            <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="dropdown-item">🧮 SGPA / CGPA Calculator ↗</a>
+            <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="dropdown-item">⏱️ 75% Attendance Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="dropdown-item">👥 Free Senior Mentorship ↗</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="academics.html" class="dropdown-item" style="font-weight: 700; color: var(--color-primary-700);">🏛️ GEC Sheikhpura Academic Overview</a>
+          </div>
+        </div>
+
+        <!-- Campus Life Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Campus Life
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">🎪 Student Community &amp; Events</a>
+            <a href="community.html?tab=events" class="dropdown-item">📅 College Events Directory</a>
+            <a href="community.html?tab=clubs" class="dropdown-item">🤝 Clubs &amp; Societies</a>
+            <a href="community.html?tab=sports" class="dropdown-item">⚽ Sports &amp; Recreation</a>
+            <a href="community.html?tab=announcements" class="dropdown-item">📢 Campus Announcements</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="campus-directory.html" class="dropdown-item">🏛️ Faculty &amp; Room Directory</a>
+            <a href="lost-found.html" class="dropdown-item">🎒 Lost &amp; Found Desk</a>
+            <a href="submit-listing.html" class="dropdown-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room (Owner)</a>
+          </div>
+        </div>
+
+        <!-- Marketplace Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Marketplace
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="rooms-pg.html" class="dropdown-item">🏠 Rooms &amp; PG Rentals</a>
+            <a href="food-tiffin.html" class="dropdown-item">🍱 Food &amp; Tiffin Services</a>
+            <a href="explore-nearby.html" class="dropdown-item">🏪 Explore Nearby Shops</a>
+            <a href="explore-nearby.html?cat=laundry" class="dropdown-item">🧺 Laundry &amp; Ironing Services</a>
+            <a href="transport.html" class="dropdown-item">🚌 Transport &amp; Bus/Train</a>
+            <a href="emergency.html" class="dropdown-item">🚑 Medical &amp; Emergency</a>
+          </div>
+        </div>
+
+        <a href="student-tools.html" class="nav-link active">Student Tools</a>
+        <a href="placement.html" class="nav-link ">Placements</a>
+        <a href="notices.html" class="nav-link ">Notices</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="saved-items.html" class="btn-bookmark-nav" title="Saved Items in My Hub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span class="badge-count" id="bookmarkCountBadge" style="display: none;">0</span>
+        </a>
+        <a href="login.html" class="btn-account-nav" id="headerUserBtn" title="Student Sign In / Dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span class="user-nav-label" id="headerUserLabel" style="font-size:0.8rem; font-weight:600; margin-left:4px;">Sign In</span>
+        </a>
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme"></button>
+        <button type="button" class="mobile-toggle-btn" id="mobileNavToggle" aria-label="Open navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-nav-drawer" id="mobileDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <span class="brand-title">GEC Hub</span>
+        <button type="button" class="modal-close-btn" id="drawerCloseBtn">✕</button>
+      </div>
+      <div class="drawer-body">
+        <a href="index.html" class="drawer-nav-item">Home</a>
+        <a href="college-info.html" class="drawer-nav-item">College Information</a>
+        <a href="admissions.html" class="drawer-nav-item">Admission &amp; UGEAC</a>
+        
+        <div class="drawer-section-title">Academics &amp; BEU Study Hub</div>
+        <a href="academics.html" class="drawer-nav-item">🏛️ Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🌐 BEU Result Portal ↗</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📝 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📋 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🧮 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">👥 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Campus Life &amp; Community</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Student Community &amp; Events</a>
+        <a href="community.html?tab=events" class="drawer-nav-item">📅 Events Directory</a>
+        <a href="community.html?tab=clubs" class="drawer-nav-item">🤝 Clubs &amp; Societies</a>
+        <a href="community.html?tab=sports" class="drawer-nav-item">⚽ Sports &amp; Recreation</a>
+        <a href="community.html?tab=announcements" class="drawer-nav-item">📢 Campus Announcements</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">🧺 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+
+        <div class="drawer-section-title">Student Resources</div>
+        <a href="student-tools.html" class="drawer-nav-item">Student Tools</a>
+        <a href="placement.html" class="drawer-nav-item">Placements &amp; Internships</a>
+        <a href="notices.html" class="drawer-nav-item">Notice Board</a>
+      </div>
+        <a href="academics.html" class="drawer-nav-item">📚 Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📄 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📊 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🎓 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🤝 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">👕 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+        
+        <div class="drawer-section-title">Campus &amp; College Life</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Community &amp; Events</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <section class="page-header">
+      <div class="container">
+        <div class="breadcrumbs">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span>Student Tools</span>
+        </div>
+        <h1 class="page-title">Student Living &amp; Financial Utilities</h1>
+        <p class="page-description">
+          Practical tools for everyday campus living in Sheikhpura: monthly expense planning, room rent comparisons, and BEU grade estimation.
+        </p>
+      </div>
+    </section>
+
+    <div class="container">
+
+      <!-- ===================================================================
+           APNA COLLEGE BIHAR ACADEMIC TOOLS CALLOUT
+           =================================================================== -->
+      <section class="apna-college-banner" style="margin-bottom: 2rem;">
+        <div class="apna-college-content">
+          <span class="apna-college-tag">
+            <span>📚 Dedicated Academic Platform</span>
+          </span>
+          <h2 class="apna-college-title">Need study timers, study groups, or exam prep?</h2>
+          <p class="apna-college-desc">
+            Notes, syllabus, PYQs, mentorship, study groups aur complete academic preparation ke liye Apna College Bihar visit karein.
+          </p>
+          <!-- Quick Deep Link Badges -->
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.85rem;">
+            <a href="https://www.apnacollegebihar.online/cgpa" target="_blank" rel="noopener noreferrer" class="tag" style="background: rgba(255,255,255,0.85); color: var(--color-primary-900); font-weight: 600; text-decoration: none; border: 1px solid var(--border-light);">📊 BEU CGPA Calc ↗</a>
+            <a href="https://www.apnacollegebihar.online/attendance" target="_blank" rel="noopener noreferrer" class="tag" style="background: rgba(255,255,255,0.85); color: var(--color-primary-900); font-weight: 600; text-decoration: none; border: 1px solid var(--border-light);">⏱️ 75% Attendance Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/calculator" target="_blank" rel="noopener noreferrer" class="tag" style="background: rgba(255,255,255,0.85); color: var(--color-primary-900); font-weight: 600; text-decoration: none; border: 1px solid var(--border-light);">🧮 Matrix & Sci Calc ↗</a>
+            <a href="https://www.apnacollegebihar.online/timetable" target="_blank" rel="noopener noreferrer" class="tag" style="background: rgba(255,255,255,0.85); color: var(--color-primary-900); font-weight: 600; text-decoration: none; border: 1px solid var(--border-light);">📅 Timetable ↗</a>
+            <a href="https://www.apnacollegebihar.online/study" target="_blank" rel="noopener noreferrer" class="tag" style="background: rgba(255,255,255,0.85); color: var(--color-primary-900); font-weight: 600; text-decoration: none; border: 1px solid var(--border-light);">🎯 Focus Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/free-mentorship" target="_blank" rel="noopener noreferrer" class="tag" style="background: rgba(255,255,255,0.85); color: var(--color-primary-900); font-weight: 600; text-decoration: none; border: 1px solid var(--border-light);">🤝 Senior Mentorship ↗</a>
+            <a href="https://www.apnacollegebihar.online/beu-result" target="_blank" rel="noopener noreferrer" class="tag" style="background: rgba(255,255,255,0.85); color: var(--color-primary-900); font-weight: 600; text-decoration: none; border: 1px solid var(--border-light);">📋 BEU Results ↗</a>
+          </div>
+        </div>
+        <div>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="apna-college-btn">
+            <span>Visit Apna College Bihar</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+        </div>
+      </section>
+
+      <!-- Tool Navigation Tabs -->
+      <div class="tools-tab-bar" role="tablist">
+        <button class="tool-nav-btn active" data-tool="expense" role="tab" aria-selected="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 2 2 3 3.5 3.5s3.5 1.5 3.5 3.5a3.5 3.5 0 0 1-7 0"></path></svg>
+          Monthly Expense Planner
+        </button>
+        <button class="tool-nav-btn" data-tool="room-compare" role="tab">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          Room-Rent Comparison
+        </button>
+        <button class="tool-nav-btn" data-tool="sgpa" role="tab">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          BEU SGPA Calculator
+        </button>
+        <button class="tool-nav-btn" data-tool="cgpa" role="tab">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          BEU CGPA Calculator
+        </button>
+        <button class="tool-nav-btn" data-tool="academic-prep" role="tab">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Study Prep &amp; Groups ↗
+        </button>
+      </div>
+
+      <!-- 1. Monthly Expense Planner Panel (Default Active) -->
+      <div class="tool-panel active" id="expense">
+        <div class="calc-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <h2 class="calc-title">Monthly Student Expense Calculator (Sheikhpura Life)</h2>
+              <p class="calc-desc" style="margin-bottom: 0;">Calculate your monthly recurring living costs in Bajidpur/Sheikhpura. Sync with your student account for private budgeting.</p>
+            </div>
+            <div>
+              <a href="dashboard.html" class="btn btn-secondary btn-sm">Open My Dashboard Budget</a>
+            </div>
+          </div>
+
+          <div class="grid-cards-2" style="gap: 1.5rem;">
+            <div>
+              <div class="form-group">
+                <label class="form-label" for="expRent">Room Rent / Hostel Fee (₹)</label>
+                <input type="number" id="expRent" class="form-control expense-input" data-label="Room Rent" value="2500" min="0" step="100">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="expMess">Food, Mess &amp; Tiffin (₹)</label>
+                <input type="number" id="expMess" class="form-control expense-input" data-label="Food &amp; Mess" value="2400" min="0" step="100">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="expRecharge">Electricity, Sub-meter &amp; WiFi (₹)</label>
+                <input type="number" id="expRecharge" class="form-control expense-input" data-label="Utilities &amp; Wi-Fi" value="450" min="0" step="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="expStationery">Books, Xerox &amp; Stationery (₹)</label>
+                <input type="number" id="expStationery" class="form-control expense-input" data-label="Stationery &amp; Print" value="300" min="0" step="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="expTravel">Local Travel / E-Rickshaw Auto (₹)</label>
+                <input type="number" id="expTravel" class="form-control expense-input" data-label="Local Transit" value="350" min="0" step="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="expOther">Laundry, Salon &amp; Personal Care (₹)</label>
+                <input type="number" id="expOther" class="form-control expense-input" data-label="Personal Care" value="400" min="0" step="50">
+              </div>
+            </div>
+
+            <div style="background-color: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column;">
+              <div style="font-size: 0.8125rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase;">Estimated Monthly Expenditure</div>
+              <div style="font-size: 2.5rem; font-weight: 800; color: var(--color-primary-900); line-height: 1.1; margin: 0.5rem 0;" id="expenseTotalMonthly">₹6,400</div>
+              <div style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1.5rem;">Approx. ₹213 per day for living in Sheikhpura.</div>
+
+              <div id="expenseBreakdownList" style="flex: 1;">
+                <!-- Injected via tools.js -->
+              </div>
+
+              <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-light); padding-top: 1rem; display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="resetToolExpenses()" style="flex: 1;">↺ Reset</button>
+                <a href="dashboard.html" class="btn btn-primary btn-sm" style="flex: 1; text-align: center;">Save to Profile</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Room-Rent Comparison Tool Panel -->
+      <div class="tool-panel" id="room-compare">
+        <div class="calc-card">
+          <h2 class="calc-title">Room &amp; PG Comparison Matrix</h2>
+          <p class="calc-desc">Side-by-side comparison of rental options near GEC Sheikhpura to help you pick the best value accommodation.</p>
+          <div class="comparison-grid" id="roomComparisonMatrix">
+            <!-- Rendered by tools.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. SGPA Calculator Panel -->
+      <div class="tool-panel" id="sgpa">
+        <div class="calc-card">
+          <h2 class="calc-title">Bihar Engineering University SGPA Calculator</h2>
+          <p class="calc-desc">Calculates your Semester Grade Point Average based on BEU's 10-point scale: <code>SGPA = ∑(Credits × Grade Point) ÷ ∑Credits</code>.</p>
+          
+          <div class="calc-form-row">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="sgpaBranchSelect">Engineering Branch</label>
+              <select id="sgpaBranchSelect" class="form-control">
+                <option value="CSE">Computer Science &amp; Engg (CSE)</option>
+                <option value="CE">Civil Engineering (CE)</option>
+                <option value="EE">Electrical Engineering (EE)</option>
+                <option value="ME">Mechanical Engineering (ME)</option>
+                <option value="ECE">Electronics &amp; Comm. (ECE)</option>
+                <option value="Common">1st Year Common Group</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="sgpaSemesterSelect">Semester</label>
+              <select id="sgpaSemesterSelect" class="form-control">
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3" selected>3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="margin: 1.5rem 0;">
+            <table class="data-table" id="sgpaSubjectsTable">
+              <thead>
+                <tr>
+                  <th>Course / Subject Name</th>
+                  <th style="width: 100px;">Credits</th>
+                  <th style="width: 160px;">Letter Grade</th>
+                  <th style="width: 120px;">Grade Point</th>
+                </tr>
+              </thead>
+              <tbody id="sgpaTableBody">
+                <!-- Dynamically populated by tools.js -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border-light); padding-top: 1.25rem;">
+            <button type="button" class="btn btn-secondary btn-sm" id="addSubjectRowBtn">+ Add Custom Subject</button>
+            <div style="display: flex; align-items: baseline; gap: 0.75rem;">
+              <span style="font-weight: 600; color: var(--text-subtle);">Calculated SGPA:</span>
+              <span class="score-display" id="sgpaResultDisplay">8.25</span>
+            </div>
+          </div>
+
+          <!-- Deep link callout to Apna College Bihar Advanced CGPA Engine -->
+          <div style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--bg-surface); border: 1px dashed var(--color-accent); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <strong style="color: var(--text-base); font-size: 0.9rem;">Need 8-Semester Multi-Credit Sync & Official BEU Grade Sheet?</strong>
+              <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--text-muted);">Apna College Bihar provides real-time grade weight calculations with official university marksheet formulas.</p>
+            </div>
+            <a href="https://www.apnacollegebihar.online/cgpa" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="color: var(--color-accent); font-weight: 700;">
+              Open BEU CGPA Portal ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. CGPA Calculator Panel -->
+      <div class="tool-panel" id="cgpa">
+        <div class="calc-card">
+          <h2 class="calc-title">BEU Cumulative CGPA &amp; Percentage Estimator</h2>
+          <p class="calc-desc">Enter your completed semester SGPAs to compute your aggregate CGPA and equivalent percentage formula (<code>Percentage = CGPA × 9.5</code>).</p>
+
+          <div class="grid-cards-2" style="gap: 1.5rem;">
+            <div id="cgpaInputsContainer">
+              <!-- Rendered by tools.js -->
+            </div>
+
+            <div style="background-color: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+              <span style="font-size: 0.8125rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase;">Aggregate Standing</span>
+              <div class="score-display" id="cgpaResultDisplay" style="font-size: 3.5rem; margin: 0.5rem 0;">7.85</div>
+              <div style="font-size: 1.15rem; font-weight: 700; color: var(--color-primary-800);" id="cgpaPercentDisplay">≈ 74.58% Equivalent</div>
+            </div>
+          </div>
+
+          <!-- Deep link callout to Apna College Bihar Advanced CGPA Engine -->
+          <div style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--bg-surface); border: 1px dashed var(--color-accent); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <strong style="color: var(--text-base); font-size: 0.9rem;">Calculate Branch-Wise BEU Credits & Percentage Online:</strong>
+              <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--text-muted);">Sync marks across semesters with the dedicated engineering calculator tool.</p>
+            </div>
+            <a href="https://www.apnacollegebihar.online/cgpa" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="color: var(--color-accent); font-weight: 700;">
+              Open Advanced BEU CGPA ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Academic Prep on Apna College Bihar -->
+      <div class="tool-panel" id="academic-prep">
+        <div class="calc-card" style="padding: 2.5rem 2rem; margin-bottom: 2rem;">
+          <div style="text-align: center; max-width: 720px; margin: 0 auto 2.5rem;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🎓</div>
+            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase; letter-spacing: 0.05em;">Dedicated Academic & Productivity Platform</span>
+            <h2 style="font-size: 1.85rem; margin: 0.5rem 0 1rem; color: var(--color-primary-900);">Cloud Engineering &amp; Academic Tools Suite</h2>
+            <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;">
+              Notes, syllabus, PYQs, mentorship, study groups aur complete academic preparation ke liye Apna College Bihar visit karein. Direct links to every live utility below:
+            </p>
+            <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.75rem 1.75rem; background-color: var(--color-accent); border-color: var(--color-accent);">
+              <span>Open Apna College Bihar (apnacollegebihar.online) ↗</span>
+            </a>
+          </div>
+
+          <!-- 12 Cloud Tools Grid Deep-Linked to Specific Pages -->
+          <div class="grid-cards-3" style="gap: 1.25rem;">
+
+            <!-- 1. BEU CGPA / SGPA -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid var(--color-accent);">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🧮</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">BEU CGPA &amp; SGPA Calculator</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Semester-wise credit weights, grade conversion (O, A+, A, B+, B, C, P, F), and official percentage formula.
+              </p>
+              <a href="https://www.apnacollegebihar.online/cgpa" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: var(--color-accent); font-weight: 700;">
+                Launch CGPA Engine ↗
+              </a>
+            </div>
+
+            <!-- 2. Attendance Tracker -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #10b981;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">⏱️</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">75% Attendance &amp; Bunk Manager</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Calculate required lectures to hit 75% BEU exam criteria, log present/absent days, and compute safe bunks.
+              </p>
+              <a href="https://www.apnacollegebihar.online/attendance" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #10b981; font-weight: 700;">
+                Launch Attendance Tool ↗
+              </a>
+            </div>
+
+            <!-- 3. Scientific & Matrix Calculator -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #6366f1;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">📐</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Matrix &amp; Scientific Calculator</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Linear algebra solver, matrix inversion, determinants, eigen values, polynomial roots, and trigonometric calculus.
+              </p>
+              <a href="https://www.apnacollegebihar.online/calculator" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #6366f1; font-weight: 700;">
+                Launch Scientific Calc ↗
+              </a>
+            </div>
+
+            <!-- 4. Semester Timetable -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #f59e0b;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">📅</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Semester Timetable Manager</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Weekly period planner for lecture blocks, lab sessions, tutorial hours, and notification reminders.
+              </p>
+              <a href="https://www.apnacollegebihar.online/timetable" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #f59e0b; font-weight: 700;">
+                Manage Timetable ↗
+              </a>
+            </div>
+
+            <!-- 5. Focus Study Tracker -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #ec4899;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🎯</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Pomodoro Focus Study Tracker</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Custom 25/50 min focus study intervals, break sounds, daily revision logs, and streak counters.
+              </p>
+              <a href="https://www.apnacollegebihar.online/study" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #ec4899; font-weight: 700;">
+                Launch Study Timer ↗
+              </a>
+            </div>
+
+            <!-- 6. BEU Results Finder -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #3b82f6;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">📋</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">BEU Semester Exam Results</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Instant portal finder for odd &amp; even semester B.Tech results, registration number lookup, and marksheet verification.
+              </p>
+              <a href="https://www.apnacollegebihar.online/beu-result" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #3b82f6; font-weight: 700;">
+                Check Exam Results ↗
+              </a>
+            </div>
+
+            <!-- 7. Video Lecture Finder -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #8b5cf6;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🎥</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Curated Video Lecture Finder</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Handpicked YouTube lectures topic-by-topic mapped exactly to BEU Mathematics, DSA, Fluid Mechanics, BEE.
+              </p>
+              <a href="https://www.apnacollegebihar.online/lecture-finder" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #8b5cf6; font-weight: 700;">
+                Find Video Lectures ↗
+              </a>
+            </div>
+
+            <!-- 8. Free Senior Mentorship -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #06b6d4;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🤝</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Free Senior Mentorship</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Direct 1-on-1 guidance from 3rd &amp; 4th year engineering seniors for subject doubts, coding roadmaps, and exams.
+              </p>
+              <a href="https://www.apnacollegebihar.online/free-mentorship" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #06b6d4; font-weight: 700;">
+                Request Free Guidance ↗
+              </a>
+            </div>
+
+            <!-- 9. Peer Study Groups -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #14b8a6;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">👥</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Study Groups &amp; Communities</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Join verified WhatsApp &amp; Telegram circles for CSE, Civil, EE, ME, and ECE peers across Bihar engineering colleges.
+              </p>
+              <a href="https://www.apnacollegebihar.online/groups" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #14b8a6; font-weight: 700;">
+                Join Study Groups ↗
+              </a>
+            </div>
+
+            <!-- 10. UGEAC Predictor -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #f97316;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🎯</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Bihar UGEAC College Predictor</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Predict college allotment based on JEE Main percentile, category (UR, BC, EBC, SC, ST, EWS), and cutoffs.
+              </p>
+              <a href="https://www.apnacollegebihar.online/ugeac-predictor" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #f97316; font-weight: 700;">
+                Predict My College ↗
+              </a>
+            </div>
+
+            <!-- 11. GEC Sheikhpura Profile -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #84cc16;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🏛️</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">GEC Sheikhpura Profile &amp; Cutoffs</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Detailed closing ranks, campus facilities, branch statistics, and placements analysis for GEC Sheikhpura.
+              </p>
+              <a href="https://www.apnacollegebihar.online/college/gec-sheikhpura" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: #84cc16; font-weight: 700;">
+                View College Profile ↗
+              </a>
+            </div>
+
+            <!-- 12. App Download -->
+            <div class="hub-card" style="padding: 1.25rem; border-top: 3px solid #64748b;">
+              <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">📱</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Download Mobile &amp; Desktop App</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; min-height: 48px;">
+                Install the official Android APK or Desktop application for offline notes access and push notifications.
+              </p>
+              <a href="https://www.apnacollegebihar.online/download" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center; color: var(--text-main); font-weight: 700;">
+                Download App (APK) ↗
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/data.js?v=13.0"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/db-service.js?v=13.0"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/tools.js"></script>
+  <script>
+    function resetToolExpenses() {
+      document.getElementById('expRent').value = 2500;
+      document.getElementById('expMess').value = 2400;
+      document.getElementById('expRecharge').value = 450;
+      document.getElementById('expStationery').value = 300;
+      document.getElementById('expTravel').value = 350;
+      document.getElementById('expOther').value = 400;
+      if (typeof updateExpenseTotals === 'function') updateExpenseTotals();
+    }
+  </script>
+  <script src="components/footer.js"></script>
+</body>
+</html>

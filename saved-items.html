@@ -1,0 +1,700 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>My Hub — Saved Bookmarks &amp; Services | GEC Sheikhpura Hub</title>
+  <meta name="description" content="View and manage your shortlisted room rentals, favorite local shops, and campus living services on GEC Sheikhpura Hub.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="disclaimer-topbar">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge">Local Bookmarks</span>
+        <span>Saved listings are stored privately. Sign in for cross-device cloud sync.</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+          📚 Apna College Bihar — Complete Study Platform ↗
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand">
+        <div class="brand-crest">
+          <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="30" height="30">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
+          <span class="brand-tag">Student Life &amp; Campus Guide</span>
+        </div>
+      </a>
+
+            <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link ">Home</a>
+        <a href="college-info.html" class="nav-link ">College Info</a>
+        <a href="admissions.html" class="nav-link ">Admissions</a>
+        
+        <!-- Academics Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Academics
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <div style="padding: 0.35rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent);">BEU Academic Hub</div>
+            <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="dropdown-item">🌐 BEU Result Portal ↗</a>
+            <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="dropdown-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+            <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="dropdown-item">📝 Previous Year Questions (PYQs) ↗</a>
+            <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="dropdown-item">📋 BEU B.Tech Syllabus ↗</a>
+            <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="dropdown-item">🧮 SGPA / CGPA Calculator ↗</a>
+            <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="dropdown-item">⏱️ 75% Attendance Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="dropdown-item">👥 Free Senior Mentorship ↗</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="academics.html" class="dropdown-item" style="font-weight: 700; color: var(--color-primary-700);">🏛️ GEC Sheikhpura Academic Overview</a>
+          </div>
+        </div>
+
+        <!-- Campus Life Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Campus Life
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">🎪 Student Community &amp; Events</a>
+            <a href="community.html?tab=events" class="dropdown-item">📅 College Events Directory</a>
+            <a href="community.html?tab=clubs" class="dropdown-item">🤝 Clubs &amp; Societies</a>
+            <a href="community.html?tab=sports" class="dropdown-item">⚽ Sports &amp; Recreation</a>
+            <a href="community.html?tab=announcements" class="dropdown-item">📢 Campus Announcements</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="campus-directory.html" class="dropdown-item">🏛️ Faculty &amp; Room Directory</a>
+            <a href="lost-found.html" class="dropdown-item">🎒 Lost &amp; Found Desk</a>
+            <a href="submit-listing.html" class="dropdown-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room (Owner)</a>
+          </div>
+        </div>
+
+        <!-- Marketplace Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Marketplace
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="rooms-pg.html" class="dropdown-item">🏠 Rooms &amp; PG Rentals</a>
+            <a href="food-tiffin.html" class="dropdown-item">🍱 Food &amp; Tiffin Services</a>
+            <a href="explore-nearby.html" class="dropdown-item">🏪 Explore Nearby Shops</a>
+            <a href="explore-nearby.html?cat=laundry" class="dropdown-item">🧺 Laundry &amp; Ironing Services</a>
+            <a href="transport.html" class="dropdown-item">🚌 Transport &amp; Bus/Train</a>
+            <a href="emergency.html" class="dropdown-item">🚑 Medical &amp; Emergency</a>
+          </div>
+        </div>
+
+        <a href="student-tools.html" class="nav-link ">Student Tools</a>
+        <a href="placement.html" class="nav-link ">Placements</a>
+        <a href="notices.html" class="nav-link ">Notices</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="saved-items.html" class="btn-bookmark-nav active" title="Saved Items in My Hub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span class="badge-count" id="bookmarkCountBadge" style="display: none;">0</span>
+        </a>
+        <a href="login.html" class="btn-account-nav" id="headerUserBtn" title="Student Sign In / Dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span class="user-nav-label" id="headerUserLabel" style="font-size:0.8rem; font-weight:600; margin-left:4px;">Sign In</span>
+        </a>
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme"></button>
+        <button type="button" class="mobile-toggle-btn" id="mobileNavToggle" aria-label="Open navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-nav-drawer" id="mobileDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <span class="brand-title">GEC Hub</span>
+        <button type="button" class="modal-close-btn" id="drawerCloseBtn">✕</button>
+      </div>
+      <div class="drawer-body">
+        <a href="index.html" class="drawer-nav-item">Home</a>
+        <a href="college-info.html" class="drawer-nav-item">College Information</a>
+        <a href="admissions.html" class="drawer-nav-item">Admission &amp; UGEAC</a>
+        
+        <div class="drawer-section-title">Academics &amp; BEU Study Hub</div>
+        <a href="academics.html" class="drawer-nav-item">🏛️ Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🌐 BEU Result Portal ↗</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📝 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📋 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🧮 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">👥 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Campus Life &amp; Community</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Student Community &amp; Events</a>
+        <a href="community.html?tab=events" class="drawer-nav-item">📅 Events Directory</a>
+        <a href="community.html?tab=clubs" class="drawer-nav-item">🤝 Clubs &amp; Societies</a>
+        <a href="community.html?tab=sports" class="drawer-nav-item">⚽ Sports &amp; Recreation</a>
+        <a href="community.html?tab=announcements" class="drawer-nav-item">📢 Campus Announcements</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">🧺 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+
+        <div class="drawer-section-title">Student Resources</div>
+        <a href="student-tools.html" class="drawer-nav-item">Student Tools</a>
+        <a href="placement.html" class="drawer-nav-item">Placements &amp; Internships</a>
+        <a href="notices.html" class="drawer-nav-item">Notice Board</a>
+      </div>
+        <a href="academics.html" class="drawer-nav-item">📚 Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📄 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📊 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🎓 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🤝 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">👕 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+        
+        <div class="drawer-section-title">Campus &amp; College Life</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Community &amp; Events</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <section class="page-header">
+      <div class="container">
+        <div class="breadcrumbs">
+          <a href="index.html">Home</a>
+          <span class="sep">/</span>
+          <span>My Hub</span>
+        </div>
+        <h1 class="page-title">My Hub — Shortlisted Services &amp; Housing</h1>
+        <p class="page-description">
+          Review and manage your shortlisted room rentals, favorite local shops, and verified food services in Sheikhpura.
+        </p>
+      </div>
+    </section>
+
+    <div class="container">
+
+      <!-- ===================================================================
+           APNA COLLEGE BIHAR PLATFORM INTEGRATION CALLOUT
+           =================================================================== -->
+      <section class="apna-college-banner" style="margin-bottom: 2rem;">
+        <div class="apna-college-content">
+          <span class="apna-college-tag">
+            <span>📚 Dedicated Academic Platform</span>
+          </span>
+          <h2 class="apna-college-title">Need help with studying?</h2>
+          <p class="apna-college-desc">
+            Notes, syllabus, PYQs, mentorship, study groups aur complete academic preparation ke liye Apna College Bihar visit karein.
+          </p>
+        </div>
+        <div>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="apna-college-btn">
+            <span>Visit Apna College Bihar</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+        </div>
+      </section>
+
+      <!-- Category Filter Tabs & Actions -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div id="savedSummaryText" style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);">
+          Loading your saved items...
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <a href="dashboard.html" class="btn btn-primary btn-sm">Open Full Dashboard</a>
+          <button type="button" class="btn btn-secondary btn-sm" id="clearAllBookmarksBtn" style="color: var(--color-danger); border-color: var(--color-danger-border);">
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <!-- Saved Accommodations -->
+      <div style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.35rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          Shortlisted Rooms &amp; PGs
+        </h2>
+        <div class="grid-cards-2" id="savedRoomsGrid">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Saved Shops -->
+      <div style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.35rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          Saved Local Shops &amp; Daily Services
+        </h2>
+        <div class="grid-cards-3" id="savedShopsGrid">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Saved Food & Mess -->
+      <div style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.35rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle></svg>
+          Saved Food &amp; Tiffin Services
+        </h2>
+        <div class="grid-cards-3" id="savedFoodGrid">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Saved Marketplace Items -->
+      <div style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.35rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🛍️</span>
+          Saved Marketplace Items &amp; Watchlist
+        </h2>
+        <div class="grid-cards-3" id="savedMarketplaceGrid">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/data.js?v=13.0"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/db-service.js?v=13.0"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await renderAllSaved();
+
+      const clearBtn = document.getElementById('clearAllBookmarksBtn');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', async () => {
+          if (confirm('Are you sure you want to remove all saved items?')) {
+            const user = window.DB ? await window.DB.getStudentSession() : null;
+            if (user && window.DB) {
+              const items = await window.DB.getUserSavedItems(user.id);
+              for (const it of items) {
+                await window.DB.removeUserItem(user.id, it.item_type, it.item_id);
+              }
+            }
+            saveBookmarks({ rooms: [], shops: [], food: [] });
+            await renderAllSaved();
+            showToast('All saved items cleared.');
+          }
+        });
+      }
+    });
+
+    async function renderAllSaved() {
+      let roomsList = [];
+      let shopsList = [];
+      let foodList = [];
+      let mktList = [];
+
+      const user = window.DB ? await window.DB.getStudentSession() : null;
+      if (user && window.DB) {
+        const cloudItems = await window.DB.getUserSavedItems(user.id);
+        cloudItems.forEach(item => {
+          if (item.item_type === 'rooms') {
+            roomsList.push({ id: item.item_id, title: item.item_title, ...item.item_meta });
+          } else if (item.item_type === 'shops') {
+            shopsList.push({ id: item.item_id, name: item.item_title, ...item.item_meta });
+          } else if (item.item_type === 'food') {
+            foodList.push({ id: item.item_id, name: item.item_title, ...item.item_meta });
+          } else if (item.item_type === 'marketplace') {
+            mktList.push({ id: item.item_id, title: item.item_title, ...item.item_meta });
+          }
+        });
+      }
+
+      // Merge with localStorage
+      const bookmarks = getBookmarks();
+      if (bookmarks.rooms) {
+        bookmarks.rooms.forEach(r => {
+          if (!roomsList.some(x => x.id === r.id)) roomsList.push(r);
+        });
+      }
+      if (bookmarks.shops) {
+        bookmarks.shops.forEach(s => {
+          if (!shopsList.some(x => x.id === s.id)) shopsList.push(s);
+        });
+      }
+      if (bookmarks.marketplace) {
+        for (const m of bookmarks.marketplace) {
+          if (!mktList.some(x => x.id === m.id)) {
+            if (window.DB) {
+              const fullItem = await window.DB.getMarketplaceListingById(m.id);
+              if (fullItem) mktList.push(fullItem); else mktList.push(m);
+            } else {
+              mktList.push(m);
+            }
+          }
+        }
+      }
+
+      const roomGrid = document.getElementById('savedRoomsGrid');
+      const shopGrid = document.getElementById('savedShopsGrid');
+      const foodGrid = document.getElementById('savedFoodGrid');
+      const mktGrid = document.getElementById('savedMarketplaceGrid');
+      const summary = document.getElementById('savedSummaryText');
+
+      const total = roomsList.length + shopsList.length + foodList.length + mktList.length;
+      if (summary) {
+        summary.textContent = user 
+          ? `You have ${total} saved items synced to your student profile.`
+          : `You have ${total} saved items in your offline browser storage.`;
+      }
+
+      // Render Rooms
+      if (roomGrid) {
+        if (roomsList.length === 0) {
+          roomGrid.innerHTML = `
+            <div class="state-container" style="grid-column: 1 / -1; padding: 2rem 1rem;">
+              <p style="color: var(--text-muted); margin-bottom: 0.75rem;">No accommodations shortlisted yet.</p>
+              <a href="rooms-pg.html" class="btn btn-secondary btn-sm">Browse Rooms &amp; PGs</a>
+            </div>
+          `;
+        } else {
+          roomGrid.innerHTML = roomsList.map(item => `
+            <article class="directory-card">
+              <div class="directory-content">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+                  <span class="status-badge status-verified">${item.gender || 'Student'} Living</span>
+                  ${item.rent ? `<span style="font-weight:800; font-size:1.25rem; color:var(--color-primary-800);">₹${item.rent}/mo</span>` : ''}
+                </div>
+                <h3 class="directory-title">${escapeHtml(item.title)}</h3>
+                <div class="directory-address" style="margin-bottom: 1rem;">
+                  <span>${escapeHtml(item.address || 'Bajidpur, Sheikhpura')}</span>
+                </div>
+                <div style="display:flex; gap:0.5rem; border-top:1px solid var(--border-light); padding-top:0.75rem;">
+                  <a href="rooms-pg.html?highlight=${item.id}" class="btn btn-secondary btn-sm" style="flex:1; text-align:center;">View Details</a>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="removeSavedDirect('rooms', '${item.id}')" style="color: var(--color-danger); border-color: var(--color-danger-border);">Remove</button>
+                </div>
+              </div>
+            </article>
+          `).join('');
+        }
+      }
+
+      // Render Shops
+      if (shopGrid) {
+        if (shopsList.length === 0) {
+          shopGrid.innerHTML = `
+            <div class="state-container" style="grid-column: 1 / -1; padding: 2rem 1rem;">
+              <p style="color: var(--text-muted); margin-bottom: 0.75rem;">No local shops bookmarked yet.</p>
+              <a href="explore-nearby.html" class="btn btn-secondary btn-sm">Explore Nearby Shops</a>
+            </div>
+          `;
+        } else {
+          shopGrid.innerHTML = shopsList.map(item => `
+            <article class="directory-card">
+              <div class="directory-content">
+                <div style="margin-bottom:0.5rem;">
+                  <span class="status-badge status-sample">${escapeHtml(item.categoryLabel || 'Local Shop')}</span>
+                </div>
+                <h3 class="directory-title">${escapeHtml(item.name)}</h3>
+                <div class="directory-address" style="margin-bottom: 1rem;">
+                  <span>${escapeHtml(item.address || 'Sheikhpura')}</span>
+                </div>
+                <div style="display:flex; gap:0.5rem; border-top:1px solid var(--border-light); padding-top:0.75rem;">
+                  <a href="explore-nearby.html?highlight=${item.id}" class="btn btn-secondary btn-sm" style="flex:1; text-align:center;">View Shop</a>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="removeSavedDirect('shops', '${item.id}')" style="color: var(--color-danger); border-color: var(--color-danger-border);">Remove</button>
+                </div>
+              </div>
+            </article>
+          `).join('');
+        }
+      }
+
+      // Render Food
+      if (foodGrid) {
+        if (foodList.length === 0) {
+          foodGrid.innerHTML = `
+            <div class="state-container" style="grid-column: 1 / -1; padding: 2rem 1rem;">
+              <p style="color: var(--text-muted); margin-bottom: 0.75rem;">No mess or tiffin services saved yet.</p>
+              <a href="food-tiffin.html" class="btn btn-secondary btn-sm">Explore Food &amp; Mess</a>
+            </div>
+          `;
+        } else {
+          foodGrid.innerHTML = foodList.map(item => `
+            <article class="directory-card">
+              <div class="directory-content">
+                <div style="margin-bottom:0.5rem;">
+                  <span class="status-badge status-verified">Food Service</span>
+                </div>
+                <h3 class="directory-title">${escapeHtml(item.name)}</h3>
+                <div style="display:flex; gap:0.5rem; border-top:1px solid var(--border-light); padding-top:0.75rem; margin-top: 1rem;">
+                  <a href="food-tiffin.html?highlight=${item.id}" class="btn btn-secondary btn-sm" style="flex:1; text-align:center;">View Menu</a>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="removeSavedDirect('food', '${item.id}')" style="color: var(--color-danger); border-color: var(--color-danger-border);">Remove</button>
+                </div>
+              </div>
+            </article>
+          `).join('');
+        }
+      }
+
+      // Render Marketplace Items
+      if (mktGrid) {
+        if (mktList.length === 0) {
+          mktGrid.innerHTML = `
+            <div class="state-container" style="grid-column: 1 / -1; padding: 2rem 1rem;">
+              <p style="color: var(--text-muted); margin-bottom: 0.75rem;">No student marketplace products bookmarked yet.</p>
+              <a href="marketplace.html" class="btn btn-secondary btn-sm">Browse Marketplace</a>
+            </div>
+          `;
+        } else {
+          mktGrid.innerHTML = mktList.map(item => `
+            <article class="directory-card">
+              <div class="directory-content">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+                  <span class="status-badge status-verified">${escapeHtml(item.item_condition || 'Product')}</span>
+                  <span style="font-weight:800; font-size:1.15rem; color:var(--color-primary-800);">₹${item.price || '0'}</span>
+                </div>
+                <h3 class="directory-title">${escapeHtml(item.title)}</h3>
+                <div class="directory-address" style="margin-bottom: 1rem;">
+                  <span>📍 ${escapeHtml(item.approximate_location || 'Campus')}</span>
+                </div>
+                <div style="display:flex; gap:0.5rem; border-top:1px solid var(--border-light); padding-top:0.75rem;">
+                  <a href="marketplace.html?id=${item.id}" class="btn btn-secondary btn-sm" style="flex:1; text-align:center;">View Item</a>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="removeSavedDirect('marketplace', '${item.id}')" style="color: var(--color-danger); border-color: var(--color-danger-border);">Remove</button>
+                </div>
+              </div>
+            </article>
+          `).join('');
+        }
+      }
+    }
+
+    async function removeSavedDirect(type, id) {
+      const user = window.DB ? await window.DB.getStudentSession() : null;
+      if (user && window.DB) {
+        await window.DB.removeUserItem(user.id, type, id);
+      }
+      if (typeof toggleBookmark === 'function') {
+        const bms = getBookmarks();
+        if (bms[type]) {
+          bms[type] = bms[type].filter(x => x.id !== id);
+          saveBookmarks(bms);
+        }
+      }
+      await renderAllSaved();
+      showToast('Item removed from saved list.');
+    }
+  </script>
+  <script src="components/footer.js"></script>
+</body>
+</html>

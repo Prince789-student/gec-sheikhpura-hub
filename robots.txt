@@ -1,0 +1,41 @@
+# ==============================================================================
+# GEC Sheikhpura Student Life Hub - Robots Exclusion Policy
+# https://gecsheikhpurahub.in/
+# ==============================================================================
+
+User-agent: *
+
+# Allow public discovery pages
+Allow: /
+Allow: /index.html
+Allow: /about.html
+Allow: /rooms-pg.html
+Allow: /food-tiffin.html
+Allow: /transport.html
+Allow: /emergency.html
+Allow: /marketplace.html
+Allow: /community.html
+Allow: /explore-nearby.html
+Allow: /college-info.html
+Allow: /admissions.html
+Allow: /placement.html
+Allow: /student-tools.html
+Allow: /notices.html
+Allow: /contact.html
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /community-guidelines.html
+Allow: /manifest.json
+Allow: /assets/
+
+# Disallow private accounts, management, and administrative consoles
+Disallow: /admin.html
+Disallow: /dashboard.html
+Disallow: /login.html
+Disallow: /saved-items.html
+Disallow: /submit-listing.html
+Disallow: /api/
+Disallow: /supabase/
+
+# Canonical XML Sitemap
+Sitemap: https://gecsheikhpurahub.in/sitemap.xml

@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Student Dashboard — Campus Life Hub | GEC Sheikhpura</title>
+  <meta name="description" content="Personalized student life dashboard for GEC Sheikhpura: saved rooms and local services, monthly expense calculator, campus living preferences, and direct study access.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="components/footer.css">
+</head>
+<body>
+  <!-- Proactive Cache Cleanup for Stale LocalStorage Data -->
+  <script>
+    (function() {
+      try {
+        var session = JSON.parse(localStorage.getItem('gec_student_session') || 'null');
+        if (session) {
+          var pKey = 'gec_profile_' + session.id;
+          var prof = JSON.parse(localStorage.getItem(pKey) || 'null');
+          if (prof && prof.name && prof.name.toLowerCase().includes('ankot')) {
+            var realName = (session.email === 'prince86944@gmail.com') ? 'Prince Kumar' : (session.display_name || 'Prince Kumar');
+            prof.name = realName;
+            prof.display_name = realName;
+            localStorage.setItem(pKey, JSON.stringify(prof));
+          }
+        }
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- Top Announcement Bar -->
+  <aside class="disclaimer-topbar">
+    <div class="disclaimer-topbar-inner">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="disclaimer-badge">Personal Dashboard</span>
+        <span>Everyday student life management for Government Engineering College Sheikhpura.</span>
+      </div>
+      <div class="disclaimer-links">
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+          📚 Apna College Bihar — Complete Study Platform ↗
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand">
+        <div class="brand-crest">
+          <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="30" height="30">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
+          <span class="brand-tag">Student Life &amp; Campus Guide</span>
+        </div>
+      </a>
+
+            <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link ">Home</a>
+        <a href="college-info.html" class="nav-link ">College Info</a>
+        <a href="admissions.html" class="nav-link ">Admissions</a>
+        
+        <!-- Academics Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Academics
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <div style="padding: 0.35rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent);">BEU Academic Hub</div>
+            <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="dropdown-item">🌐 BEU Result Portal ↗</a>
+            <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="dropdown-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+            <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="dropdown-item">📝 Previous Year Questions (PYQs) ↗</a>
+            <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="dropdown-item">📋 BEU B.Tech Syllabus ↗</a>
+            <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="dropdown-item">🧮 SGPA / CGPA Calculator ↗</a>
+            <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="dropdown-item">⏱️ 75% Attendance Tracker ↗</a>
+            <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="dropdown-item">👥 Free Senior Mentorship ↗</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="academics.html" class="dropdown-item" style="font-weight: 700; color: var(--color-primary-700);">🏛️ GEC Sheikhpura Academic Overview</a>
+          </div>
+        </div>
+
+        <!-- Campus Life Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Campus Life
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">🎪 Student Community &amp; Events</a>
+            <a href="community.html?tab=events" class="dropdown-item">📅 College Events Directory</a>
+            <a href="community.html?tab=clubs" class="dropdown-item">🤝 Clubs &amp; Societies</a>
+            <a href="community.html?tab=sports" class="dropdown-item">⚽ Sports &amp; Recreation</a>
+            <a href="community.html?tab=announcements" class="dropdown-item">📢 Campus Announcements</a>
+            <div style="border-top: 1px solid var(--border-light); margin: 0.25rem 0;"></div>
+            <a href="campus-directory.html" class="dropdown-item">🏛️ Faculty &amp; Room Directory</a>
+            <a href="lost-found.html" class="dropdown-item">🎒 Lost &amp; Found Desk</a>
+            <a href="submit-listing.html" class="dropdown-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room (Owner)</a>
+          </div>
+        </div>
+
+        <!-- Marketplace Folder Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-trigger " aria-haspopup="true">
+            Marketplace
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="rooms-pg.html" class="dropdown-item">🏠 Rooms &amp; PG Rentals</a>
+            <a href="food-tiffin.html" class="dropdown-item">🍱 Food &amp; Tiffin Services</a>
+            <a href="explore-nearby.html" class="dropdown-item">🏪 Explore Nearby Shops</a>
+            <a href="explore-nearby.html?cat=laundry" class="dropdown-item">🧺 Laundry &amp; Ironing Services</a>
+            <a href="transport.html" class="dropdown-item">🚌 Transport &amp; Bus/Train</a>
+            <a href="emergency.html" class="dropdown-item">🚑 Medical &amp; Emergency</a>
+          </div>
+        </div>
+
+        <a href="student-tools.html" class="nav-link ">Student Tools</a>
+        <a href="placement.html" class="nav-link ">Placements</a>
+        <a href="notices.html" class="nav-link ">Notices</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Direct Admin Panel Quick Badge in Header -->
+        <a href="admin.html" class="btn btn-sm" id="headerAdminQuickBtn" title="Open Admin Control Panel" style="background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.35rem 0.65rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
+          <span>👑 Admin</span>
+        </a>
+        <a href="saved-items.html" class="btn-bookmark-nav" title="Saved Items in My Hub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span class="badge-count" id="bookmarkCountBadge" style="display: none;">0</span>
+        </a>
+        <a href="dashboard.html" class="btn-account-nav active" id="headerUserBtn" title="Student Dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span class="user-nav-label" id="headerUserLabel" style="font-size:0.8rem; font-weight:600; margin-left:4px;">Dashboard</span>
+        </a>
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme"></button>
+        <button type="button" class="mobile-toggle-btn" id="mobileNavToggle" aria-label="Open navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-nav-drawer" id="mobileDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <span class="brand-title">GEC Hub</span>
+        <button type="button" class="modal-close-btn" id="drawerCloseBtn">✕</button>
+      </div>
+      <div class="drawer-body">
+        <a href="index.html" class="drawer-nav-item">Home</a>
+        <a href="college-info.html" class="drawer-nav-item">College Information</a>
+        <a href="admissions.html" class="drawer-nav-item">Admission &amp; UGEAC</a>
+        
+        <div class="drawer-section-title">Academics &amp; BEU Study Hub</div>
+        <a href="academics.html" class="drawer-nav-item">🏛️ Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🌐 BEU Result Portal ↗</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📝 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📋 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🧮 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">👥 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Campus Life &amp; Community</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Student Community &amp; Events</a>
+        <a href="community.html?tab=events" class="drawer-nav-item">📅 Events Directory</a>
+        <a href="community.html?tab=clubs" class="drawer-nav-item">🤝 Clubs &amp; Societies</a>
+        <a href="community.html?tab=sports" class="drawer-nav-item">⚽ Sports &amp; Recreation</a>
+        <a href="community.html?tab=announcements" class="drawer-nav-item">📢 Campus Announcements</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">🧺 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+
+        <div class="drawer-section-title">Student Resources</div>
+        <a href="student-tools.html" class="drawer-nav-item">Student Tools</a>
+        <a href="placement.html" class="drawer-nav-item">Placements &amp; Internships</a>
+        <a href="notices.html" class="drawer-nav-item">Notice Board</a>
+      </div>
+        <a href="academics.html" class="drawer-nav-item">📚 Academic Overview</a>
+        <a href="https://www.apnacollegebihar.online/notes" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📖 Notes Hub &amp; Lecture Notes ↗</a>
+        <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📄 Previous Year Questions (PYQs) ↗</a>
+        <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">📊 BEU Syllabus ↗</a>
+        <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🎓 SGPA / CGPA Calculator ↗</a>
+        <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">⏱️ 75% Attendance Tracker ↗</a>
+        <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" class="drawer-nav-item">🤝 Free Senior Mentorship ↗</a>
+        
+        <div class="drawer-section-title">Marketplace &amp; Services</div>
+        <a href="rooms-pg.html" class="drawer-nav-item">🏠 Rooms &amp; PG Rentals</a>
+        <a href="food-tiffin.html" class="drawer-nav-item">🍱 Food &amp; Tiffin Services</a>
+        <a href="explore-nearby.html" class="drawer-nav-item">🏪 Explore Nearby Shops</a>
+        <a href="explore-nearby.html?cat=laundry" class="drawer-nav-item">👕 Laundry Services</a>
+        <a href="transport.html" class="drawer-nav-item">🚌 Transport &amp; Transit</a>
+        <a href="emergency.html" class="drawer-nav-item">🚑 Medical &amp; Emergency</a>
+        
+        <div class="drawer-section-title">Campus &amp; College Life</div>
+        <a href="community.html" class="drawer-nav-item">🎪 Community &amp; Events</a>
+        <a href="lost-found.html" class="drawer-nav-item">🎒 Lost &amp; Found Desk</a>
+        <a href="campus-directory.html" class="drawer-nav-item">🏛️ Faculty &amp; Room Directory</a>
+        <a href="submit-listing.html" class="drawer-nav-item" style="color: var(--color-accent); font-weight: 600;">+ List Business / Room</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+
+      <!-- ===================================================================
+           SECTION F: APNA COLLEGE BIHAR INTEGRATION CARD (MANDATORY REQUIREMENT)
+           =================================================================== -->
+      <section class="apna-college-banner" aria-label="Apna College Bihar Academic Integration">
+        <div class="apna-college-content">
+          <span class="apna-college-tag">
+            <span>📚 Official Academic Partner</span>
+          </span>
+          <h2 class="apna-college-title">Need help with studying &amp; exams?</h2>
+          <p class="apna-college-desc">
+            Notes, syllabus, PYQs, mentorship, study groups aur complete academic preparation ke liye Apna College Bihar visit karein.
+          </p>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem;">
+            <a href="https://www.apnacollegebihar.online/syllabus" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg-surface); color: var(--color-accent); border: 1.5px solid var(--color-accent); text-decoration: none; padding: 0.45rem 0.85rem; font-size: 0.825rem; font-weight: 700; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+              BEU Syllabus &rarr;
+            </a>
+            <a href="https://www.apnacollegebihar.online/pyq" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg-surface); color: var(--color-accent); border: 1.5px solid var(--color-accent); text-decoration: none; padding: 0.45rem 0.85rem; font-size: 0.825rem; font-weight: 700; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+              Semester PYQs &rarr;
+            </a>
+            <a href="https://www.apnacollegebihar.online/cgpa-calculator" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg-surface); color: var(--color-accent); border: 1.5px solid var(--color-accent); text-decoration: none; padding: 0.45rem 0.85rem; font-size: 0.825rem; font-weight: 700; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+              CGPA Calculator &rarr;
+            </a>
+            <a href="https://www.apnacollegebihar.online/attendance-tracker" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg-surface); color: var(--color-accent); border: 1.5px solid var(--color-accent); text-decoration: none; padding: 0.45rem 0.85rem; font-size: 0.825rem; font-weight: 700; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+              75% Attendance &rarr;
+            </a>
+            <a href="https://www.apnacollegebihar.online/mentorship" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg-surface); color: var(--color-accent); border: 1.5px solid var(--color-accent); text-decoration: none; padding: 0.45rem 0.85rem; font-size: 0.825rem; font-weight: 700; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+              Mentorship &rarr;
+            </a>
+          </div>
+        </div>
+        <div style="align-self: center;">
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="apna-college-btn">
+            <span>Visit Apna College Bihar</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+        </div>
+      </section>
+
+      <!-- Dashboard Grid Layout -->
+      <div class="dashboard-grid">
+        
+        <!-- SIDEBAR -->
+        <aside class="dashboard-sidebar">
+          <div class="profile-avatar-large" id="dashAvatar">
+            S
+          </div>
+          <h2 id="dashStudentName" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-main);">
+            Student
+          </h2>
+          <div id="dashStudentBranch" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Engineering Student
+          </div>
+          <div class="profile-badge-row" id="dashHeaderBadges">
+            <span class="branch-badge" id="badgeBranch">CSE</span>
+            <span class="semester-badge" id="badgeSemester">3rd Sem</span>
+            <span class="semester-badge" id="badgeBatch">2024-2028</span>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="dashboard-nav-list" role="tablist">
+            <!-- 👑 Admin Portal Quick Link (For Super Admin prince86944@gmail.com / Admins) -->
+            <a href="admin.html" id="dashAdminPortalLink" class="dashboard-nav-item" style="background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(29,78,216,0.15)); border: 1.5px solid #3b82f6; color: #1d4ed8; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; margin-bottom: 0.5rem; border-radius: var(--radius-sm); padding: 0.75rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>👑 Open Admin Panel</span>
+              <span class="badge" style="background: #1d4ed8; color: #fff; font-size: 0.65rem; margin-left: auto; padding: 2px 6px; border-radius: 4px;">ADMIN</span>
+            </a>
+
+            <button type="button" class="dashboard-nav-item active" onclick="switchDashboardTab('overview')" id="tabNavOverview">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              <span>Overview &amp; Life Shortcuts</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('saved')" id="tabNavSaved">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+              <span>Saved Local Services</span>
+              <span class="badge-count" id="dashSavedCount" style="margin-left: auto; position: static;">0</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('expenses')" id="tabNavExpenses">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              <span>Living-Expense Planner</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('preferences')" id="tabNavPreferences">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              <span>Life Preferences &amp; Profile</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('community')" id="tabNavCommunity">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <span>Community &amp; Reports</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('listings')" id="tabNavListings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              <span>My Listings &amp; Status</span>
+              <span class="badge-count" id="dashListingsCount" style="margin-left: auto; position: static; display: none;">0</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('notifications')" id="tabNavNotifications">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+              <span>Notifications</span>
+              <span class="badge-count" id="dashNotifCount" style="margin-left: auto; position: static; display: none;">0</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('marketplace')" id="tabNavMarketplace">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+              <span>Marketplace &amp; Sell</span>
+              <span class="badge-count" id="dashMarketplaceCount" style="margin-left: auto; position: static; display: none;">0</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="switchDashboardTab('feedback')" id="tabNavFeedback">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              <span>My Feedback &amp; Suggestions</span>
+            </button>
+            <button type="button" class="dashboard-nav-item" onclick="handleSignOut()" style="color: var(--color-danger); margin-top: 1rem; border-top: 1px dashed var(--border-light); padding-top: 1rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>Sign Out</span>
+            </button>
+          </nav>
+        </aside>
+
+        <!-- MAIN DASHBOARD CONTENT AREA -->
+        <div class="dashboard-main-content">
+
+          <!-- 1. OVERVIEW SECTION -->
+          <div id="sectionOverview" class="dashboard-pane">
+            <div class="dashboard-welcome-hero">
+              <div>
+                <h1 style="font-size: 1.65rem; margin-bottom: 0.35rem;">
+                  Welcome back, <span id="welcomeStudentName">Student</span>! 👋
+                </h1>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">
+                  Here is your quick summary of everyday student life in Sheikhpura.
+                </p>
+                <div class="profile-badge-row" style="margin-top: 0.75rem;">
+                  <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-subtle);">Preferred Services:</span>
+                  <div id="preferredTagsPreview" style="display: inline-flex; gap: 0.35rem; flex-wrap: wrap;">
+                    <span class="semester-badge">Stationery</span>
+                    <span class="semester-badge">Grocery</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <a href="student-tools.html" class="btn btn-secondary btn-sm">
+                  🧮 Campus Living Tools
+                </a>
+              </div>
+            </div>
+
+            <!-- Quick Service Shortcuts -->
+            <div style="margin-bottom: 2rem;">
+              <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">Campus Life Quick Shortcuts</h3>
+              <div class="grid-cards-3">
+                <a href="rooms-pg.html" class="stat-card" style="text-decoration: none; padding: 1.25rem;">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🏠</div>
+                  <div style="font-weight: 700; color: var(--text-main); font-size: 1.05rem;">Rooms &amp; PGs</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Verified student rooms around Bajidpur campus</div>
+                </a>
+                <a href="food-tiffin.html" class="stat-card" style="text-decoration: none; padding: 1.25rem;">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🍱</div>
+                  <div style="font-weight: 700; color: var(--text-main); font-size: 1.05rem;">Food &amp; Tiffin</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Monthly mess and delivery menus</div>
+                </a>
+                <a href="explore-nearby.html" class="stat-card" style="text-decoration: none; padding: 1.25rem;">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🛍️</div>
+                  <div style="font-weight: 700; color: var(--text-main); font-size: 1.05rem;">Nearby Shops</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Stationery, Xerox, and daily repairs</div>
+                </a>
+              </div>
+            </div>
+
+            <!-- Recent Saved Preview -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.15rem;">Shortlisted Accommodations &amp; Services</h3>
+                <button type="button" onclick="switchDashboardTab('saved')" class="btn btn-secondary btn-sm">
+                  View All Saved (<span id="previewSavedCount">0</span>)
+                </button>
+              </div>
+              <div id="overviewSavedList" class="grid-cards-2">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. SAVED SERVICES SECTION -->
+          <div id="sectionSaved" class="dashboard-pane" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">My Saved Services &amp; Listings</h2>
+                <p style="font-size: 0.875rem; color: var(--text-muted);">
+                  Shortlisted accommodations, shops, food services, and medical contacts synced to your account.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="savedSearchInput" placeholder="Filter saved..." class="form-control" style="width: 180px; padding: 0.4rem 0.6rem; font-size: 0.85rem;" oninput="filterSavedItems()">
+              </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="search-category-tabs" style="margin-bottom: 1.5rem;">
+              <button type="button" class="tab-btn active" onclick="filterSavedCategory('all', this)">All</button>
+              <button type="button" class="tab-btn" onclick="filterSavedCategory('rooms', this)">Rooms &amp; PGs</button>
+              <button type="button" class="tab-btn" onclick="filterSavedCategory('shops', this)">Shops</button>
+              <button type="button" class="tab-btn" onclick="filterSavedCategory('food', this)">Food &amp; Mess</button>
+              <button type="button" class="tab-btn" onclick="filterSavedCategory('medical', this)">Medical</button>
+              <button type="button" class="tab-btn" onclick="filterSavedCategory('transport', this)">Transport</button>
+            </div>
+
+            <!-- Saved Items Grid -->
+            <div class="grid-cards-2" id="dashboardSavedGrid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- 3. MONTHLY LIVING-EXPENSE PLANNER SECTION -->
+          <div id="sectionExpenses" class="dashboard-pane" style="display: none;">
+            <div style="margin-bottom: 1.5rem;">
+              <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">Monthly Living-Expense Planner</h2>
+              <p style="font-size: 0.875rem; color: var(--text-muted);">
+                A private student budgeting tool to calculate and keep track of your recurring monthly costs around campus.
+              </p>
+            </div>
+
+            <div class="expense-planner-grid">
+              <!-- Expense Input Form -->
+              <div class="form-card" style="padding: 1.5rem;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+                  Monthly Expense Breakdown (₹)
+                </h3>
+
+                <div class="expense-item-field">
+                  <label for="expRoomRent">
+                    <span>🏠 Room / PG Rent</span>
+                    <span id="labelRentVal">₹3,000</span>
+                  </label>
+                  <input type="number" id="expRoomRent" min="0" step="100" value="3000" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expMessFood">
+                    <span>🍱 Mess &amp; Tiffin / Food</span>
+                    <span id="labelFoodVal">₹2,400</span>
+                  </label>
+                  <input type="number" id="expMessFood" min="0" step="100" value="2400" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expElectricity">
+                    <span>⚡ Electricity &amp; Sub-meter</span>
+                    <span id="labelElecVal">₹300</span>
+                  </label>
+                  <input type="number" id="expElectricity" min="0" step="50" value="300" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expTransit">
+                    <span>🛺 Local Transport / Auto</span>
+                    <span id="labelTransitVal">₹400</span>
+                  </label>
+                  <input type="number" id="expTransit" min="0" step="50" value="400" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expStationery">
+                    <span>📄 Stationery &amp; Xerox / Printing</span>
+                    <span id="labelStatVal">₹250</span>
+                  </label>
+                  <input type="number" id="expStationery" min="0" step="50" value="250" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expRecharge">
+                    <span>📱 Mobile Recharge &amp; WiFi</span>
+                    <span id="labelRechargeVal">₹350</span>
+                  </label>
+                  <input type="number" id="expRecharge" min="0" step="50" value="350" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expLaundry">
+                    <span>👕 Laundry, Salon &amp; Daily Needs</span>
+                    <span id="labelLaundryVal">₹300</span>
+                  </label>
+                  <input type="number" id="expLaundry" min="0" step="50" value="300" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expMedical">
+                    <span>💊 Medical &amp; Emergency Buffer</span>
+                    <span id="labelMedVal">₹200</span>
+                  </label>
+                  <input type="number" id="expMedical" min="0" step="50" value="200" oninput="calculateExpenses()">
+                </div>
+
+                <div class="expense-item-field">
+                  <label for="expPersonal">
+                    <span>☕ Snacks &amp; Personal Leisure</span>
+                    <span id="labelPersVal">₹500</span>
+                  </label>
+                  <input type="number" id="expPersonal" min="0" step="50" value="500" oninput="calculateExpenses()">
+                </div>
+              </div>
+
+              <!-- Expense Summary & Persistence Card -->
+              <div class="expense-summary-box">
+                <div>
+                  <div style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; color: var(--text-subtle);">
+                    Estimated Total Monthly Living Cost
+                  </div>
+                  <div class="expense-total-display" id="totalExpenseDisplay">
+                    ₹7,700
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+                    Approx. ₹<span id="dailyExpenseRate">256</span> per day for living in Sheikhpura.
+                  </div>
+
+                  <div style="background-color: var(--bg-surface); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); margin-bottom: 1.5rem; font-size: 0.8125rem; color: var(--text-subtle);">
+                    <strong>🔒 Privacy Isolation:</strong> Your personal budget entries are stored securely under your private user profile and are never exposed to public visitors.
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <button type="button" onclick="saveLivingExpenses()" class="btn btn-primary" id="btnSaveExpense">
+                    💾 Save Living Budget to Profile
+                  </button>
+                  <button type="button" onclick="resetExpenses()" class="btn btn-secondary btn-sm">
+                    ↺ Reset to Typical Averages
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. LIFE PREFERENCES & PROFILE SECTION -->
+          <div id="sectionPreferences" class="dashboard-pane" style="display: none;">
+            <div style="margin-bottom: 1.5rem;">
+              <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">Student Identity &amp; Profile</h2>
+              <p style="font-size: 0.875rem; color: var(--text-muted);">
+                Your verified college credentials, BEU student identity card, and local campus preferences.
+              </p>
+            </div>
+
+            <!-- Verified Student Identity Card Preview -->
+            <div class="student-id-card" id="studentIdCardVisual">
+              <div class="student-id-header">
+                <div>
+                  <div class="student-id-college" id="idCardCollege">Government Engineering College, Sheikhpura</div>
+                  <div class="student-id-univ">Affiliated to Bihar Engineering University (BEU) Patna</div>
+                </div>
+                <div style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #86efac; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase;">
+                  ✓ Verified Student
+                </div>
+              </div>
+
+              <div class="student-id-body">
+                <div class="student-id-avatar" id="idCardAvatar">
+                  S
+                </div>
+                <div class="student-id-info">
+                  <div class="student-id-name" id="idCardName">Student</div>
+                  <div class="student-id-reg" id="idCardReg">REG: PENDING VERIFICATION</div>
+                  <div style="font-size: 0.8rem; color: #cbd5e1;" id="idCardBranch">
+                    Engineering
+                  </div>
+                </div>
+              </div>
+
+              <div class="student-id-grid">
+                <div class="student-id-item">
+                  <span class="student-id-label">Date of Birth</span>
+                  <span class="student-id-val" id="idCardDob">—</span>
+                </div>
+                <div class="student-id-item">
+                  <span class="student-id-label">Mobile Contact</span>
+                  <span class="student-id-val" id="idCardPhone">—</span>
+                </div>
+                <div class="student-id-item">
+                  <span class="student-id-label">Home District</span>
+                  <span class="student-id-val" id="idCardDistrict">—</span>
+                </div>
+                <div class="student-id-item">
+                  <span class="student-id-label">Registered Email</span>
+                  <span class="student-id-val" id="idCardEmail">—</span>
+                </div>
+              </div>
+            </div>
+
+            <form class="form-card" onsubmit="handleUpdateProfile(event)">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="profDisplayName">Full Name *</label>
+                  <input type="text" id="profDisplayName" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profEmail">Registered Email</label>
+                  <input type="email" id="profEmail" class="form-control" disabled style="opacity: 0.7;">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profCollegeName">College Name *</label>
+                <select id="profCollegeName" class="form-control" onchange="toggleDashCustomCollege(this.value)">
+                  <option value="Government Engineering College, Sheikhpura">Government Engineering College, Sheikhpura</option>
+                  <option value="Bhagalpur College of Engineering (BCE), Bhagalpur">Bhagalpur College of Engineering (BCE), Bhagalpur</option>
+                  <option value="Muzaffarpur Institute of Technology (MIT), Muzaffarpur">Muzaffarpur Institute of Technology (MIT), Muzaffarpur</option>
+                  <option value="Bakhtiyarpur College of Engineering, Patna">Bakhtiyarpur College of Engineering, Patna</option>
+                  <option value="Gaya College of Engineering, Gaya">Gaya College of Engineering, Gaya</option>
+                  <option value="Darbhanga College of Engineering, Darbhanga">Darbhanga College of Engineering, Darbhanga</option>
+                  <option value="Motihari College of Engineering, Motihari">Motihari College of Engineering, Motihari</option>
+                  <option value="Nalanda College of Engineering, Chandi">Nalanda College of Engineering, Chandi</option>
+                  <option value="LNJPIT Chhapra">LNJPIT Chhapra</option>
+                  <option value="Government Engineering College, Banka">Government Engineering College, Banka</option>
+                  <option value="Government Engineering College, Vaishali">Government Engineering College, Vaishali</option>
+                  <option value="Government Engineering College, Jamui">Government Engineering College, Jamui</option>
+                  <option value="Government Engineering College, Lakhisarai">Government Engineering College, Lakhisarai</option>
+                  <option value="Government Engineering College, Nawada">Government Engineering College, Nawada</option>
+                  <option value="Government Engineering College, Munger">Government Engineering College, Munger</option>
+                  <option value="Government Engineering College, Begusarai">Government Engineering College, Begusarai</option>
+                  <option value="Government Engineering College, Aurangabad">Government Engineering College, Aurangabad</option>
+                  <option value="Government Engineering College, Rohtas">Government Engineering College, Rohtas</option>
+                  <option value="Government Engineering College, Buxar">Government Engineering College, Buxar</option>
+                  <option value="Government Engineering College, Bhojpur">Government Engineering College, Bhojpur</option>
+                  <option value="Government Engineering College, Jehanabad">Government Engineering College, Jehanabad</option>
+                  <option value="Government Engineering College, Arwal">Government Engineering College, Arwal</option>
+                  <option value="Government Engineering College, Siwan">Government Engineering College, Siwan</option>
+                  <option value="Government Engineering College, Gopalganj">Government Engineering College, Gopalganj</option>
+                  <option value="Government Engineering College, Samastipur">Government Engineering College, Samastipur</option>
+                  <option value="Government Engineering College, Madhubani">Government Engineering College, Madhubani</option>
+                  <option value="Government Engineering College, Sitamarhi">Government Engineering College, Sitamarhi</option>
+                  <option value="Government Engineering College, Sheohar">Government Engineering College, Sheohar</option>
+                  <option value="Government Engineering College, West Champaran">Government Engineering College, West Champaran</option>
+                  <option value="Government Engineering College, Saharsa">Government Engineering College, Saharsa</option>
+                  <option value="Government Engineering College, Supaul">Government Engineering College, Supaul</option>
+                  <option value="Government Engineering College, Madhepura">Government Engineering College, Madhepura</option>
+                  <option value="Purnea College of Engineering, Purnea">Purnea College of Engineering, Purnea</option>
+                  <option value="Katihar Engineering College, Katihar">Katihar Engineering College, Katihar</option>
+                  <option value="Government Engineering College, Araria">Government Engineering College, Araria</option>
+                  <option value="Government Engineering College, Kishanganj">Government Engineering College, Kishanganj</option>
+                  <option value="Government Engineering College, Khagaria">Government Engineering College, Khagaria</option>
+                  <option value="Government Engineering College, Kaimur">Government Engineering College, Kaimur</option>
+                  <option value="other">Other BEU / Technical College</option>
+                </select>
+                <input type="text" id="profCustomCollege" class="form-control" placeholder="Enter college name" style="display: none; margin-top: 0.5rem;">
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="profRegNo">BEU Registration Number *</label>
+                  <input type="text" id="profRegNo" class="form-control" placeholder="e.g. 22105128001" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profDob">Date of Birth (DOB) *</label>
+                  <input type="date" id="profDob" class="form-control" required>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="profPhone">Mobile Phone Number *</label>
+                  <input type="tel" id="profPhone" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profHomeDistrict">Home District *</label>
+                  <select id="profHomeDistrict" class="form-control" required>
+                    <option value="" disabled>Select District</option>
+                    <option value="Sheikhpura">Sheikhpura</option>
+                    <option value="Patna">Patna</option>
+                    <option value="Gaya">Gaya</option>
+                    <option value="Nalanda">Nalanda</option>
+                    <option value="Nawada">Nawada</option>
+                    <option value="Lakhisarai">Lakhisarai</option>
+                    <option value="Jamui">Jamui</option>
+                    <option value="Munger">Munger</option>
+                    <option value="Bhagalpur">Bhagalpur</option>
+                    <option value="Begusarai">Begusarai</option>
+                    <option value="Samastipur">Samastipur</option>
+                    <option value="Darbhanga">Darbhanga</option>
+                    <option value="Madhubani">Madhubani</option>
+                    <option value="Muzaffarpur">Muzaffarpur</option>
+                    <option value="Vaishali">Vaishali</option>
+                    <option value="Saran">Saran</option>
+                    <option value="Siwan">Siwan</option>
+                    <option value="Gopalganj">Gopalganj</option>
+                    <option value="Purnia">Purnia</option>
+                    <option value="Katihar">Katihar</option>
+                    <option value="Saharsa">Saharsa</option>
+                    <option value="Madhepura">Madhepura</option>
+                    <option value="Supaul">Supaul</option>
+                    <option value="Araria">Araria</option>
+                    <option value="Kishanganj">Kishanganj</option>
+                    <option value="Rohtas">Rohtas</option>
+                    <option value="Kaimur">Kaimur</option>
+                    <option value="Buxar">Buxar</option>
+                    <option value="Bhojpur">Bhojpur</option>
+                    <option value="Aurangabad">Aurangabad</option>
+                    <option value="Jehanabad">Jehanabad</option>
+                    <option value="Arwal">Arwal</option>
+                    <option value="West Champaran">West Champaran</option>
+                    <option value="East Champaran">East Champaran</option>
+                    <option value="Sitamarhi">Sitamarhi</option>
+                    <option value="Sheohar">Sheohar</option>
+                    <option value="Khagaria">Khagaria</option>
+                    <option value="Other District / State">Other District / State</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="profBranch">Branch</label>
+                  <select id="profBranch" class="form-control">
+                    <option value="CSE">Computer Science (CSE)</option>
+                    <option value="CE">Civil Engineering (CE)</option>
+                    <option value="EE">Electrical Engineering (EE)</option>
+                    <option value="ME">Mechanical Engineering (ME)</option>
+                    <option value="ECE">Electronics (ECE)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profSemester">Semester</label>
+                  <select id="profSemester" class="form-control">
+                    <option value="1st Sem">1st Semester</option>
+                    <option value="2nd Sem">2nd Semester</option>
+                    <option value="3rd Sem">3rd Semester</option>
+                    <option value="4th Sem">4th Semester</option>
+                    <option value="5th Sem">5th Semester</option>
+                    <option value="6th Sem">6th Semester</option>
+                    <option value="7th Sem">7th Semester</option>
+                    <option value="8th Sem">8th Semester</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profBatch">Batch</label>
+                  <select id="profBatch" class="form-control">
+                    <option value="2025-2029">2025 - 2029</option>
+                    <option value="2024-2028">2024 - 2028</option>
+                    <option value="2023-2027">2023 - 2027</option>
+                    <option value="2022-2026">2022 - 2026</option>
+                  </select>
+                </div>
+              </div>
+
+              <h4 style="font-size: 1.05rem; margin: 1.5rem 0 0.75rem; border-top: 1px solid var(--border-light); padding-top: 1.25rem;">
+                Everyday Living Preferences
+              </h4>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="profAccType">Preferred Accommodation Type</label>
+                  <select id="profAccType" class="form-control">
+                    <option value="Single Room">Single Room</option>
+                    <option value="Shared Room">Shared Room (2/3 sharing)</option>
+                    <option value="PG / Student Room">PG with Food</option>
+                    <option value="Hostel / PG">Hostel</option>
+                    <option value="Any">Any Accommodation</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profFoodOpt">Food Preference</label>
+                  <select id="profFoodOpt" class="form-control">
+                    <option value="Pure Vegetarian">Pure Vegetarian</option>
+                    <option value="Veg & Egg">Veg &amp; Egg Option</option>
+                    <option value="Non-Vegetarian">Non-Vegetarian Friendly</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Preferred Local Service Categories</label>
+                <div class="pref-chips-wrapper" id="prefChipsContainer">
+                  <span class="pref-chip selected" data-cat="stationery" onclick="togglePrefChip(this)">Stationery &amp; Photocopy</span>
+                  <span class="pref-chip selected" data-cat="grocery" onclick="togglePrefChip(this)">Grocery &amp; Dairy</span>
+                  <span class="pref-chip" data-cat="repair" onclick="togglePrefChip(this)">Laptop &amp; Mobile Repair</span>
+                  <span class="pref-chip" data-cat="laundry" onclick="togglePrefChip(this)">Laundry &amp; Ironing</span>
+                  <span class="pref-chip" data-cat="salon" onclick="togglePrefChip(this)">Salon &amp; Grooming</span>
+                  <span class="pref-chip" data-cat="medical" onclick="togglePrefChip(this)">Pharmacy &amp; Clinic</span>
+                  <span class="pref-chip" data-cat="bank" onclick="togglePrefChip(this)">ATMs &amp; Banking</span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btnUpdateProfile" style="margin-top: 1rem;">
+                Save Profile &amp; Preferences
+              </button>
+            </form>
+
+            <!-- Privacy, Data Export & Account Controls (Phase 10) -->
+            <div style="margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--border-medium); border-radius: var(--radius-md); background-color: var(--bg-surface);">
+              <h4 style="font-size: 1rem; color: var(--text-main); margin-bottom: 0.5rem;">🔒 Privacy &amp; Data Ownership</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Download a complete JSON export of your personal student account data, saved bookmarks, submitted listings, marketplace posts, event passes, and feedback records.
+              </p>
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button type="button" onclick="downloadMyData()" class="btn btn-secondary btn-sm">
+                  📥 Download My Personal Data (.json)
+                </button>
+                <button type="button" onclick="confirmAccountDeletion()" class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-danger-border);">
+                  Request Account Deletion
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. COMMUNITY & REPORTS SECTION -->
+          <div id="sectionCommunity" class="dashboard-pane" style="display: none;">
+            <div style="margin-bottom: 1.5rem;">
+              <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">Community Assistance &amp; Reports</h2>
+              <p style="font-size: 0.875rem; color: var(--text-muted);">
+                Help keep the GEC Sheikhpura Hub directory accurate for your juniors and batchmates.
+              </p>
+            </div>
+
+            <div class="grid-cards-3" style="margin-bottom: 2rem;">
+              <div class="form-card" style="padding: 1.25rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚩</div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">Report Inaccuracy</h4>
+                <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1rem;">Found an incorrect phone number or closed shop?</p>
+                <a href="contact.html#report" class="btn btn-secondary btn-sm">Submit Report</a>
+              </div>
+              <div class="form-card" style="padding: 1.25rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏪</div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">Submit Local Shop</h4>
+                <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1rem;">Add a trusted repair shop, grocery store, or xerox centre.</p>
+                <a href="contact.html#contribute" class="btn btn-secondary btn-sm">Add Business</a>
+              </div>
+              <div class="form-card" style="padding: 1.25rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛏️</div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">Suggest Room / PG</h4>
+                <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1rem;">Know a good lodge owner near Bajidpur or town?</p>
+                <a href="contact.html#contribute" class="btn btn-secondary btn-sm">Suggest Room</a>
+              </div>
+            </div>
+
+            <!-- Phase 7: My Registered Events -->
+            <div class="form-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h3 style="font-size: 1.15rem; margin: 0 0 0.25rem 0;">🎟️ My Registered Campus Events</h3>
+                  <p style="font-size: 0.8125rem; color: var(--text-muted); margin: 0;">Activities and festivals you have signed up for.</p>
+                </div>
+                <a href="community.html" class="btn btn-primary btn-sm">Explore All Events &amp; Clubs</a>
+              </div>
+              <div id="userRegisteredEventsContainer">
+                <!-- Rendered dynamically via dashboard.js -->
+              </div>
+            </div>
+
+            <div class="form-card" style="padding: 1.5rem;">
+              <h4 style="font-size: 1.05rem; margin-bottom: 1rem;">My Activity &amp; Support Requests</h4>
+              <div id="userActivityLog" style="font-size: 0.875rem; color: var(--text-muted);">
+                <p>No active correction tickets pending review. All your submissions will appear here once submitted.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. MY SUBMITTED LISTINGS & HOUSING SECTION (Phase 4) -->
+          <div id="sectionListings" class="dashboard-pane" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">My Listings &amp; Submissions</h2>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
+                  Manage the local businesses, services, and room/PG accommodations you have listed on GEC Hub.
+                </p>
+              </div>
+              <a href="submit-listing.html" class="btn btn-primary btn-sm">+ Submit New Listing</a>
+            </div>
+
+            <div id="userListingsContainer">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+          </div>
+
+          <!-- 7. IN-APP NOTIFICATIONS INBOX (Phase 4) -->
+          <div id="sectionNotifications" class="dashboard-pane" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">Notifications &amp; Alerts</h2>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
+                  Updates about your listing approvals, moderator requests, review feedback, and campus reminders.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <div style="display: inline-flex; border: 1px solid var(--border-light); border-radius: var(--radius-sm); overflow: hidden;">
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnNotifFilterAll" onclick="setNotifFilter('all')" style="border: none; border-radius: 0; font-weight: 700;">All</button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnNotifFilterUnread" onclick="setNotifFilter('unread')" style="border: none; border-radius: 0; border-left: 1px solid var(--border-light);">Unread Only</button>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="markAllNotificationsAsRead()">Mark All as Read</button>
+              </div>
+            </div>
+
+            <div id="userNotificationsContainer" style="margin-bottom: 2rem;">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+
+            <!-- Phase 8: Notification Preferences & Optional Browser Push -->
+            <div class="hub-card" style="padding: 1.5rem; border: 1px solid var(--border-light); background-color: var(--bg-surface); border-radius: var(--radius-md);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <h3 style="font-size: 1.15rem; margin: 0 0 0.25rem 0; color: var(--text-main);">⚙️ Notification Preferences</h3>
+                  <p style="font-size: 0.8125rem; color: var(--text-muted); margin: 0;">Control which updates and reminders you receive on your student account.</p>
+                </div>
+                <span class="status-badge status-verified" style="font-size: 0.725rem;">Student Controlled</span>
+              </div>
+
+              <div style="display: grid; gap: 1rem; max-width: 600px; margin-bottom: 1.5rem;">
+                <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 0.5rem 0; border-bottom: 1px solid var(--border-light);">
+                  <div>
+                    <strong style="font-size: 0.9rem; color: var(--text-main);">Listing Moderation Updates</strong>
+                    <div style="font-size: 0.775rem; color: var(--text-muted);">Receive alerts when your submitted shop or room listing is verified or needs correction.</div>
+                  </div>
+                  <input type="checkbox" id="prefListingAlerts" style="width: 18px; height: 18px; cursor: pointer;" onchange="saveNotifPrefs()">
+                </label>
+
+                <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 0.5rem 0; border-bottom: 1px solid var(--border-light);">
+                  <div>
+                    <strong style="font-size: 0.9rem; color: var(--text-main);">Campus Event &amp; Club Reminders</strong>
+                    <div style="font-size: 0.775rem; color: var(--text-muted);">Receive reminders for festivals and sports activities you registered for.</div>
+                  </div>
+                  <input type="checkbox" id="prefEventReminders" style="width: 18px; height: 18px; cursor: pointer;" onchange="saveNotifPrefs()">
+                </label>
+
+                <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 0.5rem 0; border-bottom: 1px solid var(--border-light);">
+                  <div>
+                    <strong style="font-size: 0.9rem; color: var(--text-main);">Marketplace Buyer Enquiries</strong>
+                    <div style="font-size: 0.775rem; color: var(--text-muted);">Receive instant notifications when students message you about your second-hand items.</div>
+                  </div>
+                  <input type="checkbox" id="prefMarketplace" style="width: 18px; height: 18px; cursor: pointer;" onchange="saveNotifPrefs()">
+                </label>
+              </div>
+
+              <!-- Push Notification Opt-In Section -->
+              <div style="background-color: var(--bg-muted); border-radius: var(--radius-sm); padding: 1.15rem; border: 1px solid var(--border-light);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                      <strong style="font-size: 0.9rem; color: var(--text-main);">Browser Push Notifications</strong>
+                      <span id="pushStatusBadge" class="status-badge status-sample" style="font-size: 0.7rem;">Disabled</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; max-width: 500px;">
+                      Get device alerts for urgent moderation status or buyer offers. Requires explicit browser permission. We never send marketing ads.
+                    </p>
+                  </div>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnTogglePush" onclick="togglePushNotifications()">
+                    Enable Browser Alerts
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 8. MY MARKETPLACE ITEMS & ENQUIRIES (Phase 5) -->
+          <div id="sectionMarketplace" class="dashboard-pane" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">My Marketplace Items &amp; Enquiries</h2>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
+                  Manage the items you have listed for sale, update availability status, and review buyer enquiries.
+                </p>
+              </div>
+              <a href="marketplace.html" class="btn btn-primary btn-sm">+ Post New Item</a>
+            </div>
+
+            <!-- Subtabs: My Items vs Received Enquiries -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">
+              <button type="button" class="btn btn-secondary btn-sm" id="subtabMktItemsBtn" onclick="switchMktSubtab('items')" style="font-weight: 700;">
+                My Listed Items (<span id="mktItemsCount">0</span>)
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="subtabMktEnqBtn" onclick="switchMktSubtab('enquiries')">
+                Received Enquiries (<span id="mktEnqCount">0</span>)
+              </button>
+            </div>
+
+            <div id="userMktItemsContainer">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+
+            <div id="userMktEnquiriesContainer" style="display: none;">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+          </div>
+
+          <!-- 8. MY SUBMITTED FEEDBACK & SUGGESTIONS (Phase 10) -->
+          <div id="sectionFeedback" class="dashboard-pane" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h2 style="font-size: 1.45rem; margin-bottom: 0.25rem;">My Feedback &amp; Suggestions</h2>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
+                  Track real-time status updates and resolution notes for your feature requests, missing service suggestions, and corrections.
+                </p>
+              </div>
+              <a href="contact.html" class="btn btn-primary btn-sm">
+                + Submit New Feedback
+              </a>
+            </div>
+
+            <!-- Feedback List Container -->
+            <div id="myFeedbackContainer">
+              <p style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading your feedback requests...</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="universal-site-footer">
+  <div class="container">
+    <!-- Academic Platform Partner Banner -->
+    <div class="footer-partner-strip">
+      <div>
+        <div class="partner-title">
+          <span>📚 Looking for Academic Resources, BEU Syllabus, or PYQs?</span>
+        </div>
+        <div class="partner-desc">
+          Official study materials, B.Tech semester notes, lecture finder, and CGPA tools are hosted on Apna College Bihar.
+        </div>
+      </div>
+      <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-partner-btn">
+        Visit Apna College Bihar ↗
+      </a>
+    </div>
+
+    <!-- Main Footer Grid -->
+    <div class="footer-main-grid">
+      <!-- 1. Brand Section -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-header">
+          <div class="footer-brand-crest">
+            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          </div>
+          <div>
+            <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>
+            <div style="font-size: 0.725rem; color: #64748b; font-weight: 600;">Student Life &amp; Local Services</div>
+          </div>
+        </div>
+
+        <div class="footer-unofficial-badge">
+          <span>🛡️ Independent Student Platform</span>
+        </div>
+
+        <p class="footer-brand-desc">
+          A dedicated student-built life hub for Government Engineering College Sheikhpura. Helping students discover verified hostel rooms, tiffin services, campus clubs, and nearby essentials in Bajidpur.
+        </p>
+
+        <div class="footer-social-links">
+          <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Official GEC Sheikhpura Website">
+            🌐
+          </a>
+          <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Apna College Bihar Partner">
+            📚
+          </a>
+          <a href="community.html" class="footer-social-btn" title="Campus Community Hub">
+            👥
+          </a>
+          <a href="contact.html" class="footer-social-btn" title="Student Support Desk">
+            ✉️
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Quick Links -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Quick Links</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">🏠 Home Hub</a></li>
+          <li><a href="about.html">🏛️ About This Project</a></li>
+          <li><a href="college-info.html">ℹ️ College Information</a></li>
+          <li><a href="admissions.html">🎓 Admissions &amp; Cutoffs</a></li>
+          <li><a href="academics.html">📖 Academic Overview</a></li>
+          <li><a href="campus-directory.html">👥 Faculty Directory</a></li>
+          <li><a href="placement.html">💼 Training &amp; Placements</a></li>
+          <li><a href="notices.html">📢 Campus &amp; BEU Notices</a></li>
+          <li><a href="student-tools.html">🧮 Student Tools &amp; CGPA</a></li>
+          <li><a href="contact.html">✉️ Contact &amp; Corrections</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Student Resources -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Student Living</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="community.html">🎪 Student Community</a></li>
+          <li><a href="community.html?tab=events">📅 College Events</a></li>
+          <li><a href="community.html?tab=clubs">🤝 Clubs &amp; Societies</a></li>
+          <li><a href="community.html?tab=sports">⚽ Sports &amp; Recreation</a></li>
+          <li><a href="community.html?tab=announcements">📢 Campus Announcements</a></li>
+          <li><a href="rooms-pg.html">🏠 Rooms &amp; PG Rentals</a></li>
+          <li><a href="food-tiffin.html">🍱 Food &amp; Mess Services</a></li>
+          <li><a href="explore-nearby.html">🏪 Explore Local Shops</a></li>
+          <li><a href="transport.html">🚌 Sheikhpura Transport</a></li>
+          <li><a href="emergency.html">🚑 Medical &amp; Emergency</a></li>
+          <li><a href="lost-found.html">🎒 Lost &amp; Found Desk</a></li>
+          <li><a href="submit-listing.html" style="color: var(--color-accent, #38bdf8); font-weight: 600;">+ List Room / Shop (Free)</a></li>
+        </ul>
+      </div>
+
+      <!-- 4. Legal & Governance -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Legal &amp; Policy</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <ul class="footer-links-list">
+          <li><a href="privacy.html">🔒 Privacy Policy</a></li>
+          <li><a href="terms.html">📜 Terms &amp; Conditions</a></li>
+          <li><a href="disclaimer.html">⚠️ Website Disclaimer</a></li>
+          <li><a href="cookie-policy.html">🍪 Cookie Policy</a></li>
+          <li><a href="community-guidelines.html">🤝 Community Guidelines</a></li>
+          <li><a href="acceptable-use.html">🛡️ Acceptable Use Policy</a></li>
+          <li><a href="data-deletion.html">🗑️ Data Deletion Policy</a></li>
+          <li><a href="intellectual-property.html">⚖️ Copyright &amp; IP Policy</a></li>
+          <li><a href="accessibility.html">♿ Accessibility Statement</a></li>
+          <li><a href="grievance.html">⚖️ Grievance Redressal</a></li>
+        </ul>
+      </div>
+
+      <!-- 5. Contact & Support -->
+      <div class="footer-col" data-footer-accordion>
+        <div class="footer-col-header" tabindex="0" role="button" aria-expanded="false">
+          <h4 class="footer-heading">Verified Contact</h4>
+          <span class="footer-accordion-toggle" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
+        </div>
+        <div class="footer-contact-body">
+          <div class="footer-contact-item">
+            <strong>Campus Location</strong>
+            Bajidpur, Near Police Line, Sheikhpura, Bihar – 811105
+          </div>
+          <div class="footer-contact-item">
+            <strong>Community Helpdesk</strong>
+            <a href="mailto:contact@gecsheikhpura.in">contact@gecsheikhpura.in</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Academic Partner</strong>
+            <a href="mailto:support@apnacollegebihar.online">support@apnacollegebihar.online</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Emergency Police / Medical</strong>
+            <span style="color: #ef4444; font-weight: 700;">Dial 112 (Toll Free)</span><br>
+            <span>Sadar Hospital: 06341-223333</span>
+          </div>
+          <div style="margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.openReportModal){window.openReportModal('General Student Hub Feedback');} else {window.location.href='contact.html';}" style="font-size: 0.775rem; width: 100%; justify-content: center;">
+              ⚠️ Report Wrong Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Bar -->
+    <div class="footer-bottom-bar">
+      <div class="footer-disclaimer-legal">
+        <strong>Disclaimer:</strong> GEC Sheikhpura Student Life Hub is an independent, unofficial community project maintained by engineering students for peer support and local convenience. It is not affiliated with, endorsed by, or operated by Government Engineering College Sheikhpura, Aryabhatta Knowledge University, or the Department of Science, Technology and Technical Education (DSTTE), Government of Bihar. All official college communications and notices are sourced directly from <a href="https://www.gecsheikhpura.ac.in/" target="_blank" rel="noopener noreferrer">gecsheikhpura.ac.in</a>. All academic notes and syllabus belong to <a href="https://www.apnacollegebihar.online/" target="_blank" rel="noopener noreferrer">Apna College Bihar</a>.
+      </div>
+
+      <div class="footer-bottom-flex">
+        <div>
+          &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="admin.html">🔒 Admin Portal</a>
+          <a href="student-tools.html">Student Tools</a>
+          <a href="saved-items.html">Saved Hub</a>
+          <a href="community-guidelines.html">Guidelines</a>
+          <a href="contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/data.js?v=13.0"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/logger.js"></script>
+  <script src="assets/js/db-service.js?v=13.0"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+  <script src="components/footer.js"></script>
+</body>
+</html>
