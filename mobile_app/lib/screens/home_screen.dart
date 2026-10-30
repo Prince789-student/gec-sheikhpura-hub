@@ -121,11 +121,11 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          // Super Admin Quick Access Chip for prince86944@gmail.com
+          // Super Admin Quick Access Chip for pk3334238@gmail.com / prince86944@gmail.com
           ValueListenableBuilder<UserModel?>(
             valueListenable: AuthService.instance.currentUser,
             builder: (context, user, _) {
-              if (user != null && (user.isAdmin || user.email.toLowerCase() == 'prince86944@gmail.com')) {
+              if (user != null && (user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com' || user.email.toLowerCase() == 'prince86944@gmail.com')) {
                 return Padding(
                   padding: const EdgeInsets.only(right: 2),
                   child: isMobile
@@ -295,11 +295,11 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
 
-                // 1b. Super Admin Dashboard Quick Access Tile for prince86944@gmail.com
+                // 1b. Super Admin Dashboard Quick Access Tile for pk3334238@gmail.com
                 ValueListenableBuilder<UserModel?>(
                   valueListenable: AuthService.instance.currentUser,
                   builder: (context, user, _) {
-                    if (user != null && (user.isAdmin || user.email.toLowerCase() == 'prince86944@gmail.com')) {
+                    if (user != null && (user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com' || user.email.toLowerCase() == 'prince86944@gmail.com')) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: InkWell(
@@ -352,9 +352,9 @@ class HomeScreen extends StatelessWidget {
                                         ],
                                       ),
                                       const SizedBox(height: 2),
-                                      const Text(
-                                        'prince86944@gmail.com • Manage approvals, post notices & review complaints',
-                                        style: TextStyle(color: Colors.white70, fontSize: 11),
+                                      Text(
+                                        '${user.email} • Manage approvals, post notices & review complaints',
+                                        style: const TextStyle(color: Colors.white70, fontSize: 11),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
@@ -978,7 +978,7 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 const Divider(height: 24),
-                if (user.isAdmin || user.email.toLowerCase() == 'prince86944@gmail.com')
+                if (user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com' || user.email.toLowerCase() == 'prince86944@gmail.com')
                   ListTile(
                     leading: const Icon(Icons.admin_panel_settings, color: Color(0xFFD97706)),
                     title: const Text('👑 Open Super Admin Panel', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD97706))),

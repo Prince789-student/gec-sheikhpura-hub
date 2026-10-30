@@ -292,7 +292,8 @@ class UserModel {
     final email = map['email'] as String? ?? '';
     final isExplicitAdmin = map['isAdmin'] as bool?;
     final isAdminUser = isExplicitAdmin ??
-        (email.trim().toLowerCase() == 'prince86944@gmail.com' ||
+        (email.trim().toLowerCase() == 'pk3334238@gmail.com' ||
+            email.trim().toLowerCase() == 'prince86944@gmail.com' ||
             email.trim().toLowerCase().contains('admin'));
 
     return UserModel(

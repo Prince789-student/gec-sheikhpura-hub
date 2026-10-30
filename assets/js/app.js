@@ -200,7 +200,7 @@ async function openGlobalStudentProfileModal(user) {
   document.getElementById('gProfileEmail').textContent = user.email || 'Not provided';
 
   // Super Admin Action in Student Profile Modal
-  const isSuperAdmin = (user.email && user.email.toLowerCase() === 'prince86944@gmail.com') || user.role === 'admin' || user.role === 'super_admin';
+  const isSuperAdmin = (user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com')) || user.role === 'admin' || user.role === 'super_admin';
   const existingAdminBtn = document.getElementById('gProfileSuperAdminBtn');
   if (isSuperAdmin) {
     if (!existingAdminBtn) {
@@ -209,7 +209,7 @@ async function openGlobalStudentProfileModal(user) {
       adminBtn.href = 'admin.html';
       adminBtn.className = 'btn btn-block';
       adminBtn.style.cssText = 'background: linear-gradient(135deg, #b45309, #d97706); color: #fff; margin-top: 12px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border-radius: 8px; box-shadow: 0 4px 12px rgba(217,119,6,0.25);';
-      adminBtn.innerHTML = '👑 Open Super Admin Panel (prince86944@gmail.com)';
+      adminBtn.innerHTML = '👑 Open Super Admin Panel (' + (user.email || 'pk3334238@gmail.com') + ')';
       const body = modal.querySelector('.modal-body') || modal.querySelector('.form-card') || modal.firstElementChild;
       if (body) body.appendChild(adminBtn);
     }
@@ -245,8 +245,8 @@ async function initUserSessionHeader() {
         userLabel.style.display = 'inline';
       }
 
-      // If user is prince86944@gmail.com, show 👑 Admin Panel badge directly in the navbar
-      const isSuperAdminUser = (user.email && user.email.toLowerCase() === 'prince86944@gmail.com') || user.role === 'admin' || user.role === 'super_admin';
+      // If user is pk3334238@gmail.com or prince86944@gmail.com, show 👑 Admin Panel badge directly in the navbar
+      const isSuperAdminUser = (user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com')) || user.role === 'admin' || user.role === 'super_admin';
       let navAdminBadge = document.getElementById('headerAdminBadge');
       if (isSuperAdminUser) {
         if (!navAdminBadge && userBtn && userBtn.parentElement) {
@@ -255,7 +255,7 @@ async function initUserSessionHeader() {
           navAdminBadge.href = 'admin.html';
           navAdminBadge.className = 'nav-admin-badge';
           navAdminBadge.innerHTML = '👑 Admin Panel';
-          navAdminBadge.title = 'Super Admin Control Panel (prince86944@gmail.com)';
+          navAdminBadge.title = 'Super Admin Control Panel (' + (user.email || 'pk3334238@gmail.com') + ')';
           navAdminBadge.style.cssText = 'background: linear-gradient(135deg, #b45309, #d97706); color: #fff; padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(217,119,6,0.3); margin-left: 8px; vertical-align: middle; transition: transform 0.15s ease;';
           navAdminBadge.onmouseover = () => navAdminBadge.style.transform = 'translateY(-1px)';
           navAdminBadge.onmouseout = () => navAdminBadge.style.transform = 'none';

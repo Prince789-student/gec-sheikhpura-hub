@@ -182,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
-                        if (user.isAdmin || user.email.toLowerCase() == 'prince86944@gmail.com') ...[
+                        if (user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com' || user.email.toLowerCase() == 'prince86944@gmail.com') ...[
                           const SizedBox(height: 10),
                           Container(
                             width: double.infinity,

@@ -29,8 +29,8 @@ async function initDashboard() {
   // 2. Load Profile
   currentProfile = await window.DB.getStudentProfile(currentUser.id);
 
-  // If user is prince86944@gmail.com, ensure name displays Prince Kumar and show Super Admin badge
-  if (currentUser.email === 'prince86944@gmail.com') {
+  // If user is pk3334238@gmail.com or prince86944@gmail.com, ensure name displays Prince Kumar and show Super Admin badge
+  if (currentUser.email === 'pk3334238@gmail.com' || currentUser.email === 'prince86944@gmail.com') {
     if (!currentProfile.name || currentProfile.name.toLowerCase().includes('ankot') || currentProfile.name === 'Student') {
       currentProfile.name = 'Prince Kumar';
       currentProfile.display_name = 'Prince Kumar';

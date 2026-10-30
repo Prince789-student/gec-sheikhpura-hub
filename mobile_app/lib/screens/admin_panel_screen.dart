@@ -188,7 +188,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
                     style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
                   ),
                   Text(
-                    'prince86944@gmail.com • Lead Administrator',
+                    'pk3334238@gmail.com • Lead Administrator',
                     style: TextStyle(
                       fontSize: 11,
                       color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -783,7 +783,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
               const ListTile(
                 leading: Icon(Icons.security, color: Color(0xFFD97706)),
                 title: Text('Designated Super Administrator', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                subtitle: Text('Prince Kumar (prince86944@gmail.com)', style: TextStyle(fontSize: 11)),
+                subtitle: Text('Prince Kumar (pk3334238@gmail.com)', style: TextStyle(fontSize: 11)),
               ),
             ],
           ),

@@ -254,10 +254,10 @@ let activeGooglePopup = null;
 
 async function handlePrinceGoogleSignIn() {
   hideAuthAlert();
-  showAuthAlert('Authenticating as Prince Kumar (prince86944@gmail.com) via Google Firebase...', 'info');
+  showAuthAlert('Authenticating as Prince Kumar (pk3334238@gmail.com) via Google Firebase...', 'info');
   if (window.DB) {
-    await window.DB.signInWithGoogleDemo('prince86944@gmail.com', 'Prince Kumar');
-    showAuthAlert('✓ Signed in as Prince Kumar (prince86944@gmail.com)! Super Admin permissions active.', 'success');
+    await window.DB.signInWithGoogleDemo('pk3334238@gmail.com', 'Prince Kumar');
+    showAuthAlert('✓ Signed in as Prince Kumar (pk3334238@gmail.com)! Super Admin permissions active.', 'success');
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 700);

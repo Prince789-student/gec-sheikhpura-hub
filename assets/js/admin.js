@@ -86,7 +86,7 @@ async function initAdminDashboard() {
   window.loginAsPrinceAdmin = async function() {
     const emailField = document.getElementById('adminEmail');
     const passField = document.getElementById('adminPassword');
-    if (emailField) emailField.value = 'prince86944@gmail.com';
+    if (emailField) emailField.value = 'pk3334238@gmail.com';
     if (passField) passField.value = 'princeAdmin2026';
     const form = document.getElementById('adminLoginForm');
     if (form) form.dispatchEvent(new Event('submit'));

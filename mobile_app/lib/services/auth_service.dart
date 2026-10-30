@@ -25,11 +25,11 @@ class AuthService {
         debugPrint('Error restoring user session: $e');
       }
     } else if (!hasLoggedOut) {
-      // Pre-seed authenticated Super Admin student session: Prince Kumar (prince86944@gmail.com) on initial launch
+      // Pre-seed authenticated Super Admin student session: Prince Kumar (pk3334238@gmail.com) on initial launch
       final princeUser = UserModel(
-        uid: 'admin_prince86944',
+        uid: 'admin_prince_pk',
         displayName: 'Prince Kumar',
-        email: 'prince86944@gmail.com',
+        email: 'pk3334238@gmail.com',
         photoUrl: 'https://lh3.googleusercontent.com/a/default-user',
         branch: 'Computer Science & Engg (CSE)',
         batchYear: '2023-2027',
@@ -56,12 +56,13 @@ class AuthService {
     String? rollNo,
     String? phone,
   }) async {
-    final safeEmail = (email != null && email.trim().isNotEmpty) ? email.trim() : 'prince86944@gmail.com';
+    final safeEmail = (email != null && email.trim().isNotEmpty) ? email.trim() : 'pk3334238@gmail.com';
     final safeName = (name != null && name.trim().isNotEmpty)
         ? name.trim()
         : (safeEmail.split('@')[0].replaceAll('.', ' '));
 
-    final isSuperAdmin = safeEmail.toLowerCase() == 'prince86944@gmail.com' ||
+    final isSuperAdmin = safeEmail.toLowerCase() == 'pk3334238@gmail.com' ||
+        safeEmail.toLowerCase() == 'prince86944@gmail.com' ||
         safeEmail.toLowerCase().contains('admin');
 
     final user = UserModel(

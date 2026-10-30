@@ -548,8 +548,8 @@ class HubDatabaseService {
   }
 
   async signInWithGoogleDemo(customEmail, customName, customAvatar) {
-    const isPrince = (customEmail || '').trim().toLowerCase() === 'prince86944@gmail.com';
-    const email = customEmail || 'student.beu@gmail.com';
+    const isPrince = (customEmail || '').trim().toLowerCase() === 'pk3334238@gmail.com' || (customEmail || '').trim().toLowerCase() === 'prince86944@gmail.com';
+    const email = customEmail || 'pk3334238@gmail.com';
     const displayName = isPrince ? 'Prince Kumar' : (customName || 'BEU Student (Google)');
     const dummyUser = {
       id: isPrince ? 'admin-prince-super-id' : ('google-usr-' + (customEmail ? customEmail.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12) : Math.random().toString(36).substr(2, 9))),
@@ -613,7 +613,7 @@ class HubDatabaseService {
     }
 
     // Offline / Demo sign in
-    const isPrince = email && email.trim().toLowerCase() === 'prince86944@gmail.com';
+    const isPrince = email && (email.trim().toLowerCase() === 'pk3334238@gmail.com' || email.trim().toLowerCase() === 'prince86944@gmail.com');
     const dummyUser = {
       id: isPrince ? 'admin-prince-super-id' : 'demo-student-id',
       email: email.trim(),
@@ -681,11 +681,11 @@ class HubDatabaseService {
       return { user: data.user, session: data.session, error: null };
     }
 
-    // Authorized Super Admin prince86944@gmail.com check
-    if (email && email.trim().toLowerCase() === 'prince86944@gmail.com') {
+    // Authorized Super Admin pk3334238@gmail.com / prince86944@gmail.com check
+    if (email && (email.trim().toLowerCase() === 'pk3334238@gmail.com' || email.trim().toLowerCase() === 'prince86944@gmail.com')) {
       const princeUser = {
         id: 'admin-prince-super-id',
-        email: 'prince86944@gmail.com',
+        email: email.trim().toLowerCase(),
         role: 'super_admin',
         display_name: 'Prince Kumar (Super Admin)',
         created_at: new Date().toISOString()

@@ -131,7 +131,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             Navigator.pop(dialogCtx);
                             _performGoogleLogin(
                               name: 'Prince Kumar',
-                              email: 'prince86944@gmail.com',
+                              email: 'pk3334238@gmail.com',
                               branch: 'Computer Science & Engg (CSE)',
                               batchYear: '2023-2027',
                               rollNo: '23CSE01',
@@ -182,7 +182,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        'prince86944@gmail.com',
+                                        'pk3334238@gmail.com',
                                         style: TextStyle(
                                           fontSize: 11.5,
                                           color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -626,7 +626,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     user.displayName,
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
                                   ),
-                                  if (user.isAdmin || user.email.toLowerCase() == 'prince86944@gmail.com') ...[
+                                  if (user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com' || user.email.toLowerCase() == 'prince86944@gmail.com') ...[
                                     const SizedBox(width: 6),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
