@@ -544,11 +544,11 @@ function initNavigation() {
   const drawerClose = document.getElementById('drawerCloseBtn');
 
   if (mobileToggle && drawer) {
-    mobileToggle.addEventListener('click', () => {
+    const openDrawer = () => {
       drawer.classList.add('open');
       document.body.style.overflow = 'hidden';
       mobileToggle.setAttribute('aria-expanded', 'true');
-    });
+    };
 
     const closeDrawer = () => {
       drawer.classList.remove('open');
@@ -556,14 +556,29 @@ function initNavigation() {
       mobileToggle.setAttribute('aria-expanded', 'false');
     };
 
+    mobileToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      openDrawer();
+    });
+
     if (drawerClose) {
-      drawerClose.addEventListener('click', closeDrawer);
+      drawerClose.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeDrawer();
+      });
     }
 
     drawer.addEventListener('click', (e) => {
       if (e.target === drawer) {
         closeDrawer();
       }
+    });
+
+    // Auto-close drawer when any link inside is tapped on mobile
+    drawer.querySelectorAll('.drawer-nav-item').forEach(link => {
+      link.addEventListener('click', () => {
+        closeDrawer();
+      });
     });
 
     // Close on ESC

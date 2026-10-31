@@ -1846,4 +1846,20 @@ html, body {
   }
 }
 
+/* Responsive Tables, Embeds & Mobile Guard */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-responsive,
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+iframe, video, embed {
+  max-width: 100%;
+}
+
 

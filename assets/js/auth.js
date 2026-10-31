@@ -280,6 +280,57 @@ function initFirebaseClient() {
 }
 initFirebaseClient();
 
+async function processFirebaseAuthenticatedUser(u) {
+  if (!u) return;
+  const email = (u.email || '').toLowerCase().trim();
+  const name = u.displayName || email.split('@')[0] || 'Student';
+  const photo = u.photoURL || '';
+
+  // Super Admin privileges strictly reserved for pk3334238@gmail.com
+  const isSuperAdmin = (email === 'pk3334238@gmail.com');
+
+  if (window.DB) {
+    await window.DB.signInWithGoogleDemo(email, name, photo);
+  }
+
+  if (isSuperAdmin) {
+    localStorage.setItem('gec_admin_session', JSON.stringify({
+      admin_id: 'adm_prince',
+      email: 'pk3334238@gmail.com',
+      role: 'Super Admin',
+      full_name: 'Prince Kumar',
+      login_time: new Date().toISOString()
+    }));
+    showAuthAlert(`👑 Welcome Prince Kumar! Super Admin verified. Opening Admin Panel...`, 'success');
+    setTimeout(() => {
+      window.location.href = 'admin.html';
+    }, 600);
+  } else {
+    localStorage.removeItem('gec_admin_session');
+    showAuthAlert(`✓ Welcome, ${name}! Signed in with Google. Opening student dashboard...`, 'success');
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 600);
+  }
+}
+
+// Automatically check for Mobile Google Sign-In Redirect callback
+async function checkMobileRedirectAuth() {
+  initFirebaseClient();
+  if (firebaseAuth && typeof firebaseAuth.getRedirectResult === 'function') {
+    try {
+      const result = await firebaseAuth.getRedirectResult();
+      if (result && result.user) {
+        showAuthAlert('✓ Mobile Google Sign-In verified! Setting up your session...', 'info');
+        await processFirebaseAuthenticatedUser(result.user);
+      }
+    } catch (e) {
+      console.warn("getRedirectResult check notice:", e);
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', checkMobileRedirectAuth);
+
 async function handleContinueWithGoogle() {
   hideAuthAlert();
   initFirebaseClient();
@@ -289,47 +340,31 @@ async function handleContinueWithGoogle() {
     return;
   }
 
-  showAuthAlert('Opening official Google Sign-In popup...', 'info');
+  // Detect mobile or touch device
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
+
+  showAuthAlert('Connecting to Google Sign-In...', 'info');
 
   try {
     const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
     if (result && result.user) {
-      const u = result.user;
-      const email = (u.email || '').toLowerCase().trim();
-      const name = u.displayName || email.split('@')[0] || 'Student';
-      const photo = u.photoURL || '';
-
-      // Super Admin privileges strictly reserved for pk3334238@gmail.com
-      const isSuperAdmin = (email === 'pk3334238@gmail.com');
-
-      if (window.DB) {
-        await window.DB.signInWithGoogleDemo(email, name, photo);
-      }
-
-      if (isSuperAdmin) {
-        localStorage.setItem('gec_admin_session', JSON.stringify({
-          admin_id: 'adm_prince',
-          email: 'pk3334238@gmail.com',
-          role: 'Super Admin',
-          full_name: 'Prince Kumar',
-          login_time: new Date().toISOString()
-        }));
-        showAuthAlert(`👑 Welcome Prince Kumar! Super Admin verified. Opening Admin Panel...`, 'success');
-        setTimeout(() => {
-          window.location.href = 'admin.html';
-        }, 600);
-      } else {
-        localStorage.removeItem('gec_admin_session');
-        showAuthAlert(`✓ Welcome, ${name}! Signed in with Google. Opening student dashboard...`, 'success');
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 600);
-      }
+      await processFirebaseAuthenticatedUser(result.user);
       return;
     }
   } catch (error) {
     console.error("Firebase signInWithPopup error:", error);
-    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+    if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request' || isMobileDevice) {
+      // Mobile browsers frequently block popups; fallback gracefully to full redirect
+      showAuthAlert('Switching to official mobile Google sign-in window...', 'info');
+      try {
+        await firebaseAuth.signInWithRedirect(googleAuthProvider);
+        return;
+      } catch (redirectErr) {
+        showAuthAlert('Redirect error: ' + (redirectErr.message || redirectErr.code), 'error');
+        return;
+      }
+    }
+    if (error.code === 'auth/popup-closed-by-user') {
       showAuthAlert('Google Sign-In popup was closed.', 'info');
     } else if (error.code === 'auth/unauthorized-domain') {
       showAuthAlert(`Domain ${window.location.hostname} not authorized in Firebase Console yet.`, 'error');

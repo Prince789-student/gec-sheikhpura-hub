@@ -701,6 +701,17 @@ textarea.form-control {
   box-shadow: var(--shadow-md);
 }
 
+@media (max-width: 640px) {
+  .auth-wrapper {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+  .auth-card {
+    padding: 1.5rem 1rem !important;
+    border-radius: var(--radius-md);
+  }
+}
+
 .auth-tabs {
   display: flex;
   background-color: var(--bg-muted);
@@ -758,6 +769,33 @@ textarea.form-control {
 @media (max-width: 900px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .dashboard-sidebar {
+    padding: 1.25rem 1rem;
+  }
+  .dashboard-nav-list {
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 0.5rem;
+    padding: 0.85rem 0.25rem 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .dashboard-nav-item {
+    width: auto;
+    flex-shrink: 0;
+    padding: 0.55rem 0.95rem;
+    font-size: 0.85rem;
+    border-radius: 9999px;
+    background: var(--surface-1, #f8fafc);
+    border: 1px solid var(--border-light, #e2e8f0);
+  }
+  .dashboard-nav-item.active {
+    background: var(--color-primary-600);
+    color: #ffffff;
+    border-color: var(--color-primary-600);
   }
 }
 
@@ -1542,7 +1580,7 @@ textarea.form-control {
   .pwa-install-banner {
     left: 1rem;
     right: 1rem;
-    bottom: 1rem;
+    bottom: calc(var(--mobile-nav-height, 62px) + var(--safe-bottom, 0px) + 12px) !important;
   }
 }
 
@@ -1550,7 +1588,7 @@ textarea.form-control {
 .mobile-view-toggle {
   display: none;
   position: sticky;
-  bottom: 1rem;
+  bottom: calc(var(--mobile-nav-height, 62px) + var(--safe-bottom, 0px) + 12px) !important;
   left: 50%;
   transform: translateX(-50%);
   z-index: 800;
@@ -2530,6 +2568,23 @@ textarea.form-control {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
   padding: 1.75rem;
   position: relative;
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal-box-card {
+    padding: 1.25rem 1rem !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 85vh;
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    border-bottom: none;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+  }
 }
 
 

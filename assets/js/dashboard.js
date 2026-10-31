@@ -82,16 +82,28 @@ async function initDashboard() {
    ========================================================================== */
 function switchDashboardTab(tabId) {
   const panes = ['overview', 'saved', 'expenses', 'preferences', 'community', 'listings', 'notifications', 'marketplace', 'feedback'];
+  let activePane = null;
   panes.forEach(p => {
     const pane = document.getElementById(`section${p.charAt(0).toUpperCase() + p.slice(1)}`);
     const navBtn = document.getElementById(`tabNav${p.charAt(0).toUpperCase() + p.slice(1)}`);
-    if (pane) pane.style.display = (p === tabId) ? 'block' : 'none';
+    if (pane) {
+      const isCurrent = (p === tabId);
+      pane.style.display = isCurrent ? 'block' : 'none';
+      if (isCurrent) activePane = pane;
+    }
     if (navBtn) navBtn.classList.toggle('active', p === tabId);
   });
   if (tabId === 'feedback') {
     loadMyFeedback();
   }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (window.innerWidth <= 900 && activePane) {
+    const navHeader = document.querySelector('.site-header');
+    const headerOffset = navHeader ? navHeader.offsetHeight + 10 : 70;
+    const panePosition = activePane.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: Math.max(0, panePosition), behavior: 'smooth' });
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 /* ==========================================================================
