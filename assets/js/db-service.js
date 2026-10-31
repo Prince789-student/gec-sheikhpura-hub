@@ -568,6 +568,8 @@ class HubDatabaseService {
     localStorage.setItem('gec_student_session', JSON.stringify(dummyUser));
     if (isPrince) {
       localStorage.setItem('gec_admin_session', JSON.stringify(dummyUser));
+    } else {
+      localStorage.removeItem('gec_admin_session');
     }
 
     // Get or initialize profile
@@ -625,6 +627,8 @@ class HubDatabaseService {
     localStorage.setItem('gec_student_session', JSON.stringify(dummyUser));
     if (isPrince) {
       localStorage.setItem('gec_admin_session', JSON.stringify(dummyUser));
+    } else {
+      localStorage.removeItem('gec_admin_session');
     }
     return { user: dummyUser, session: { user: dummyUser }, error: null };
   }

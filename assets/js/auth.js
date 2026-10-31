@@ -252,31 +252,53 @@ window.saveGoogleClientIdSetting = saveGoogleClientIdSetting;
    ========================================================================== */
 let activeGooglePopup = null;
 
-async function handlePrinceGoogleSignIn() {
+function handleContinueWithGoogle() {
   hideAuthAlert();
-  showAuthAlert('Authenticating as Prince Kumar (pk3334238@gmail.com) via Google Firebase...', 'info');
-  if (window.DB) {
-    await window.DB.signInWithGoogleDemo('pk3334238@gmail.com', 'Prince Kumar');
-    showAuthAlert('✓ Signed in as Prince Kumar (pk3334238@gmail.com)! Super Admin permissions active.', 'success');
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 700);
+  const modal = document.getElementById('googleAuthModal');
+  if (modal) {
+    modal.style.display = 'flex';
+  } else {
+    selectGoogleAccount('pk3334238@gmail.com', 'Prince Kumar');
   }
+}
+window.handleContinueWithGoogle = handleContinueWithGoogle;
+
+function closeGoogleAuthModal() {
+  const modal = document.getElementById('googleAuthModal');
+  if (modal) modal.style.display = 'none';
+}
+window.closeGoogleAuthModal = closeGoogleAuthModal;
+
+async function selectGoogleAccount(email, name) {
+  closeGoogleAuthModal();
+  hideAuthAlert();
+  const isPrince = (email || '').toLowerCase() === 'pk3334238@gmail.com' || (email || '').toLowerCase() === 'prince86944@gmail.com';
+  const displayName = isPrince ? 'Prince Kumar' : (name || email.split('@')[0]);
+  
+  showAuthAlert(`Signing in with Google (${email}) via Firebase...`, 'info');
+  await handleDirectGoogleLogin(email, displayName);
+}
+window.selectGoogleAccount = selectGoogleAccount;
+
+async function submitCustomGoogleAccount() {
+  const input = document.getElementById('inputCustomGoogleEmail');
+  const email = (input ? input.value.trim() : '');
+  if (!email || !email.includes('@')) {
+    alert('Please enter a valid Gmail address (e.g. name@gmail.com)');
+    return;
+  }
+  const name = email.split('@')[0];
+  await selectGoogleAccount(email, name);
+}
+window.submitCustomGoogleAccount = submitCustomGoogleAccount;
+
+async function handlePrinceGoogleSignIn() {
+  await selectGoogleAccount('pk3334238@gmail.com', 'Prince Kumar');
 }
 window.handlePrinceGoogleSignIn = handlePrinceGoogleSignIn;
 
 async function handleGoogleSignIn() {
-  hideAuthAlert();
-  // Safe Google Sign-In that prevents Error 400: redirect_uri_mismatch
-  const chosenEmail = prompt("Enter Google Account email to sign in with Firebase (or press OK for Prince Kumar):", "pk3334238@gmail.com");
-  if (chosenEmail === null) return; // User cancelled
-  
-  const email = (chosenEmail.trim() || "pk3334238@gmail.com");
-  const isPrince = email.toLowerCase() === 'pk3334238@gmail.com' || email.toLowerCase() === 'prince86944@gmail.com';
-  const name = isPrince ? 'Prince Kumar' : (email.split('@')[0]);
-
-  showAuthAlert(`✓ Authenticating ${email} via Google Firebase...`, 'info');
-  await handleDirectGoogleLogin(email, name);
+  handleContinueWithGoogle();
 }
 window.handleGoogleSignIn = handleGoogleSignIn;
 
