@@ -489,6 +489,37 @@ class HubDatabaseService {
      8. Student Authentication & Session Management (Phase 3)
      ======================================================================== */
   async studentSignUp(email, password, displayName) {
+    // 1. Firebase Authentication signup
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
+      try {
+        const cred = await firebase.auth().createUserWithEmailAndPassword(email.trim(), password);
+        if (displayName && cred.user.updateProfile) {
+          await cred.user.updateProfile({ displayName: displayName.trim() });
+        }
+        const isPrince = (email || '').trim().toLowerCase() === 'pk3334238@gmail.com';
+        const user = {
+          id: cred.user.uid,
+          email: cred.user.email,
+          display_name: displayName.trim() || (isPrince ? 'Prince Kumar' : email.split('@')[0]),
+          role: isPrince ? 'super_admin' : 'student',
+          is_admin: isPrince,
+          created_at: new Date().toISOString()
+        };
+        localStorage.setItem('gec_student_session', JSON.stringify(user));
+        if (isPrince) {
+          localStorage.setItem('gec_admin_session', JSON.stringify(user));
+        } else {
+          localStorage.removeItem('gec_admin_session');
+        }
+        return { user, session: { user }, error: null };
+      } catch (fErr) {
+        console.warn("Firebase studentSignUp notice:", fErr);
+        if (fErr.code === 'auth/email-already-in-use') {
+          return { user: null, error: { message: 'This email is already registered.' } };
+        }
+      }
+    }
+
     if (this.isLive()) {
       const { data, error } = await this.client.auth.signUp({
         email,
@@ -608,6 +639,34 @@ class HubDatabaseService {
   }
 
   async studentSignIn(email, password) {
+    // 1. Firebase Authentication sign-in
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
+      try {
+        const cred = await firebase.auth().signInWithEmailAndPassword(email.trim(), password);
+        const isPrince = (email || '').trim().toLowerCase() === 'pk3334238@gmail.com';
+        const user = {
+          id: cred.user.uid,
+          email: cred.user.email,
+          display_name: cred.user.displayName || (isPrince ? 'Prince Kumar' : email.split('@')[0]),
+          role: isPrince ? 'super_admin' : 'student',
+          is_admin: isPrince,
+          created_at: new Date().toISOString()
+        };
+        localStorage.setItem('gec_student_session', JSON.stringify(user));
+        if (isPrince) {
+          localStorage.setItem('gec_admin_session', JSON.stringify(user));
+        } else {
+          localStorage.removeItem('gec_admin_session');
+        }
+        return { user, session: { user }, error: null };
+      } catch (fErr) {
+        console.warn("Firebase studentSignIn notice:", fErr);
+        if (fErr.code === 'auth/wrong-password' || fErr.code === 'auth/user-not-found' || fErr.code === 'auth/invalid-credential') {
+          return { user: null, error: { message: 'Invalid email or password.' } };
+        }
+      }
+    }
+
     if (this.isLive()) {
       const { data, error } = await this.client.auth.signInWithPassword({ email, password });
       if (error) return { user: null, error };
@@ -634,6 +693,11 @@ class HubDatabaseService {
   }
 
   async studentSignOut() {
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
+      try {
+        await firebase.auth().signOut();
+      } catch (e) {}
+    }
     if (this.isLive()) {
       await this.client.auth.signOut();
     }
@@ -756,6 +820,20 @@ class HubDatabaseService {
      9. Student Profiles & Life Preferences (Phase 3)
      ======================================================================== */
   async getStudentProfile(userId) {
+    // 1. Fetch from Cloud Firestore
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && typeof firebase.firestore === 'function') {
+      try {
+        const doc = await firebase.firestore().collection('profiles').doc(userId).get();
+        if (doc.exists) {
+          const remoteProfile = { id: doc.id, ...doc.data() };
+          localStorage.setItem(`gec_profile_${userId}`, JSON.stringify(remoteProfile));
+          return remoteProfile;
+        }
+      } catch (fErr) {
+        console.warn("Firestore getStudentProfile notice:", fErr);
+      }
+    }
+
     if (this.isLive()) {
       try {
         const { data, error } = await this.client
@@ -798,6 +876,19 @@ class HubDatabaseService {
   }
 
   async updateStudentProfile(userId, updates) {
+    const current = await this.getStudentProfile(userId);
+    const updated = { ...current, ...updates, updated_at: new Date().toISOString() };
+    localStorage.setItem(`gec_profile_${userId}`, JSON.stringify(updated));
+
+    // Sync to Cloud Firestore
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && typeof firebase.firestore === 'function') {
+      try {
+        await firebase.firestore().collection('profiles').doc(userId).set(updated, { merge: true });
+      } catch (fErr) {
+        console.warn("Firestore updateStudentProfile notice:", fErr);
+      }
+    }
+
     if (this.isLive()) {
       try {
         const { error } = await this.client
@@ -810,10 +901,11 @@ class HubDatabaseService {
       }
     }
 
-    const current = await this.getStudentProfile(userId);
-    const updated = { ...current, ...updates, updated_at: new Date().toISOString() };
-    localStorage.setItem(`gec_profile_${userId}`, JSON.stringify(updated));
     return { success: true, profile: updated };
+  }
+
+  async saveUserProfileFirestore(userId, updates) {
+    return this.updateStudentProfile(userId, updates);
   }
 
   /* ========================================================================

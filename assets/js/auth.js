@@ -248,27 +248,28 @@ function saveGoogleClientIdSetting() {
 window.saveGoogleClientIdSetting = saveGoogleClientIdSetting;
 
 /* ==========================================================================
-   Google Sign-In via Official Firebase Auth SDK (Popup Flow)
+   Firebase Authentication Suite (Google Sign-In, Phone OTP, Email/Password)
+   Project: gec-sheikhpura (pk3334238@gmail.com)
    ========================================================================== */
-const firebaseConfig = {
-  projectId: "beu-vision",
-  appId: "1:401950515540:web:6e5f6bed1048d2e1bea8c1",
-  databaseURL: "https://beu-vision-default-rtdb.firebaseio.com",
-  storageBucket: "beu-vision.firebasestorage.app",
-  apiKey: "AIzaSyACRMu_UkHnowxTpgPIrnS2min2O2N_LhY",
-  authDomain: "beu-vision.firebaseapp.com",
-  messagingSenderId: "401950515540",
-  measurementId: "G-LYFLRBHEM1"
-};
-
 let firebaseAuth = null;
 let googleAuthProvider = null;
+let phoneRecaptchaVerifier = null;
+let phoneConfirmationResult = null;
 
 function initFirebaseClient() {
   if (typeof firebase !== 'undefined') {
     try {
-      if (!firebase.apps || !firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+      if (window.FIREBASE_CONFIG && typeof window.FIREBASE_CONFIG.init === 'function') {
+        window.FIREBASE_CONFIG.init();
+      } else if (!firebase.apps || !firebase.apps.length) {
+        const fallbackConfig = {
+          projectId: "gec-sheikhpura",
+          authDomain: "gec-sheikhpura.firebaseapp.com",
+          storageBucket: "gec-sheikhpura.firebasestorage.app",
+          apiKey: window.localStorage.getItem('gec_firebase_api_key') || "AIzaSy_GEC_Sheikhpura_Placeholder",
+          appId: window.localStorage.getItem('gec_firebase_app_id') || "1:gec-sheikhpura:web:hub"
+        };
+        firebase.initializeApp(fallbackConfig);
       }
       firebaseAuth = firebase.auth();
       googleAuthProvider = new firebase.auth.GoogleAuthProvider();
@@ -283,14 +284,34 @@ initFirebaseClient();
 async function processFirebaseAuthenticatedUser(u) {
   if (!u) return;
   const email = (u.email || '').toLowerCase().trim();
-  const name = u.displayName || email.split('@')[0] || 'Student';
+  const phone = u.phoneNumber || '';
+  const name = u.displayName || (email ? email.split('@')[0] : (phone ? 'Student (' + phone.slice(-4) + ')' : 'Verified Student'));
   const photo = u.photoURL || '';
 
   // Super Admin privileges strictly reserved for pk3334238@gmail.com
   const isSuperAdmin = (email === 'pk3334238@gmail.com');
 
   if (window.DB) {
-    await window.DB.signInWithGoogleDemo(email, name, photo);
+    const userSession = {
+      id: u.uid || ('usr-' + Math.random().toString(36).substr(2, 9)),
+      email: email || (phone ? `${phone.replace(/[^0-9]/g, '')}@student.gecsheikhpura.ac.in` : 'student@gecsheikhpura.ac.in'),
+      phone: phone,
+      display_name: isSuperAdmin ? 'Prince Kumar' : name,
+      role: isSuperAdmin ? 'super_admin' : 'student',
+      is_admin: isSuperAdmin,
+      created_at: new Date().toISOString()
+    };
+    localStorage.setItem('gec_student_session', JSON.stringify(userSession));
+
+    // Sync profile to Cloud Firestore
+    if (typeof window.DB.saveUserProfileFirestore === 'function') {
+      await window.DB.saveUserProfileFirestore(userSession.id, {
+        name: userSession.display_name,
+        display_name: userSession.display_name,
+        email: userSession.email,
+        phone: phone || ''
+      });
+    }
   }
 
   if (isSuperAdmin) {
@@ -307,7 +328,7 @@ async function processFirebaseAuthenticatedUser(u) {
     }, 600);
   } else {
     localStorage.removeItem('gec_admin_session');
-    showAuthAlert(`✓ Welcome, ${name}! Signed in with Google. Opening student dashboard...`, 'success');
+    showAuthAlert(`✓ Welcome, ${name}! Signed in successfully. Opening student dashboard...`, 'success');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
     }, 600);
@@ -520,7 +541,7 @@ async function handleSaveOnboardingProfile(event) {
 }
 
 function switchAuthTab(tabName) {
-  const tabs = ['signIn', 'signUp', 'reset'];
+  const tabs = ['signIn', 'signUp', 'reset', 'phone'];
   tabs.forEach(t => {
     const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
     const form = document.getElementById(`${t}Form`);
@@ -534,7 +555,130 @@ function switchAuthTab(tabName) {
   });
 
   hideAuthAlert();
+  if (tabName.toLowerCase() === 'phone') {
+    initPhoneAuthRecaptcha();
+  }
 }
+
+/* ==========================================================================
+   Firebase Phone Authentication Handlers (SMS OTP via RecaptchaVerifier)
+   ========================================================================== */
+function initPhoneAuthRecaptcha() {
+  initFirebaseClient();
+  if (!firebaseAuth) return;
+  const container = document.getElementById('recaptcha-container');
+  if (!container) return;
+
+  if (!phoneRecaptchaVerifier && typeof firebase.auth.RecaptchaVerifier === 'function') {
+    try {
+      phoneRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          console.log("reCAPTCHA solved for Firebase Phone Auth");
+        },
+        'expired-callback': () => {
+          showAuthAlert('Security check expired. Please try sending OTP again.', 'info');
+        }
+      });
+    } catch (e) {
+      console.warn("reCAPTCHA init notice:", e);
+    }
+  }
+}
+
+async function handleSendPhoneOtp(event) {
+  if (event) event.preventDefault();
+  hideAuthAlert();
+  initFirebaseClient();
+
+  const phoneInput = document.getElementById('phoneInput');
+  const btn = document.getElementById('btnSendPhoneOtp');
+  const rawNumber = (phoneInput ? phoneInput.value : '').trim();
+
+  if (!rawNumber || rawNumber.length !== 10) {
+    showAuthAlert('Please enter a valid 10-digit mobile number.');
+    return;
+  }
+
+  const fullPhone = '+91' + rawNumber;
+  initPhoneAuthRecaptcha();
+
+  if (!phoneRecaptchaVerifier || !firebaseAuth) {
+    showAuthAlert('Initializing Firebase Phone Auth... Please click again in a moment.', 'info');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending OTP...';
+  showAuthAlert('Sending verification SMS to ' + fullPhone + '...', 'info');
+
+  try {
+    phoneConfirmationResult = await firebaseAuth.signInWithPhoneNumber(fullPhone, phoneRecaptchaVerifier);
+    window.phoneConfirmationResult = phoneConfirmationResult;
+
+    showAuthAlert('✓ 6-Digit OTP sent to ' + fullPhone + '! Check your SMS inbox.', 'success');
+    document.getElementById('phoneStep1').style.display = 'none';
+    document.getElementById('phoneStep2').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Send OTP via SMS';
+  } catch (error) {
+    console.error("Firebase signInWithPhoneNumber error:", error);
+    btn.disabled = false;
+    btn.textContent = 'Send OTP via SMS';
+    if (phoneRecaptchaVerifier && phoneRecaptchaVerifier.clear) {
+      try { phoneRecaptchaVerifier.clear(); phoneRecaptchaVerifier = null; } catch(e) {}
+    }
+    showAuthAlert('Phone OTP error: ' + (error.message || error.code), 'error');
+  }
+}
+window.handleSendPhoneOtp = handleSendPhoneOtp;
+
+async function handleVerifyPhoneOtp() {
+  hideAuthAlert();
+  const otpInput = document.getElementById('phoneOtpCode');
+  const otp = (otpInput ? otpInput.value : '').trim();
+  const btn = document.getElementById('btnVerifyPhoneOtp');
+
+  if (!otp || otp.length < 6) {
+    showAuthAlert('Please enter the 6-digit verification code received via SMS.');
+    return;
+  }
+
+  const confirmation = phoneConfirmationResult || window.phoneConfirmationResult;
+  if (!confirmation) {
+    showAuthAlert('OTP session expired. Please request a new OTP.', 'error');
+    resetPhoneStep();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Verifying OTP...';
+
+  try {
+    const result = await confirmation.confirm(otp);
+    if (result && result.user) {
+      showAuthAlert('✓ Phone number verified! Setting up your session...', 'success');
+      await processFirebaseAuthenticatedUser(result.user);
+    }
+  } catch (error) {
+    console.error("Phone Auth confirm error:", error);
+    btn.disabled = false;
+    btn.textContent = 'Verify OTP & Sign In';
+    showAuthAlert('Invalid OTP code. Please check and try again.', 'error');
+  }
+}
+window.handleVerifyPhoneOtp = handleVerifyPhoneOtp;
+
+function resetPhoneStep() {
+  const s1 = document.getElementById('phoneStep1');
+  const s2 = document.getElementById('phoneStep2');
+  if (s1) s1.style.display = 'block';
+  if (s2) s2.style.display = 'none';
+  const otpInput = document.getElementById('phoneOtpCode');
+  if (otpInput) otpInput.value = '';
+  hideAuthAlert();
+}
+window.resetPhoneStep = resetPhoneStep;
 
 function showAuthAlert(message, type = 'error') {
   const alertBox = document.getElementById('authAlert');
@@ -679,6 +823,19 @@ async function handlePasswordReset(event) {
 
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending...';
+
+  initFirebaseClient();
+  if (firebaseAuth) {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email);
+      showAuthAlert('✓ Password reset link sent to ' + email + '! Check your inbox.', 'success');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Recovery Email';
+      return;
+    } catch (fErr) {
+      console.warn("Firebase password reset notice:", fErr);
+    }
+  }
 
   try {
     const res = await window.DB.resetPassword(email);

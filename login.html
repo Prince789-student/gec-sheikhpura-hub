@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -239,6 +239,9 @@
               <button type="button" class="auth-tab-btn active" id="tabBtnSignIn" onclick="switchAuthTab('signin')" role="tab" aria-selected="true">
                 Sign In
               </button>
+              <button type="button" class="auth-tab-btn" id="tabBtnPhone" onclick="switchAuthTab('phone')" role="tab" aria-selected="false">
+                📱 Phone OTP
+              </button>
               <button type="button" class="auth-tab-btn" id="tabBtnSignUp" onclick="switchAuthTab('signup')" role="tab" aria-selected="false">
                 Create Account
               </button>
@@ -347,6 +350,53 @@
                 <button type="button" onclick="switchAuthTab('signin')" style="background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: underline;">
                   ← Back to Sign In
                 </button>
+              </div>
+            </form>
+
+            <!-- 4. PHONE OTP AUTH FORM (Firebase Phone Authentication) -->
+            <form id="phoneForm" onsubmit="handleSendPhoneOtp(event)" style="display: none;">
+              <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Sign in or register using your 10-digit mobile number with Firebase SMS OTP.
+              </p>
+
+              <div id="phoneStep1">
+                <div class="form-group">
+                  <label class="form-label" for="phoneInput">Mobile Number</label>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; height: 42px; padding: 0 12px; background: var(--surface-2, #f3f4f6); border: 1px solid var(--border-light, #d1d5db); border-radius: var(--radius-sm, 6px); font-weight: 700; font-size: 0.9rem; color: var(--text-main);">+91</span>
+                    <input type="tel" id="phoneInput" class="form-control" placeholder="10-digit Mobile Number" pattern="[0-9]{10}" maxlength="10" required autocomplete="tel-national" style="flex: 1;">
+                  </div>
+                  <small style="color: var(--text-subtle); font-size: 0.75rem; display: block; margin-top: 0.35rem;">
+                    Firebase will send a 6-digit OTP SMS to verify your mobile number.
+                  </small>
+                </div>
+
+                <!-- Invisible Recaptcha container for Firebase Phone Auth -->
+                <div id="recaptcha-container"></div>
+
+                <button type="submit" class="btn btn-primary" id="btnSendPhoneOtp" style="width: 100%; margin-top: 0.5rem;">
+                  Send OTP via SMS
+                </button>
+              </div>
+
+              <div id="phoneStep2" style="display: none;">
+                <div class="form-group">
+                  <label class="form-label" for="phoneOtpCode">Enter 6-Digit OTP</label>
+                  <input type="text" id="phoneOtpCode" class="form-control" placeholder="123456" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" style="letter-spacing: 0.35rem; font-size: 1.3rem; text-align: center; font-weight: 700;">
+                  <small style="color: var(--text-subtle); font-size: 0.75rem; display: block; margin-top: 0.35rem; text-align: center;">
+                    Enter the code sent to your mobile.
+                  </small>
+                </div>
+
+                <button type="button" class="btn btn-primary" id="btnVerifyPhoneOtp" onclick="handleVerifyPhoneOtp()" style="width: 100%; margin-top: 0.5rem;">
+                  Verify OTP &amp; Sign In
+                </button>
+
+                <div style="margin-top: 1rem; text-align: center;">
+                  <button type="button" onclick="resetPhoneStep()" style="background: none; border: none; color: var(--color-accent); font-size: 0.8125rem; cursor: pointer; text-decoration: underline;">
+                    ← Change Mobile Number
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -686,6 +736,8 @@
   <!-- Firebase Compat SDK from Google CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/data.js?v=13.0"></script>
   <script src="assets/js/supabase-config.js"></script>
