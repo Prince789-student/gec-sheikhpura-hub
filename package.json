@@ -1,0 +1,10 @@
+{
+  "name": "gec-sheikhpura-hub",
+  "version": "1.0.0",
+  "description": "GEC Sheikhpura Student Hub & Campus Life Portal",
+  "scripts": {
+    "deploy": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy.ps1",
+    "deploy:vercel": "npx vercel deploy --prod --yes",
+    "deploy:git": "git push origin main"
+  }
+}
