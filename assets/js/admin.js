@@ -826,7 +826,23 @@ window.loadNoticesTable = async function() {
       summary: document.getElementById('noticeSummary').value
     };
     await window.DB.createNoticeDirect(noticeData);
-    showToast(`Notice "${noticeData.title}" published to live board.`);
+
+    // Live broadcast to Render Backend API for instant mobile app sync
+    try {
+      fetch('https://gec-sheikhpura-backend.onrender.com/api/notices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: noticeData.title,
+          category: noticeData.category,
+          date: noticeData.date,
+          url: noticeData.link || '#',
+          isImportant: true
+        })
+      }).catch(e => console.warn('Backend sync notice:', e));
+    } catch (_) {}
+
+    showToast(`Notice "${noticeData.title}" published to live board and mobile app.`);
     document.getElementById('publishNoticeForm').reset();
     closePublishNoticeModal();
     await loadNoticesTable();
@@ -835,6 +851,11 @@ window.loadNoticesTable = async function() {
   window.adminDeleteNotice = async function(noticeId) {
     if (confirm("Are you sure you want to archive / delete this circular?")) {
       await window.DB.deleteNotice(noticeId);
+      try {
+        fetch(`https://gec-sheikhpura-backend.onrender.com/api/notices/${noticeId}`, {
+          method: 'DELETE'
+        }).catch(e => console.warn('Backend sync delete:', e));
+      } catch (_) {}
       showToast("Notice archived.");
       await loadNoticesTable();
     }

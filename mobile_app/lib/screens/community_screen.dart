@@ -131,15 +131,33 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
             child: TabBarView(
               controller: _tabController,
               children: [
-                // 1. Events Tab
-                ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: DataService.instance.sampleEvents.length,
-                  itemBuilder: (context, index) {
-                    final event = DataService.instance.sampleEvents[index];
-                    final isRsvpd = _rsvpdEventIds.contains(event.id);
-                    return _buildEventCard(context, event, isRsvpd);
+                // 1. Events Tab (Live Sync from Admin Panel)
+                RefreshIndicator(
+                  onRefresh: () async {
+                    await DataService.instance.fetchLiveEvents();
+                    setState(() {});
                   },
+                  child: DataService.instance.sampleEvents.isEmpty
+                      ? ListView(
+                          padding: const EdgeInsets.all(32),
+                          children: const [
+                            SizedBox(height: 40),
+                            Icon(Icons.event_available, size: 48, color: Colors.grey),
+                            SizedBox(height: 12),
+                            Text('No active events scheduled.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                            SizedBox(height: 4),
+                            Text('Official college events published from the Admin Panel will appear here automatically.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          ],
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: DataService.instance.sampleEvents.length,
+                          itemBuilder: (context, index) {
+                            final event = DataService.instance.sampleEvents[index];
+                            final isRsvpd = _rsvpdEventIds.contains(event.id);
+                            return _buildEventCard(context, event, isRsvpd);
+                          },
+                        ),
                 ),
 
                 // 2. Clubs Tab
@@ -153,15 +171,27 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
                 ),
 
                 // 3. Sports & Squads Tab
-                ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: DataService.instance.sportsSquads.length,
-                  itemBuilder: (context, index) {
-                    final squad = DataService.instance.sportsSquads[index];
-                    final isJoined = _joinedSquadIds.contains(squad.id);
-                    return _buildSportsCard(context, squad, isJoined, isDark);
-                  },
-                ),
+                DataService.instance.sportsSquads.isEmpty
+                    ? ListView(
+                        padding: const EdgeInsets.all(32),
+                        children: const [
+                          SizedBox(height: 40),
+                          Icon(Icons.sports_cricket, size: 48, color: Colors.grey),
+                          SizedBox(height: 12),
+                          Text('No sports matches active today.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(height: 4),
+                          Text('Upcoming tournament fixtures from Sports Committee will appear here.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        ],
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: DataService.instance.sportsSquads.length,
+                        itemBuilder: (context, index) {
+                          final squad = DataService.instance.sportsSquads[index];
+                          final isJoined = _joinedSquadIds.contains(squad.id);
+                          return _buildSportsCard(context, squad, isJoined, isDark);
+                        },
+                      ),
 
                 // 4. Lost & Found Tab (Interactive Student Submission & Live Sync)
                 RefreshIndicator(
@@ -261,35 +291,39 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
                   ),
                 ),
 
-                // 5. Announcements Tab
-                ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildAnnouncementCard(
-                      context: context,
-                      category: 'Sports & Ground',
-                      title: 'Hostel Badminton Court Floodlight Sparring — Evening 6:30 PM',
-                      date: 'Oct 30, 2026',
-                      author: 'Hostel Sports Representative',
-                      content: 'Open doubles sparring at Boys Hostel court. Bring your own rackets; shuttles provided by committee.',
-                    ),
-                    _buildAnnouncementCard(
-                      context: context,
-                      category: 'Lost & Found',
-                      title: 'Lost Casio fx-991ES Plus Scientific Calculator in Room 204',
-                      date: 'Oct 29, 2026',
-                      author: 'Aman Kumar (CSE 3rd Year)',
-                      content: 'Left in Room 204 after 3rd period. If found, return to CSE HOD desk or guard room.',
-                    ),
-                    _buildAnnouncementCard(
-                      context: context,
-                      category: 'Cultural',
-                      title: 'Natraj Drama Club Auditions for Aarohan Street Play',
-                      date: 'Oct 28, 2026',
-                      author: 'Natraj Cultural Society',
-                      content: 'Calling actors, scriptwriters, and musicians. Auditions on Friday at Open Air Stage.',
-                    ),
-                  ],
+                // 5. Announcements Tab (Live Sync from Admin Panel)
+                RefreshIndicator(
+                  onRefresh: () async {
+                    await DataService.instance.fetchLiveNotices();
+                    setState(() {});
+                  },
+                  child: DataService.instance.campusNotices.isEmpty
+                      ? ListView(
+                          padding: const EdgeInsets.all(32),
+                          children: const [
+                            SizedBox(height: 40),
+                            Icon(Icons.campaign_outlined, size: 48, color: Colors.grey),
+                            SizedBox(height: 12),
+                            Text('No circulars or announcements posted yet.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                            SizedBox(height: 4),
+                            Text('Official notices published from the Admin Panel will appear here automatically.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          ],
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: DataService.instance.campusNotices.length,
+                          itemBuilder: (context, index) {
+                            final notice = DataService.instance.campusNotices[index];
+                            return _buildAnnouncementCard(
+                              context: context,
+                              category: notice.category,
+                              title: notice.title,
+                              date: notice.dateStr,
+                              author: notice.authority,
+                              content: notice.description,
+                            );
+                          },
+                        ),
                 ),
               ],
             ),

@@ -55,30 +55,34 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  // --- 1. Pure Google Sign In with SHA-1 Verification ---
-  Future<void> _handleGoogleSignIn({String? email, String? customName}) async {
+  // --- 1. Native Google Sign-In (Opens Device Account Picker on Phone) ---
+  Future<void> _handleNativeGoogleSignIn() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final googleUser = await AuthService.instance.signInWithGoogle(
-        email: email,
-        name: customName,
-      );
+      final googleUser = await AuthService.instance.signInWithNativeGoogle();
+      if (googleUser == null) {
+        // User closed or dismissed the Google account chooser
+        setState(() => _isLoading = false);
+        return;
+      }
 
       setState(() {
         _isLoading = false;
       });
 
-      // Pre-fill fields if available
-      if (_nameCtrl.text.isEmpty) _nameCtrl.text = googleUser.displayName;
-      if (_regNoCtrl.text.isEmpty && googleUser.regNo.isNotEmpty) _regNoCtrl.text = googleUser.regNo;
-      if (_dobCtrl.text.isEmpty && googleUser.dob.isNotEmpty) _dobCtrl.text = googleUser.dob;
-      if (_phoneCtrl.text.isEmpty && googleUser.phone.isNotEmpty) _phoneCtrl.text = googleUser.phone;
+      // Pre-fill profile name from Google account
+      if (_nameCtrl.text.isEmpty) {
+        _nameCtrl.text = googleUser.displayName;
+      }
+      if (googleUser.regNo.isNotEmpty) _regNoCtrl.text = googleUser.regNo;
+      if (googleUser.dob.isNotEmpty) _dobCtrl.text = googleUser.dob;
+      if (googleUser.phone.isNotEmpty) _phoneCtrl.text = googleUser.phone;
 
-      // If user is already Super Admin or has filled their registration number and phone, enter immediately
+      // If user already has registration and phone saved in local storage, login immediately
       if (googleUser.isAdmin || (googleUser.regNo.isNotEmpty && googleUser.phone.isNotEmpty)) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,10 +95,51 @@ class _AuthScreenState extends State<AuthScreen> {
           Navigator.pop(context);
         }
       } else {
-        // Prompt for the 5 student profile fields
+        // Prompt student to enter Registration Number, DOB, Phone & Branch
         setState(() {
           _showProfileStep = true;
         });
+      }
+    } catch (e) {
+      // If native Google Play Services fails (e.g. running on web/test simulator), show clean error or fallback
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Google Sign-In note: ${e.toString().replaceAll('Exception: ', '')}. You can also use direct admin sign-in below.';
+      });
+    }
+  }
+
+  // Fallback sign in for Admin or specific email
+  Future<void> _handleDirectSignIn({String? email, String? customName}) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final googleUser = await AuthService.instance.signInWithGoogle(
+        email: email,
+        name: customName,
+      );
+
+      setState(() => _isLoading = false);
+
+      if (_nameCtrl.text.isEmpty) _nameCtrl.text = googleUser.displayName;
+      if (googleUser.regNo.isNotEmpty) _regNoCtrl.text = googleUser.regNo;
+      if (googleUser.dob.isNotEmpty) _dobCtrl.text = googleUser.dob;
+      if (googleUser.phone.isNotEmpty) _phoneCtrl.text = googleUser.phone;
+
+      if (googleUser.isAdmin || (googleUser.regNo.isNotEmpty && googleUser.phone.isNotEmpty)) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✓ Signed in as ${googleUser.displayName}!'),
+            backgroundColor: AppTheme.successGreen,
+          ),
+        );
+        if (Navigator.canPop(context)) Navigator.pop(context);
+      } else {
+        setState(() => _showProfileStep = true);
       }
     } catch (e) {
       setState(() {
@@ -104,7 +149,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  // --- 2. Save Student Profile (5 Fields: Name, Reg No, DOB, Phone, Branch) ---
+  // --- 2. Save Student Profile in Local Storage (5 Fields) ---
   Future<void> _saveStudentProfile() async {
     final name = _nameCtrl.text.trim();
     final regNo = _regNoCtrl.text.trim();
@@ -145,7 +190,7 @@ class _AuthScreenState extends State<AuthScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ Welcome, ${updated.displayName}! Profile verified.'),
+          content: Text('✓ Welcome, ${updated.displayName}! Profile saved locally.'),
           backgroundColor: AppTheme.successGreen,
         ),
       );
@@ -203,14 +248,14 @@ class _AuthScreenState extends State<AuthScreen> {
           children: [
             Icon(Icons.account_circle, color: AppTheme.primaryNavy),
             SizedBox(width: 8),
-            Text('Sign in with Google Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('Sign in with Google ID', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Enter your Google account email to sign in via official OAuth:',
+              'Enter your Google account email to log in:',
               style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 12),
@@ -237,7 +282,7 @@ class _AuthScreenState extends State<AuthScreen> {
               final em = emailCtrl.text.trim();
               if (em.isNotEmpty) {
                 Navigator.pop(ctx);
-                _handleGoogleSignIn(email: em);
+                _handleDirectSignIn(email: em);
               }
             },
             child: const Text('Sign In', style: TextStyle(color: Colors.white)),
@@ -280,28 +325,28 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // --- View A: Pure Google Sign In ---
+  // --- View A: Pure Google Sign In with Device Account Chooser ---
   Widget _buildGoogleSignInCard(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 10),
 
-        // Official College Logo (Clean Fit)
+        // Official College Logo (Pura Fit)
         Container(
-          width: 96,
-          height: 96,
+          width: 100,
+          height: 100,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
             ],
-            border: Border.all(color: AppTheme.primaryNavy.withOpacity(0.2), width: 2),
+            border: Border.all(color: AppTheme.primaryNavy.withValues(alpha: 0.2), width: 2),
           ),
           child: ClipOval(
             child: Image.asset(
@@ -338,7 +383,7 @@ class _AuthScreenState extends State<AuthScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppTheme.primaryNavy.withOpacity(0.08),
+            color: AppTheme.primaryNavy.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(20),
           ),
           child: const Row(
@@ -347,7 +392,7 @@ class _AuthScreenState extends State<AuthScreen> {
               Icon(Icons.verified_user, size: 14, color: AppTheme.primaryNavy),
               SizedBox(width: 6),
               Text(
-                'SHA-1 Firebase Secured Authentication',
+                'Official Google Authentication',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy),
               ),
             ],
@@ -361,9 +406,9 @@ class _AuthScreenState extends State<AuthScreen> {
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: AppTheme.dangerRed.withOpacity(0.1),
+              color: AppTheme.dangerRed.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppTheme.dangerRed.withOpacity(0.3)),
+              border: Border.all(color: AppTheme.dangerRed.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -379,7 +424,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           ),
 
-        // Main In-App Google Sign-In Card
+        // Main Google Sign-In Card
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
@@ -388,7 +433,7 @@ class _AuthScreenState extends State<AuthScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.3 : 0.06),
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -399,35 +444,35 @@ class _AuthScreenState extends State<AuthScreen> {
               const Text(
                 'Sign In with Google',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 19,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Official student authentication via Google OAuth & Firebase. Quick, seamless and secure.',
+                'Tap below to choose any Google account present on your phone.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 13,
                   color: isDark ? Colors.white60 : AppTheme.textSecondary,
                   height: 1.4,
                 ),
               ),
               const SizedBox(height: 24),
 
-              // 1. One-Tap Google Sign-In (Super Admin pk3334238@gmail.com)
+              // 1. Native Device Google Account Picker Button
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : () => _handleGoogleSignIn(email: 'pk3334238@gmail.com', customName: 'Prince Kumar'),
+                  onPressed: _isLoading ? null : _handleNativeGoogleSignIn,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF3C4043),
                     elevation: 2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: Color(0xFFDADCE0), width: 1.2),
+                      side: const BorderSide(color: Color(0xFFDADCE0), width: 1.5),
                     ),
                   ),
                   child: _isLoading
@@ -443,13 +488,13 @@ class _AuthScreenState extends State<AuthScreen> {
                               'assets/images/google_logo.png',
                               height: 22,
                               width: 22,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.g_mobiledata, size: 28, color: Colors.blue),
+                              errorBuilder: (_, _, _) => const Icon(Icons.g_mobiledata, size: 28, color: Colors.blue),
                             ),
                             const SizedBox(width: 12),
                             const Text(
-                              'Continue as Prince Kumar (Admin)',
+                              'Sign in with Google',
                               style: TextStyle(
-                                fontSize: 14.5,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF3C4043),
                               ),
@@ -461,32 +506,43 @@ class _AuthScreenState extends State<AuthScreen> {
 
               const SizedBox(height: 14),
 
-              // 2. Custom Google Account Sign-In
+              // 2. Direct Admin Sign-in (pk3334238@gmail.com)
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 48,
                 child: OutlinedButton.icon(
-                  onPressed: _isLoading ? null : _showCustomGoogleDialog,
-                  icon: const Icon(Icons.person_outline, size: 20, color: AppTheme.primaryNavy),
+                  onPressed: _isLoading ? null : () => _handleDirectSignIn(email: 'pk3334238@gmail.com', customName: 'Prince Kumar'),
+                  icon: const Icon(Icons.shield, size: 18, color: Color(0xFFD97706)),
                   label: const Text(
-                    'Sign In with Another Google Account',
+                    'Login as College Admin (Prince Kumar)',
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.primaryNavy,
+                      color: Color(0xFFD97706),
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    side: BorderSide(color: AppTheme.primaryNavy.withOpacity(0.5)),
+                    side: const BorderSide(color: Color(0xFFD97706), width: 1.2),
                   ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 3. Or enter another Google ID
+              TextButton(
+                onPressed: _isLoading ? null : _showCustomGoogleDialog,
+                child: const Text(
+                  'Or enter another Google email manually',
+                  style: TextStyle(fontSize: 12.5, color: AppTheme.accentSky),
                 ),
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
 
         // Information Callout
         Container(
@@ -503,7 +559,7 @@ class _AuthScreenState extends State<AuthScreen> {
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'After Google verification, you will complete your student record: Name, Registration Number, DOB, Phone & Branch.',
+                  'After Google verification, your student record (Name, BEU Reg No, DOB, Phone & Branch) is stored securely in your phone.',
                   style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.4),
                 ),
               ),
@@ -526,8 +582,8 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             children: [
               Container(
-                width: 72,
-                height: 72,
+                width: 76,
+                height: 76,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
@@ -547,7 +603,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Enter your verified institutional details for your Digital ID Card',
+                'Enter your institutional details to generate your Digital Student ID',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12.5, color: isDark ? Colors.white60 : AppTheme.textSecondary),
               ),
@@ -562,9 +618,9 @@ class _AuthScreenState extends State<AuthScreen> {
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: AppTheme.dangerRed.withOpacity(0.1),
+              color: AppTheme.dangerRed.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.dangerRed.withOpacity(0.3)),
+              border: Border.all(color: AppTheme.dangerRed.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -587,7 +643,7 @@ class _AuthScreenState extends State<AuthScreen> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -597,17 +653,17 @@ class _AuthScreenState extends State<AuthScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Full Name
-              _buildFieldLabel('1. Full Name *'),
+              _buildFieldLabel('1. Student Full Name *'),
               TextFormField(
                 controller: _nameCtrl,
                 decoration: _inputDecoration(
-                  hint: 'e.g. Prince Kumar',
+                  hint: 'Enter your full name',
                   icon: Icons.person_outline,
                 ),
               ),
               const SizedBox(height: 16),
 
-              // 2. Registration Number
+              // 2. Registration Number (Clean empty field with hint)
               _buildFieldLabel('2. BEU Registration Number *'),
               TextFormField(
                 controller: _regNoCtrl,
@@ -625,7 +681,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 readOnly: true,
                 onTap: _pickDateOfBirth,
                 decoration: _inputDecoration(
-                  hint: 'DD/MM/YYYY',
+                  hint: 'DD/MM/YYYY (Tap calendar to select)',
                   icon: Icons.calendar_today_outlined,
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.calendar_month, color: AppTheme.primaryNavy),

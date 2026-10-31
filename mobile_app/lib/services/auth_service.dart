@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/models.dart';
 
 class AuthService {
@@ -12,45 +13,95 @@ class AuthService {
 
   final ValueNotifier<UserModel?> currentUser = ValueNotifier<UserModel?>(null);
 
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
+
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final userJson = prefs.getString(_userKey);
-    final hasLoggedOut = prefs.getBool('has_logged_out') ?? false;
 
     if (userJson != null) {
       try {
         final map = jsonDecode(userJson) as Map<String, dynamic>;
         currentUser.value = UserModel.fromMap(map);
+        return;
       } catch (e) {
         debugPrint('Error restoring user session: $e');
       }
-    } else if (!hasLoggedOut) {
-      // Pre-seed authenticated Super Admin student session: Prince Kumar (pk3334238@gmail.com) on initial launch
-      final princeUser = UserModel(
-        uid: 'admin_prince_pk',
-        displayName: 'Prince Kumar',
-        email: 'pk3334238@gmail.com',
-        photoUrl: 'https://lh3.googleusercontent.com/a/default-user',
+    }
+
+    currentUser.value = null;
+  }
+
+  // --- Real Google Sign In (Pops up Native Android Account Chooser) ---
+  Future<UserModel?> signInWithNativeGoogle() async {
+    try {
+      // Disconnect or sign out previous cache to ensure account picker opens
+      try {
+        await _googleSignIn.signOut();
+      } catch (_) {}
+
+      final GoogleSignInAccount? account = await _googleSignIn.signIn();
+      if (account == null) {
+        // User cancelled account selection
+        return null;
+      }
+
+      final email = account.email.trim();
+      final name = (account.displayName != null && account.displayName!.trim().isNotEmpty)
+          ? account.displayName!.trim()
+          : email.split('@')[0];
+      final photo = account.photoUrl;
+
+      // Check if user profile is already saved locally in DB
+      final prefs = await SharedPreferences.getInstance();
+      final usersDb = prefs.getStringList(_usersDbKey) ?? [];
+      for (var uStr in usersDb) {
+        try {
+          final map = jsonDecode(uStr) as Map<String, dynamic>;
+          if (map['email']?.toString().toLowerCase() == email.toLowerCase()) {
+            final existingUser = UserModel.fromMap(map);
+            currentUser.value = existingUser;
+            await _saveSession(existingUser);
+            return existingUser;
+          }
+        } catch (_) {}
+      }
+
+      // New Google User
+      final isSuperAdmin = email.toLowerCase() == 'pk3334238@gmail.com';
+      final newUser = UserModel(
+        uid: account.id.isNotEmpty ? account.id : 'goog_${DateTime.now().millisecondsSinceEpoch}',
+        displayName: name,
+        email: email,
+        photoUrl: photo ?? 'https://lh3.googleusercontent.com/a/default-user',
         branch: 'Computer Science & Engg (CSE)',
         batchYear: '2023-2027',
-        rollNo: '23CSE01',
-        phone: '06341-224401',
+        rollNo: isSuperAdmin ? '23CSE01' : '',
+        regNo: isSuperAdmin ? '23105127001' : '',
+        dob: isSuperAdmin ? '15/08/2004' : '',
+        phone: isSuperAdmin ? '9835012345' : '',
         provider: 'google',
         isVerified: true,
-        isAdmin: true,
+        isAdmin: isSuperAdmin,
         createdAt: DateTime.now().toIso8601String(),
       );
-      currentUser.value = princeUser;
-      await _saveSession(princeUser);
-    } else {
-      currentUser.value = null;
+
+      currentUser.value = newUser;
+      await _saveSession(newUser);
+      return newUser;
+    } catch (e) {
+      debugPrint('Native Google Sign-In exception: $e');
+      rethrow;
     }
   }
 
-  // --- Sign In with Google (Firebase OAuth & SHA Certificate) ---
+  // --- Manual/Fallback Google Sign In ---
   Future<UserModel> signInWithGoogle({
     String? email,
     String? name,
+    String? photoUrl,
     String? regNo,
     String? dob,
     String? phone,
@@ -67,12 +118,12 @@ class AuthService {
 
     final user = UserModel(
       uid: 'goog_${DateTime.now().millisecondsSinceEpoch}',
-      displayName: safeName[0].toUpperCase() + safeName.substring(1),
+      displayName: safeName,
       email: safeEmail,
-      photoUrl: 'https://lh3.googleusercontent.com/a/default-user',
+      photoUrl: photoUrl ?? 'https://lh3.googleusercontent.com/a/default-user',
       branch: branch ?? 'Computer Science & Engg (CSE)',
       batchYear: batchYear ?? '2023-2027',
-      rollNo: rollNo ?? (isSuperAdmin ? '23CSE01' : '23CSE${(DateTime.now().millisecondsSinceEpoch % 60) + 1}'),
+      rollNo: rollNo ?? (isSuperAdmin ? '23CSE01' : ''),
       regNo: regNo ?? (isSuperAdmin ? '23105127001' : ''),
       dob: dob ?? (isSuperAdmin ? '15/08/2004' : ''),
       phone: phone ?? (isSuperAdmin ? '9835012345' : ''),
@@ -82,11 +133,12 @@ class AuthService {
       createdAt: DateTime.now().toIso8601String(),
     );
 
+    currentUser.value = user;
     await _saveSession(user);
     return user;
   }
 
-  // --- Update Student Profile (5 Mandatory Identity Fields) ---
+  // --- Save / Update Student Profile in SharedPreferences ---
   Future<UserModel> updateStudentProfile({
     required String name,
     required String regNo,
@@ -103,7 +155,7 @@ class AuthService {
       photoUrl: current?.photoUrl,
       branch: branch.trim(),
       batchYear: batchYear ?? (current?.batchYear ?? '2023-2027'),
-      rollNo: current?.rollNo ?? '23CSE01',
+      rollNo: current?.rollNo ?? '',
       regNo: regNo.trim(),
       dob: dob.trim(),
       phone: phone.trim(),
@@ -113,7 +165,23 @@ class AuthService {
       createdAt: current?.createdAt ?? DateTime.now().toIso8601String(),
     );
 
+    currentUser.value = updated;
     await _saveSession(updated);
+
+    // Also persist in registered users DB
+    final prefs = await SharedPreferences.getInstance();
+    final usersDb = prefs.getStringList(_usersDbKey) ?? [];
+    usersDb.removeWhere((u) {
+      try {
+        final m = jsonDecode(u) as Map<String, dynamic>;
+        return m['email']?.toString().toLowerCase() == updated.email.toLowerCase();
+      } catch (_) {
+        return false;
+      }
+    });
+    usersDb.add(jsonEncode(updated.toMap()));
+    await prefs.setStringList(_usersDbKey, usersDb);
+
     return updated;
   }
 

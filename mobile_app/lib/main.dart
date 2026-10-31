@@ -13,6 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AuthService.instance.init();
   await DataService.instance.init();
+  DataService.instance.refreshAll();
   runApp(const GecStudentHubApp());
 }
 
@@ -96,6 +97,7 @@ class _MainNavigationScaffoldState extends State<MainNavigationScaffold> {
 
   void _onTabChange(int index) {
     NavigationService.instance.navigateTo(index);
+    DataService.instance.refreshAll();
   }
 
   @override

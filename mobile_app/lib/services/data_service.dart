@@ -214,11 +214,42 @@ class DataService {
     }
   }
 
+  Future<void> fetchLiveEvents() async {
+    try {
+      final response = await http.get(Uri.parse('$apiBase/api/events')).timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is Map && data['events'] is List) {
+          final list = data['events'] as List;
+          final List<EventItem> liveEvents = [];
+          for (var item in list) {
+            liveEvents.add(
+              EventItem(
+                id: item['id']?.toString() ?? 'ev_${DateTime.now().millisecondsSinceEpoch}',
+                title: item['title']?.toString() ?? 'College Event',
+                dateStr: item['dateStr']?.toString() ?? 'Upcoming',
+                venue: item['location']?.toString() ?? 'GEC Sheikhpura Campus',
+                organizer: item['organizer']?.toString() ?? 'Administration',
+                category: item['category']?.toString() ?? 'Campus Event',
+                seatsRemaining: item['spotsLeft'] is int ? item['spotsLeft'] : 25,
+              ),
+            );
+          }
+          sampleEvents.clear();
+          sampleEvents.addAll(liveEvents);
+        }
+      }
+    } catch (e) {
+      debugPrint('Live events fetch notice: $e');
+    }
+  }
+
   Future<void> refreshAll() async {
     await Future.wait([
       fetchLiveNotices(),
       fetchLiveListings(),
       fetchLiveLostFound(),
+      fetchLiveEvents(),
     ]);
   }
 
@@ -536,36 +567,8 @@ class DataService {
     ),
   ];
 
-  // --- 5. College Events Directory ---
-  final List<EventItem> sampleEvents = [
-    const EventItem(
-      id: 'event-1',
-      title: 'TechnoUtsav 2026: Intra-College Hackathon',
-      dateStr: 'Sat, 14 Nov 2026 • 10:00 AM',
-      venue: 'Computer Science Lab 2 & Seminar Hall',
-      organizer: 'CodeCraft CSE Society',
-      category: 'Technical',
-      seatsRemaining: 24,
-    ),
-    const EventItem(
-      id: 'event-2',
-      title: 'Shaurya Cup: Inter-Branch Cricket League',
-      dateStr: 'Sun, 15 Nov 2026 • 08:30 AM',
-      venue: 'College Main Sports Ground, Bajidpur',
-      organizer: 'Campus Sports Committee',
-      category: 'Sports',
-      seatsRemaining: 18,
-    ),
-    const EventItem(
-      id: 'event-3',
-      title: 'Aarohan Cultural Festival Auditions',
-      dateStr: 'Fri, 20 Nov 2026 • 04:30 PM',
-      venue: 'Open Air Theatre / Main Auditorium',
-      organizer: 'Natraj Dramatic Society',
-      category: 'Cultural',
-      seatsRemaining: 40,
-    ),
-  ];
+  // --- 5. College Events Directory (Live from Backend / Admin) ---
+  final List<EventItem> sampleEvents = [];
 
   // --- 6. Clubs & Societies ---
   final List<ClubItem> sampleClubs = [
@@ -598,53 +601,8 @@ class DataService {
     ),
   ];
 
-  // --- 7. Sports & Squads Matches ---
-  final List<SportsSquad> sportsSquads = [
-    const SportsSquad(
-      id: 'sp-1',
-      sportName: 'Cricket',
-      matchType: 'Match',
-      title: 'Weekend Friendly T20 Match: 3rd Year vs 4th Year',
-      dateStr: 'Sun, 1 Nov 2026 • 08:00 AM IST',
-      venue: 'Bajidpur Campus Sports Ground',
-      organizer: 'Rohit (ME 4th Year) • Hostel 2',
-      currentPlayers: 18,
-      maxPlayers: 22,
-    ),
-    const SportsSquad(
-      id: 'sp-2',
-      sportName: 'Badminton',
-      matchType: 'Practice Session',
-      title: 'Evening Doubles Badminton Sparring & Practice',
-      dateStr: 'Fri, 30 Oct 2026 • 06:30 PM IST',
-      venue: 'Boys Hostel Badminton Court',
-      organizer: 'Hostel Sports Rep (Hostel Court)',
-      currentPlayers: 6,
-      maxPlayers: 8,
-    ),
-    const SportsSquad(
-      id: 'sp-3',
-      sportName: 'Volleyball',
-      matchType: 'Team Recruitment',
-      title: 'Hostel Volleyball Team Recruitment & Trials',
-      dateStr: 'Mon, 2 Nov 2026 • 05:15 PM IST',
-      venue: 'Volleyball Court, Near Gymnasium',
-      organizer: 'Sunil (Captain) • sports.gecskp@gmail.com',
-      currentPlayers: 7,
-      maxPlayers: 12,
-    ),
-    const SportsSquad(
-      id: 'sp-4',
-      sportName: 'Chess & Indoor',
-      matchType: 'Practice Session',
-      title: 'Inter-Hostel Blitz Chess & Carrom Gathering',
-      dateStr: 'Sat, 7 Nov 2026 • 07:00 PM IST',
-      venue: 'Hostel 1 Indoor Recreation Room',
-      organizer: 'Indoor Games Council',
-      currentPlayers: 10,
-      maxPlayers: 16,
-    ),
-  ];
+  // --- 7. Sports & Squads Matches (Live Student & Admin Matches) ---
+  final List<SportsSquad> sportsSquads = [];
 
   // --- 8. Lost & Found Items ---
   final List<LostFoundItem> lostFoundItems = [

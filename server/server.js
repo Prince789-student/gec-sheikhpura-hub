@@ -96,29 +96,15 @@ let listings = [
 let notices = [
   {
     id: 'not_1',
-    title: 'Revised B.Tech 1st & 3rd Sem Mid-Term Exam Schedule Announced',
+    title: 'Revised B.Tech Mid-Term Exam Schedule Announced',
     date: '30 Oct 2026',
     category: 'Examination',
     url: 'https://beu-bih.ac.in',
     isImportant: true
-  },
-  {
-    id: 'not_2',
-    title: 'Smart India Hackathon (SIH 2026) College Team Nominations Open',
-    date: '29 Oct 2026',
-    category: 'Events',
-    url: '#',
-    isImportant: false
-  },
-  {
-    id: 'not_3',
-    title: 'Guest Assistant Professor & Lab Assistant Recruitment Notification',
-    date: '28 Oct 2026',
-    category: 'Recruitment',
-    url: '#',
-    isImportant: false
   }
 ];
+
+let events = [];
 
 let grievances = [];
 
@@ -237,6 +223,42 @@ app.post('/api/notices', (req, res) => {
 
   notices.unshift(newNotice);
   res.status(201).json({ message: 'Notice posted successfully', notice: newNotice });
+});
+
+app.delete('/api/notices/:id', (req, res) => {
+  const { id } = req.params;
+  notices = notices.filter(n => n.id !== id);
+  res.json({ message: 'Notice deleted successfully', count: notices.length });
+});
+
+// Events API (Live Admin Sync)
+app.get('/api/events', (req, res) => {
+  res.json({ count: events.length, events });
+});
+
+app.post('/api/events', (req, res) => {
+  const { title, dateStr, location, category, description, organizer, maxSpots } = req.body;
+  if (!title) return res.status(400).json({ error: 'Event title is required' });
+
+  const newEvent = {
+    id: `ev_${Date.now()}`,
+    title: title.trim(),
+    dateStr: dateStr || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+    location: location ? location.trim() : 'GEC Sheikhpura Campus',
+    category: category || 'Technical',
+    description: description ? description.trim() : 'Campus student event.',
+    organizer: organizer ? organizer.trim() : 'GEC Student Society',
+    spotsLeft: maxSpots ? parseInt(maxSpots) : 25
+  };
+
+  events.unshift(newEvent);
+  res.status(201).json({ message: 'Event posted successfully', event: newEvent });
+});
+
+app.delete('/api/events/:id', (req, res) => {
+  const { id } = req.params;
+  events = events.filter(e => e.id !== id);
+  res.json({ message: 'Event deleted successfully', count: events.length });
 });
 
 // Grievance / Anti-Ragging Cell
