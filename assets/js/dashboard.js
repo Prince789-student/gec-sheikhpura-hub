@@ -42,6 +42,18 @@ async function initDashboard() {
 
   renderProfileUI(currentProfile);
 
+  // Control Admin Portal Link Visibility strictly for pk3334238@gmail.com
+  const isPrinceAdmin = (currentUser && currentUser.email && (currentUser.email.toLowerCase() === 'pk3334238@gmail.com' || currentUser.email.toLowerCase() === 'prince86944@gmail.com'));
+  const dashAdminLink = document.getElementById('dashAdminPortalLink');
+  const headerAdminBtn = document.getElementById('headerAdminQuickBtn');
+  if (isPrinceAdmin) {
+    if (dashAdminLink) dashAdminLink.style.display = 'flex';
+    if (headerAdminBtn) headerAdminBtn.style.display = 'inline-flex';
+  } else {
+    if (dashAdminLink) dashAdminLink.style.display = 'none';
+    if (headerAdminBtn) headerAdminBtn.style.display = 'none';
+  }
+
   // 3. Load Saved Listings
   await loadSavedItems();
 
@@ -263,6 +275,18 @@ async function handleUpdateProfile(event) {
   const res = await window.DB.updateStudentProfile(currentUser.id, updates);
   currentProfile = res.profile || { ...currentProfile, ...updates };
   renderProfileUI(currentProfile);
+
+  // Control Admin Portal Link Visibility strictly for pk3334238@gmail.com
+  const isPrinceAdmin = (currentUser && currentUser.email && (currentUser.email.toLowerCase() === 'pk3334238@gmail.com' || currentUser.email.toLowerCase() === 'prince86944@gmail.com'));
+  const dashAdminLink = document.getElementById('dashAdminPortalLink');
+  const headerAdminBtn = document.getElementById('headerAdminQuickBtn');
+  if (isPrinceAdmin) {
+    if (dashAdminLink) dashAdminLink.style.display = 'flex';
+    if (headerAdminBtn) headerAdminBtn.style.display = 'inline-flex';
+  } else {
+    if (dashAdminLink) dashAdminLink.style.display = 'none';
+    if (headerAdminBtn) headerAdminBtn.style.display = 'none';
+  }
 
   btn.disabled = false;
   btn.textContent = 'Save Profile & Preferences';

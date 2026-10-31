@@ -199,8 +199,8 @@ async function openGlobalStudentProfileModal(user) {
   document.getElementById('gProfileDistrict').textContent = profile.home_district ? `${profile.home_district}, Bihar` : 'Sheikhpura, Bihar';
   document.getElementById('gProfileEmail').textContent = user.email || 'Not provided';
 
-  // Super Admin Action in Student Profile Modal
-  const isSuperAdmin = (user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com')) || user.role === 'admin' || user.role === 'super_admin';
+  // Super Admin Action in Student Profile Modal (Strictly pk3334238@gmail.com)
+  const isSuperAdmin = user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com');
   const existingAdminBtn = document.getElementById('gProfileSuperAdminBtn');
   if (isSuperAdmin) {
     if (!existingAdminBtn) {
@@ -245,8 +245,8 @@ async function initUserSessionHeader() {
         userLabel.style.display = 'inline';
       }
 
-      // If user is pk3334238@gmail.com or prince86944@gmail.com, show 👑 Admin Panel badge directly in the navbar
-      const isSuperAdminUser = (user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com')) || user.role === 'admin' || user.role === 'super_admin';
+      // Strictly only pk3334238@gmail.com gets 👑 Admin Panel badge directly in the navbar
+      const isSuperAdminUser = user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com');
       let navAdminBadge = document.getElementById('headerAdminBadge');
       if (isSuperAdminUser) {
         if (!navAdminBadge && userBtn && userBtn.parentElement) {

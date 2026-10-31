@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -125,8 +125,8 @@
       </nav>
 
       <div class="header-actions">
-        <!-- Direct Admin Panel Quick Badge in Header -->
-        <a href="admin.html" class="btn btn-sm" id="headerAdminQuickBtn" title="Open Admin Control Panel" style="background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.35rem 0.65rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
+        <!-- Direct Admin Panel Quick Badge in Header (Hidden by default, only for pk3334238@gmail.com) -->
+        <a href="admin.html" class="btn btn-sm" id="headerAdminQuickBtn" title="Open Admin Control Panel" style="display: none; background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.35rem 0.65rem; border-radius: 6px; align-items: center; gap: 4px; text-decoration: none;">
           <span>👑 Admin</span>
         </a>
         <a href="saved-items.html" class="btn-bookmark-nav" title="Saved Items in My Hub">
@@ -278,8 +278,8 @@
 
           <!-- Navigation Links -->
           <nav class="dashboard-nav-list" role="tablist">
-            <!-- 👑 Admin Portal Quick Link (For Super Admin prince86944@gmail.com / Admins) -->
-            <a href="admin.html" id="dashAdminPortalLink" class="dashboard-nav-item" style="background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(29,78,216,0.15)); border: 1.5px solid #3b82f6; color: #1d4ed8; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; margin-bottom: 0.5rem; border-radius: var(--radius-sm); padding: 0.75rem;">
+            <!-- 👑 Admin Portal Quick Link (Strictly hidden by default; ONLY shown if user is pk3334238@gmail.com) -->
+            <a href="admin.html" id="dashAdminPortalLink" class="dashboard-nav-item" style="display: none; background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(29,78,216,0.15)); border: 1.5px solid #3b82f6; color: #1d4ed8; font-weight: 700; align-items: center; gap: 0.5rem; text-decoration: none; margin-bottom: 0.5rem; border-radius: var(--radius-sm); padding: 0.75rem;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               <span>👑 Open Admin Panel</span>
               <span class="badge" style="background: #1d4ed8; color: #fff; font-size: 0.65rem; margin-left: auto; padding: 2px 6px; border-radius: 4px;">ADMIN</span>
@@ -1194,8 +1194,7 @@
           &copy; <span id="footerCurrentYear">2026</span> GEC Sheikhpura Student Life Hub. All rights reserved.
         </div>
         <div class="footer-bottom-links">
-          <a href="admin.html">🔒 Admin Portal</a>
-          <a href="student-tools.html">Student Tools</a>
+                    <a href="student-tools.html">Student Tools</a>
           <a href="saved-items.html">Saved Hub</a>
           <a href="community-guidelines.html">Guidelines</a>
           <a href="contact.html">Support</a>
