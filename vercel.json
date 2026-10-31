@@ -2,34 +2,33 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "https://gec-sheikhpura-backend.onrender.com/api/$1"
+      "source": "/api/:path*",
+      "destination": "https://gec-sheikhpura-backend.onrender.com/api/:path*"
     },
     {
-      "src": "/health",
-      "dest": "https://gec-sheikhpura-backend.onrender.com/health"
+      "source": "/health",
+      "destination": "https://gec-sheikhpura-backend.onrender.com/health"
     },
     {
-      "src": "/app/(.*)",
-      "dest": "/mobile_app/build/web/$1"
+      "source": "/app",
+      "destination": "/mobile_app/build/web/index.html"
     },
     {
-      "src": "/app",
-      "dest": "/mobile_app/build/web/index.html"
-    },
+      "source": "/app/:path*",
+      "destination": "/mobile_app/build/web/:path*"
+    }
+  ],
+  "headers": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1.html"
-    },
-    {
-      "src": "/(.*)",
-      "status": 404,
-      "dest": "/404.html"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        }
+      ]
     }
   ]
 }
