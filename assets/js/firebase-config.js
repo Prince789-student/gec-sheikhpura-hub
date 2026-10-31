@@ -9,9 +9,9 @@ const DEFAULT_FIREBASE_CONFIG = {
   projectId: "gec-sheikhpura",
   authDomain: "gec-sheikhpura.firebaseapp.com",
   storageBucket: "gec-sheikhpura.firebasestorage.app",
-  messagingSenderId: window.localStorage.getItem('gec_firebase_messaging_sender_id') || "1005121473187",
-  apiKey: window.localStorage.getItem('gec_firebase_api_key') || "",
-  appId: window.localStorage.getItem('gec_firebase_app_id') || "1:1005121473187:web:9c2758335e434a9e8078bc"
+  messagingSenderId: window.localStorage.getItem('gec_firebase_messaging_sender_id') || "748172575005",
+  apiKey: window.localStorage.getItem('gec_firebase_api_key') || "AIzaSyCGGk5H6GvBYwykQlk1RArPV-_IGctipRs",
+  appId: window.localStorage.getItem('gec_firebase_app_id') || "1:748172575005:web:9c2758335e434a9e8078bc"
 };
 
 window.FIREBASE_CONFIG = {

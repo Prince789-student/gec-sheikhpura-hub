@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "748172575005",
+    "project_id": "gec-sheikhpura",
+    "storage_bucket": "gec-sheikhpura.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:748172575005:android:15c29d62f234dadcebe1f4",
+        "android_client_info": {
+          "package_name": "com.gecsheikhpura.gec_student_hub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGGk5H6GvBYwykQlk1RArPV-_IGctipRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
