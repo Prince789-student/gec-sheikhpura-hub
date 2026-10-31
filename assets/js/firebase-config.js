@@ -11,7 +11,7 @@ const DEFAULT_FIREBASE_CONFIG = {
   storageBucket: "gec-sheikhpura.firebasestorage.app",
   messagingSenderId: window.localStorage.getItem('gec_firebase_messaging_sender_id') || "748172575005",
   apiKey: window.localStorage.getItem('gec_firebase_api_key') || "AIzaSyCGGk5H6GvBYwykQlk1RArPV-_IGctipRs",
-  appId: window.localStorage.getItem('gec_firebase_app_id') || "1:748172575005:web:9c2758335e434a9e8078bc"
+  appId: window.localStorage.getItem('gec_firebase_app_id') || "1:748172575005:web:9c2758335e434a2580a2786bceg1fab8"
 };
 
 window.FIREBASE_CONFIG = {
