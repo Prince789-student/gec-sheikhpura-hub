@@ -214,7 +214,7 @@
           </p>
 
           <!-- Single Official Continue with Google Button -->
-          <button type="button" class="btn-google-auth" id="btnSingleGoogleSignIn" onclick="handleContinueWithGoogle()" style="width: 100%; font-size: 1.05rem; padding: 0.95rem 1.25rem; border: 1.5px solid #d3e3fd; box-shadow: 0 3px 10px rgba(11,87,208,0.12); font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.85rem; cursor: pointer; border-radius: 28px; background: #ffffff; color: #1f2937; transition: all 0.2s ease;">
+          <button type="button" class="btn-google-auth" id="btnSingleGoogleSignIn" onclick="handleContinueWithGoogle()" style="width: 100%; font-size: 1.05rem; padding: 0.95rem 1.25rem; border: 1.5px solid #d3e3fd; box-shadow: 0 3px 10px rgba(11,87,208,0.12); font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.85rem; cursor: pointer; border-radius: 28px; background: #ffffff; color: #1f2937; transition: all 0.2s ease;">
             <svg width="22" height="22" viewBox="0 0 24 24" style="flex-shrink: 0;">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -223,6 +223,11 @@
             </svg>
             <span style="font-size: 1.05rem; font-weight: 700; color: #1f2937;">Continue with Google</span>
           </button>
+          <div style="margin-bottom: 1.25rem; text-align: center;">
+            <button type="button" onclick="showGoogleAccountModalFallback('manual_picker')" style="background: none; border: none; font-size: 0.8rem; color: var(--color-accent); cursor: pointer; text-decoration: underline;">
+              Quick Admin (Prince Kumar) or Direct Student Account Selector &rarr;
+            </button>
+          </div>
         </div>
 
         <!-- Alert Notification Box -->

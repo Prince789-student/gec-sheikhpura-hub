@@ -94,9 +94,15 @@ async function openGlobalStudentProfileModal(user) {
   if (!user || !window.DB) return;
   const profile = await window.DB.getStudentProfile(user.id);
 
-  // If profile is not complete, redirect to login/onboarding
+  // If user is pk3334238@gmail.com, direct to admin.html
+  if (user.email && user.email.toLowerCase() === 'pk3334238@gmail.com') {
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  // If profile is not complete, redirect to dashboard.html to view and update details
   if (!window.DB.isProfileComplete(profile)) {
-    window.location.href = 'login.html';
+    window.location.href = 'dashboard.html';
     return;
   }
 

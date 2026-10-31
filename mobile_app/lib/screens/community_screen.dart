@@ -161,14 +161,26 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
                 ),
 
                 // 2. Clubs Tab
-                ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: DataService.instance.sampleClubs.length,
-                  itemBuilder: (context, index) {
-                    final club = DataService.instance.sampleClubs[index];
-                    return _buildClubCard(context, club);
-                  },
-                ),
+                DataService.instance.sampleClubs.isEmpty
+                    ? ListView(
+                        padding: const EdgeInsets.all(32),
+                        children: const [
+                          SizedBox(height: 40),
+                          Icon(Icons.groups_outlined, size: 48, color: Colors.grey),
+                          SizedBox(height: 12),
+                          Text('No student clubs registered yet.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(height: 4),
+                          Text('Official technical and cultural student clubs will appear here once approved by college authorities.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        ],
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: DataService.instance.sampleClubs.length,
+                        itemBuilder: (context, index) {
+                          final club = DataService.instance.sampleClubs[index];
+                          return _buildClubCard(context, club);
+                        },
+                      ),
 
                 // 3. Sports & Squads Tab
                 DataService.instance.sportsSquads.isEmpty
