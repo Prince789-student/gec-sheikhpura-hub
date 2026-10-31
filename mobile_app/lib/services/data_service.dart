@@ -135,10 +135,90 @@ class DataService {
     }
   }
 
+  Future<void> fetchLiveLostFound() async {
+    try {
+      final response = await http.get(Uri.parse('$apiBase/api/lostfound')).timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is Map && data['items'] is List) {
+          final list = data['items'] as List;
+          final List<LostFoundItem> liveItems = [];
+          for (var item in list) {
+            liveItems.add(
+              LostFoundItem(
+                id: item['id']?.toString() ?? 'lf_${DateTime.now().millisecondsSinceEpoch}',
+                title: item['title']?.toString() ?? 'Item',
+                itemType: item['type']?.toString() ?? 'Lost',
+                category: item['category']?.toString() ?? 'General',
+                location: item['location']?.toString() ?? 'Sheikhpura Campus',
+                dateStr: item['dateStr']?.toString() ?? 'Today',
+                contactPerson: item['contactName']?.toString() ?? 'Student',
+                contactPhone: item['contactPhone']?.toString() ?? '',
+                description: item['description']?.toString() ?? '',
+              ),
+            );
+          }
+          if (liveItems.isNotEmpty) {
+            lostFoundItems.clear();
+            lostFoundItems.addAll(liveItems);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Live lost & found fetch notice: $e');
+    }
+  }
+
+  Future<void> submitLostFoundItem({
+    required String title,
+    required String itemType,
+    required String category,
+    required String location,
+    required String dateStr,
+    required String contactPerson,
+    required String contactPhone,
+    required String description,
+  }) async {
+    final newItem = LostFoundItem(
+      id: 'lf_${DateTime.now().millisecondsSinceEpoch}',
+      title: title,
+      itemType: itemType,
+      category: category,
+      location: location,
+      dateStr: dateStr,
+      contactPerson: contactPerson,
+      contactPhone: contactPhone,
+      description: description,
+    );
+
+    lostFoundItems.insert(0, newItem);
+
+    // Live broadcast to Render backend
+    try {
+      await http.post(
+        Uri.parse('$apiBase/api/lostfound'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'title': title,
+          'type': itemType,
+          'category': category,
+          'location': location,
+          'dateStr': dateStr,
+          'contactName': contactPerson,
+          'contactPhone': contactPhone,
+          'description': description,
+        }),
+      ).timeout(const Duration(seconds: 8));
+    } catch (e) {
+      debugPrint('Lost & Found broadcast notice: $e');
+    }
+  }
+
   Future<void> refreshAll() async {
     await Future.wait([
       fetchLiveNotices(),
       fetchLiveListings(),
+      fetchLiveLostFound(),
     ]);
   }
 

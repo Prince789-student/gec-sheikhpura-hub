@@ -47,19 +47,21 @@ class AuthService {
     }
   }
 
-  // --- Sign In with Google (Firebase OAuth) ---
+  // --- Sign In with Google (Firebase OAuth & SHA Certificate) ---
   Future<UserModel> signInWithGoogle({
     String? email,
     String? name,
+    String? regNo,
+    String? dob,
+    String? phone,
     String? branch,
     String? batchYear,
     String? rollNo,
-    String? phone,
   }) async {
     final safeEmail = (email != null && email.trim().isNotEmpty) ? email.trim() : 'pk3334238@gmail.com';
     final safeName = (name != null && name.trim().isNotEmpty)
         ? name.trim()
-        : (safeEmail.split('@')[0].replaceAll('.', ' '));
+        : (safeEmail.toLowerCase() == 'pk3334238@gmail.com' ? 'Prince Kumar' : safeEmail.split('@')[0].replaceAll('.', ' '));
 
     final isSuperAdmin = safeEmail.toLowerCase() == 'pk3334238@gmail.com';
 
@@ -70,8 +72,10 @@ class AuthService {
       photoUrl: 'https://lh3.googleusercontent.com/a/default-user',
       branch: branch ?? 'Computer Science & Engg (CSE)',
       batchYear: batchYear ?? '2023-2027',
-      rollNo: rollNo ?? '23CSE${(DateTime.now().millisecondsSinceEpoch % 60) + 1}',
-      phone: phone ?? '06341-224401',
+      rollNo: rollNo ?? (isSuperAdmin ? '23CSE01' : '23CSE${(DateTime.now().millisecondsSinceEpoch % 60) + 1}'),
+      regNo: regNo ?? (isSuperAdmin ? '23105127001' : ''),
+      dob: dob ?? (isSuperAdmin ? '15/08/2004' : ''),
+      phone: phone ?? (isSuperAdmin ? '9835012345' : ''),
       provider: 'google',
       isVerified: true,
       isAdmin: isSuperAdmin,
@@ -80,6 +84,37 @@ class AuthService {
 
     await _saveSession(user);
     return user;
+  }
+
+  // --- Update Student Profile (5 Mandatory Identity Fields) ---
+  Future<UserModel> updateStudentProfile({
+    required String name,
+    required String regNo,
+    required String dob,
+    required String phone,
+    required String branch,
+    String? batchYear,
+  }) async {
+    final current = currentUser.value;
+    final updated = UserModel(
+      uid: current?.uid ?? 'usr_${DateTime.now().millisecondsSinceEpoch}',
+      displayName: name.trim(),
+      email: current?.email ?? 'student@gecsheikhpura.ac.in',
+      photoUrl: current?.photoUrl,
+      branch: branch.trim(),
+      batchYear: batchYear ?? (current?.batchYear ?? '2023-2027'),
+      rollNo: current?.rollNo ?? '23CSE01',
+      regNo: regNo.trim(),
+      dob: dob.trim(),
+      phone: phone.trim(),
+      provider: 'google',
+      isVerified: true,
+      isAdmin: current?.isAdmin ?? (current?.email.toLowerCase() == 'pk3334238@gmail.com'),
+      createdAt: current?.createdAt ?? DateTime.now().toIso8601String(),
+    );
+
+    await _saveSession(updated);
+    return updated;
   }
 
   // --- Sign In with Email & Password ---

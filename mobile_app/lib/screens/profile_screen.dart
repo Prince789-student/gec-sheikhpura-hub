@@ -124,20 +124,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  if (user.branch.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Text(
-                                        '${user.branch} • ${user.batchYear}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppTheme.accentSky,
+                                  const SizedBox(height: 6),
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 4,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.primaryNavy.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(4),
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                        child: Text(
+                                          user.branch.isNotEmpty ? user.branch : 'Engineering',
+                                          style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy),
+                                        ),
                                       ),
-                                    ),
+                                      if (user.regNo.isNotEmpty)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.successGreen.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            'Reg: ${user.regNo}',
+                                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppTheme.successGreen),
+                                          ),
+                                        ),
+                                      if (user.dob.isNotEmpty)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            'DOB: ${user.dob}',
+                                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blue),
+                                          ),
+                                        ),
+                                      if (user.phone.isNotEmpty)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.purple.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            'Ph: ${user.phone}',
+                                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.purple),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),

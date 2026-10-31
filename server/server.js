@@ -122,6 +122,32 @@ let notices = [
 
 let grievances = [];
 
+// Lost & Found Items Store
+let lostFound = [
+  {
+    id: 'lf_1',
+    title: 'Casio fx-991ES Plus Scientific Calculator',
+    type: 'Lost',
+    category: 'Electronics',
+    location: 'Classroom 204 (Academic Building)',
+    dateStr: '30 Oct 2026',
+    contactName: 'Aman Kumar (CSE 3rd Year)',
+    contactPhone: '06341-224401',
+    description: 'Black scientific calculator with blue batch sticker on back. Please return to guard room.'
+  },
+  {
+    id: 'lf_2',
+    title: 'Civil Engg 2nd Year Student ID Card',
+    type: 'Found',
+    category: 'Document',
+    location: 'Central Library Reading Desk',
+    dateStr: '29 Oct 2026',
+    contactName: 'Library Security Desk',
+    contactPhone: '06341-224402',
+    description: 'Deposited at central library reception desk. Please collect with registration proof.'
+  }
+];
+
 // --- API ROUTES ---
 
 // Health & Uptime
@@ -232,6 +258,42 @@ app.post('/api/grievances', (req, res) => {
     message: '✓ Grievance submitted securely to GEC Sheikhpura Cell.',
     ticketId: newGrievance.id
   });
+});
+
+// Lost & Found Endpoints (Live In-App Updates)
+app.get('/api/lostfound', (req, res) => {
+  res.json({ count: lostFound.length, items: lostFound });
+});
+
+app.post('/api/lostfound', (req, res) => {
+  const { title, type, category, location, dateStr, contactName, contactPhone, description } = req.body;
+  if (!title || !contactPhone) {
+    return res.status(400).json({ error: 'Title and contact phone are required' });
+  }
+
+  const newItem = {
+    id: `lf_${Date.now()}`,
+    title: title.trim(),
+    type: type || 'Lost',
+    category: category || 'General',
+    location: location ? location.trim() : 'GEC Sheikhpura Campus',
+    dateStr: dateStr || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+    contactName: contactName ? contactName.trim() : 'Student',
+    contactPhone: contactPhone.trim(),
+    description: description ? description.trim() : ''
+  };
+
+  lostFound.unshift(newItem);
+  res.status(201).json({
+    message: '✓ Lost & Found entry submitted and updated live!',
+    item: newItem
+  });
+});
+
+app.delete('/api/lostfound/:id', (req, res) => {
+  const { id } = req.params;
+  lostFound = lostFound.filter(item => item.id !== id);
+  res.json({ message: 'Item removed successfully', count: lostFound.length });
 });
 
 // Super Admin Endpoints

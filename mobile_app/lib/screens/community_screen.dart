@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/data_service.dart';
+import '../services/auth_service.dart';
 import '../services/navigation_service.dart';
 import '../theme/app_theme.dart';
 
@@ -162,14 +163,102 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
                   },
                 ),
 
-                // 4. Lost & Found Tab
-                ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: DataService.instance.lostFoundItems.length,
-                  itemBuilder: (context, index) {
-                    final item = DataService.instance.lostFoundItems[index];
-                    return _buildLostFoundCard(context, item, isDark, theme);
+                // 4. Lost & Found Tab (Interactive Student Submission & Live Sync)
+                RefreshIndicator(
+                  onRefresh: () async {
+                    await DataService.instance.fetchLiveLostFound();
+                    setState(() {});
                   },
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      // Direct Post Banner
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppTheme.primaryNavy, Color(0xFF1E3A8A)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryNavy.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.campaign, color: Colors.white, size: 22),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Lost or Found Something on Campus?',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'Post details instantly for all students and guard rooms.',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: () => _showPostLostFoundSheet(context, isDark),
+                              icon: const Icon(Icons.add, size: 16),
+                              label: const Text('Post'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.warningAmber,
+                                foregroundColor: Colors.black87,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      if (DataService.instance.lostFoundItems.isEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(32),
+                          alignment: Alignment.center,
+                          child: const Column(
+                            children: [
+                              Icon(Icons.check_circle_outline, size: 48, color: AppTheme.successGreen),
+                              SizedBox(height: 12),
+                              Text('No active lost items reported.', style: TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(height: 4),
+                              Text('Campus is safe! Tap "Post" above if you lost or found something.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            ],
+                          ),
+                        )
+                      else
+                        ...DataService.instance.lostFoundItems.map(
+                          (item) => _buildLostFoundCard(context, item, isDark, theme),
+                        ),
+                    ],
+                  ),
                 ),
 
                 // 5. Announcements Tab
@@ -587,5 +676,279 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
         ),
       ),
     );
+  }
+
+  void _showPostLostFoundSheet(BuildContext context, bool isDark) {
+    final titleCtrl = TextEditingController();
+    final locationCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    final user = AuthService.instance.currentUser.value;
+    final contactNameCtrl = TextEditingController(text: user?.displayName ?? '');
+    final contactPhoneCtrl = TextEditingController(text: user?.phone ?? '');
+
+    String selectedType = 'Lost';
+    String selectedCategory = 'Electronics';
+
+    final categories = ['Electronics', 'Document / ID Card', 'Keys', 'Books & Notes', 'Bag / Purse', 'Other'];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            final isLost = selectedType == 'Lost';
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Post Lost or Found Notice',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : AppTheme.primaryNavy,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 20),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Toggle: Lost or Found
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setSheetState(() => selectedType = 'Lost'),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isLost ? AppTheme.dangerRed : Colors.transparent,
+                                border: Border.all(
+                                  color: isLost ? AppTheme.dangerRed : Colors.grey.shade400,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '🔴 I Lost Something',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.5,
+                                  color: isLost ? Colors.white : (isDark ? Colors.white70 : AppTheme.textPrimary),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setSheetState(() => selectedType = 'Found'),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color: !isLost ? AppTheme.successGreen : Colors.transparent,
+                                border: Border.all(
+                                  color: !isLost ? AppTheme.successGreen : Colors.grey.shade400,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '🟢 I Found Something',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.5,
+                                  color: !isLost ? Colors.white : (isDark ? Colors.white70 : AppTheme.textPrimary),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Item Title
+                    TextFormField(
+                      controller: titleCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Item Name / Title *',
+                        hintText: 'e.g. Boat Earbuds Black Case, Casio Calculator',
+                        prefixIcon: Icon(Icons.search, size: 18),
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Category Dropdown
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedCategory,
+                      items: categories
+                          .map((c) => DropdownMenuItem(value: c, child: Text(c, style: const TextStyle(fontSize: 13))))
+                          .toList(),
+                      onChanged: (val) {
+                        if (val != null) setSheetState(() => selectedCategory = val);
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Category',
+                        prefixIcon: Icon(Icons.category_outlined, size: 18),
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Location
+                    TextFormField(
+                      controller: locationCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Location on Campus *',
+                        hintText: 'e.g. Room 204, Library 1st Floor, Canteen',
+                        prefixIcon: Icon(Icons.place_outlined, size: 18),
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Detailed Description ("jo user likhna chahta hon")
+                    TextFormField(
+                      controller: descCtrl,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: 'Full Description & Identification Details',
+                        hintText: 'Color, brand, identifying marks, serial number, or any message you want to post...',
+                        prefixIcon: Icon(Icons.description_outlined, size: 18),
+                        border: OutlineInputBorder(),
+                        alignLabelWithHint: true,
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Contact Details
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: contactNameCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Your Name *',
+                              prefixIcon: Icon(Icons.person_outline, size: 18),
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextFormField(
+                            controller: contactPhoneCtrl,
+                            keyboardType: TextInputType.phone,
+                            decoration: const InputDecoration(
+                              labelText: 'Contact Phone *',
+                              prefixIcon: Icon(Icons.phone_outlined, size: 18),
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Submit Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isLost ? AppTheme.dangerRed : AppTheme.successGreen,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () async {
+                          final title = titleCtrl.text.trim();
+                          final loc = locationCtrl.text.trim();
+                          final phone = contactPhoneCtrl.text.trim();
+                          final name = contactNameCtrl.text.trim();
+                          final desc = descCtrl.text.trim();
+
+                          if (title.isEmpty || phone.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter Item Name and Contact Phone.')),
+                            );
+                            return;
+                          }
+
+                          final now = DateTime.now();
+                          final dateStr = '${now.day} ${_monthName(now.month)} ${now.year}';
+
+                          await DataService.instance.submitLostFoundItem(
+                            title: title,
+                            itemType: selectedType,
+                            category: selectedCategory,
+                            location: loc.isNotEmpty ? loc : 'Sheikhpura Campus',
+                            dateStr: dateStr,
+                            contactPerson: name.isNotEmpty ? name : 'Student',
+                            contactPhone: phone,
+                            description: desc.isNotEmpty ? desc : 'Contact owner/finder directly via phone.',
+                          );
+
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (context.mounted) {
+                            setState(() {});
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('✓ $selectedType notice published live across campus!'),
+                                backgroundColor: AppTheme.successGreen,
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.send, size: 18),
+                        label: Text(
+                          'Publish $selectedType Notice',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _monthName(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return (month >= 1 && month <= 12) ? months[month - 1] : '';
   }
 }

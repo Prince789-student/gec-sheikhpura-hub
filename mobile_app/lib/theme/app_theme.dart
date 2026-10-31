@@ -8,6 +8,8 @@ class AppTheme {
   static const Color dangerRed = Color(0xFFEF4444);
   static const Color successGreen = Color(0xFF10B981);
   static const Color warningAmber = Color(0xFFF59E0B);
+  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textSecondary = Color(0xFF64748B);
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,

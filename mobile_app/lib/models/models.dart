@@ -250,6 +250,8 @@ class UserModel {
   final String branch;
   final String batchYear;
   final String rollNo;
+  final String regNo;
+  final String dob;
   final String phone;
   final String provider;
   final bool isVerified;
@@ -264,6 +266,8 @@ class UserModel {
     required this.branch,
     required this.batchYear,
     required this.rollNo,
+    this.regNo = '',
+    this.dob = '',
     required this.phone,
     required this.provider,
     this.isVerified = true,
@@ -280,6 +284,8 @@ class UserModel {
       'branch': branch,
       'batchYear': batchYear,
       'rollNo': rollNo,
+      'regNo': regNo,
+      'dob': dob,
       'phone': phone,
       'provider': provider,
       'isVerified': isVerified,
@@ -292,20 +298,20 @@ class UserModel {
     final email = map['email'] as String? ?? '';
     final isExplicitAdmin = map['isAdmin'] as bool?;
     final isAdminUser = isExplicitAdmin ??
-        (email.trim().toLowerCase() == 'pk3334238@gmail.com' ||
-            email.trim().toLowerCase() == 'prince86944@gmail.com' ||
-            email.trim().toLowerCase().contains('admin'));
+        (email.trim().toLowerCase() == 'pk3334238@gmail.com');
 
     return UserModel(
       uid: map['uid'] as String,
-      displayName: map['displayName'] as String? ?? 'Student',
+      displayName: map['displayName'] as String? ?? 'GEC Student',
       email: email,
       photoUrl: map['photoUrl'] as String?,
-      branch: map['branch'] as String? ?? 'Computer Science (CSE)',
+      branch: map['branch'] as String? ?? 'Computer Science & Engg (CSE)',
       batchYear: map['batchYear'] as String? ?? '2023-2027',
       rollNo: map['rollNo'] as String? ?? '23CSE01',
+      regNo: map['regNo'] as String? ?? '',
+      dob: map['dob'] as String? ?? '',
       phone: map['phone'] as String? ?? '',
-      provider: map['provider'] as String? ?? 'firebase',
+      provider: map['provider'] as String? ?? 'google',
       isVerified: map['isVerified'] as bool? ?? true,
       isAdmin: isAdminUser,
       createdAt: map['createdAt'] as String? ?? DateTime.now().toIso8601String(),

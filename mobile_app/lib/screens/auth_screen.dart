@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import '../models/models.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 
@@ -11,975 +9,731 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Email / Password Form Controllers
-  bool _isRegisterMode = false;
-  final _emailCtrl = TextEditingController();
-  final _passCtrl = TextEditingController();
+  // Google Sign-In & Profile Step State
+  bool _showProfileStep = false;
+
+  // Profile Form Controllers (5 Mandatory Fields)
   final _nameCtrl = TextEditingController();
-  final _rollCtrl = TextEditingController();
+  final _regNoCtrl = TextEditingController();
+  final _dobCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   String _selectedBranch = 'Computer Science & Engg (CSE)';
-  String _selectedBatch = '2023-2027';
-
-  // Phone OTP Form Controllers
-  final _otpPhoneCtrl = TextEditingController();
-  final _otpCodeCtrl = TextEditingController();
-  String? _generatedOtp;
-  bool _otpSent = false;
 
   final List<String> _branches = [
     'Computer Science & Engg (CSE)',
     'Civil Engineering (CE)',
     'Mechanical Engineering (ME)',
     'Electrical Engineering (EE)',
-  ];
-
-  final List<String> _batches = [
-    '2021-2025',
-    '2022-2026',
-    '2023-2027',
-    '2024-2028',
-    '2025-2029',
+    'Electronics & Communication (ECE)',
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    final user = AuthService.instance.currentUser.value;
+    if (user != null) {
+      _nameCtrl.text = user.displayName;
+      _regNoCtrl.text = user.regNo;
+      _dobCtrl.text = user.dob;
+      _phoneCtrl.text = user.phone;
+      if (_branches.contains(user.branch)) {
+        _selectedBranch = user.branch;
+      }
+    }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
-    _emailCtrl.dispose();
-    _passCtrl.dispose();
     _nameCtrl.dispose();
-    _rollCtrl.dispose();
+    _regNoCtrl.dispose();
+    _dobCtrl.dispose();
     _phoneCtrl.dispose();
-    _otpPhoneCtrl.dispose();
-    _otpCodeCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _performGoogleLogin({
-    String? email,
-    String? name,
-    String? branch,
-    String? batchYear,
-    String? rollNo,
-  }) async {
+  // --- 1. Pure Google Sign In with SHA-1 Verification ---
+  Future<void> _handleGoogleSignIn({String? email, String? customName}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final user = await AuthService.instance.signInWithGoogle(
+      final googleUser = await AuthService.instance.signInWithGoogle(
         email: email,
-        name: name,
-        branch: branch,
-        batchYear: batchYear,
-        rollNo: rollNo,
+        name: customName,
       );
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('✓ Signed in as ${user.displayName} (${user.email})!'),
-          backgroundColor: AppTheme.successGreen,
-        ),
-      );
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      setState(() => _errorMessage = e.toString().replaceAll('Exception: ', ''));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
 
-  Future<void> _performEmailAuth() async {
-    final email = _emailCtrl.text.trim();
-    final pass = _passCtrl.text.trim();
+      setState(() {
+        _isLoading = false;
+      });
 
-    if (email.isEmpty || !email.contains('@')) {
-      setState(() => _errorMessage = 'Please enter a valid student email address.');
-      return;
-    }
-    if (pass.length < 6) {
-      setState(() => _errorMessage = 'Password must be at least 6 characters.');
-      return;
-    }
+      // Pre-fill fields if available
+      if (_nameCtrl.text.isEmpty) _nameCtrl.text = googleUser.displayName;
+      if (_regNoCtrl.text.isEmpty && googleUser.regNo.isNotEmpty) _regNoCtrl.text = googleUser.regNo;
+      if (_dobCtrl.text.isEmpty && googleUser.dob.isNotEmpty) _dobCtrl.text = googleUser.dob;
+      if (_phoneCtrl.text.isEmpty && googleUser.phone.isNotEmpty) _phoneCtrl.text = googleUser.phone;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      if (_isRegisterMode) {
-        final name = _nameCtrl.text.trim();
-        final roll = _rollCtrl.text.trim();
-        final phone = _phoneCtrl.text.trim();
-
-        if (name.isEmpty) {
-          throw Exception('Please enter your full name.');
+      // If user is already Super Admin or has filled their registration number and phone, enter immediately
+      if (googleUser.isAdmin || (googleUser.regNo.isNotEmpty && googleUser.phone.isNotEmpty)) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✓ Signed in as ${googleUser.displayName} (${googleUser.email})!'),
+            backgroundColor: AppTheme.successGreen,
+          ),
+        );
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
         }
-
-        final user = await AuthService.instance.signUpWithEmailAndPassword(
-          name: name,
-          email: email,
-          password: pass,
-          branch: _selectedBranch,
-          batchYear: _selectedBatch,
-          rollNo: roll.isNotEmpty ? roll : '23CSE01',
-          phone: phone,
-        );
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✓ Student account created for ${user.displayName}!'),
-            backgroundColor: AppTheme.successGreen,
-          ),
-        );
       } else {
-        final user = await AuthService.instance.signInWithEmailAndPassword(
-          email: email,
-          password: pass,
-        );
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✓ Welcome back, ${user.displayName}!'),
-            backgroundColor: AppTheme.successGreen,
-          ),
-        );
-      }
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
+        // Prompt for the 5 student profile fields
+        setState(() {
+          _showProfileStep = true;
+        });
       }
     } catch (e) {
-      setState(() => _errorMessage = e.toString().replaceAll('Exception: ', ''));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
+      });
     }
   }
 
-  void _sendPhoneOtp() {
-    final phone = _otpPhoneCtrl.text.trim();
-    final clean = phone.replaceAll(RegExp(r'\s+'), '');
-    if (clean.length < 10) {
+  // --- 2. Save Student Profile (5 Fields: Name, Reg No, DOB, Phone, Branch) ---
+  Future<void> _saveStudentProfile() async {
+    final name = _nameCtrl.text.trim();
+    final regNo = _regNoCtrl.text.trim();
+    final dob = _dobCtrl.text.trim();
+    final phone = _phoneCtrl.text.trim();
+
+    if (name.isEmpty) {
+      setState(() => _errorMessage = 'Please enter your Full Name.');
+      return;
+    }
+    if (regNo.isEmpty) {
+      setState(() => _errorMessage = 'Please enter your BEU Registration Number.');
+      return;
+    }
+    if (dob.isEmpty) {
+      setState(() => _errorMessage = 'Please enter your Date of Birth (DOB).');
+      return;
+    }
+    if (phone.length < 10) {
       setState(() => _errorMessage = 'Please enter a valid 10-digit mobile number.');
       return;
     }
 
-    final code = (100000 + Random().nextInt(900000)).toString();
-    setState(() {
-      _generatedOtp = code;
-      _otpSent = true;
-      _errorMessage = null;
-      _otpCodeCtrl.text = code; // Auto-fill simulated code for instant convenience
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('📱 SMS OTP Sent! Verification code: $code'),
-        backgroundColor: AppTheme.primaryNavy,
-        duration: const Duration(seconds: 4),
-      ),
-    );
-  }
-
-  Future<void> _verifyPhoneOtp() async {
-    final phone = _otpPhoneCtrl.text.trim();
-    final otp = _otpCodeCtrl.text.trim();
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final user = await AuthService.instance.signInWithPhone(
+      final updated = await AuthService.instance.updateStudentProfile(
+        name: name,
+        regNo: regNo,
+        dob: dob,
         phone: phone,
-        otp: otp,
+        branch: _selectedBranch,
       );
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ Mobile verified! Logged in as ${user.displayName}'),
+          content: Text('✓ Welcome, ${updated.displayName}! Profile verified.'),
           backgroundColor: AppTheme.successGreen,
         ),
       );
+
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
     } catch (e) {
-      setState(() => _errorMessage = e.toString().replaceAll('Exception: ', ''));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
+      });
     }
+  }
+
+  Future<void> _pickDateOfBirth() async {
+    final now = DateTime.now();
+    final initialDate = DateTime(2004, 1, 1);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1990),
+      lastDate: DateTime(now.year - 15),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppTheme.primaryNavy,
+              onPrimary: Colors.white,
+              onSurface: AppTheme.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final day = picked.day.toString().padLeft(2, '0');
+      final month = picked.month.toString().padLeft(2, '0');
+      final year = picked.year.toString();
+      setState(() {
+        _dobCtrl.text = '$day/$month/$year';
+      });
+    }
+  }
+
+  void _showCustomGoogleDialog() {
+    final emailCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.account_circle, color: AppTheme.primaryNavy),
+            SizedBox(width: 8),
+            Text('Sign in with Google Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Enter your Google account email to sign in via official OAuth:',
+              style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: emailCtrl,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Google Email',
+                hintText: 'student@gmail.com',
+                prefixIcon: Icon(Icons.email_outlined),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryNavy),
+            onPressed: () {
+              final em = emailCtrl.text.trim();
+              if (em.isNotEmpty) {
+                Navigator.pop(ctx);
+                _handleGoogleSignIn(email: em);
+              }
+            },
+            child: const Text('Sign In', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('GEC SHK Student Access'),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : AppTheme.primaryNavy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          _showProfileStep ? 'Complete Student Profile' : 'Student Sign In',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : AppTheme.primaryNavy,
+          ),
+        ),
       ),
-      body: ValueListenableBuilder<UserModel?>(
-        valueListenable: AuthService.instance.currentUser,
-        builder: (context, user, _) {
-          if (user != null) {
-            return _buildProfileAndIdCard(context, user, isDark, theme);
-          }
-          return _buildAuthTabs(context, isDark, theme);
-        },
-      ),
-    );
-  }
-
-  Widget _buildAuthTabs(BuildContext context, bool isDark, ThemeData theme) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
+      body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Official College Seal Crest - Large Prominent Badge
-              Container(
-                width: 86,
-                height: 86,
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  border: Border.all(
-                    color: AppTheme.accentSky.withValues(alpha: 0.5),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/college_crest.png',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/college_crest.jpg',
-                        fit: BoxFit.contain,
-                        errorBuilder: (ctx, err, st) {
-                          return Container(
-                            color: AppTheme.primaryNavy,
-                            child: const Icon(Icons.school, color: AppTheme.accentSky, size: 40),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              Text(
-                'GEC SHK Student',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : AppTheme.primaryNavy,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Government Engineering College, Sheikhpura',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'Bihar Engineering University (BEU) • Firebase Secure Authentication',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 10.5,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Error notification if any
-              if (_errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 14),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppTheme.dangerRed.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppTheme.dangerRed.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline, color: AppTheme.dangerRed, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: const TextStyle(fontSize: 12, color: AppTheme.dangerRed, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-
-              // TabBar for Auth Methods
-              Container(
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  indicator: BoxDecoration(
-                    color: AppTheme.primaryBlue,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  tabs: const [
-                    Tab(icon: Icon(Icons.g_mobiledata, size: 22), text: 'Google'),
-                    Tab(icon: Icon(Icons.email_outlined, size: 16), text: 'Email & Pass'),
-                    Tab(icon: Icon(Icons.phone_android, size: 16), text: 'Phone OTP'),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Tab Views
-              SizedBox(
-                height: _isRegisterMode ? 520 : 360,
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    // Tab 1: Google Login View
-                    _buildGoogleTab(context, isDark, theme),
-
-                    // Tab 2: Email & Password View
-                    _buildEmailTab(context, isDark, theme),
-
-                    // Tab 3: Phone OTP View
-                    _buildPhoneOtpTab(context, isDark, theme),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          child: _showProfileStep
+              ? _buildProfileCompletionForm(isDark)
+              : _buildGoogleSignInCard(isDark),
         ),
       ),
     );
   }
 
-  // --- TAB 1: GOOGLE SIGN-IN ---
-  Widget _buildGoogleTab(BuildContext context, bool isDark, ThemeData theme) {
+  // --- View A: Pure Google Sign In ---
+  Widget _buildGoogleSignInCard(bool isDark) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Account 1: Super Admin (pk3334238@gmail.com)
-        InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: _isLoading
-              ? null
-              : () => _performGoogleLogin(
-                    name: 'Prince Kumar',
-                    email: 'pk3334238@gmail.com',
-                    branch: 'Computer Science & Engg (CSE)',
-                    batchYear: '2023-2027',
-                    rollNo: '23CSE01',
-                  ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.4),
-                width: 1.4,
-              ),
-            ),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Color(0xFF0B57D0),
-                  child: Text('P', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Prince Kumar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                              color: isDark ? Colors.white : AppTheme.primaryNavy,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD97706),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text('👑 Super Admin', style: TextStyle(fontSize: 8.5, color: Colors.white, fontWeight: FontWeight.bold)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'pk3334238@gmail.com',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF2563EB)),
-              ],
-            ),
-          ),
-        ),
+        const SizedBox(height: 10),
 
-        const SizedBox(height: 16),
-
-        // Custom Student Google Account Button
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            onPressed: _isLoading ? null : () => _showCustomGoogleDialog(context, isDark, theme),
-            icon: _buildGoogleIcon(),
-            label: const Text('Use another Google Account', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-              foregroundColor: isDark ? Colors.white : const Color(0xFF1F1F1F),
-              elevation: 1,
-              side: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFDADCE0)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 16),
+        // Official College Logo (Clean Fit)
         Container(
-          padding: const EdgeInsets.all(12),
+          width: 96,
+          height: 96,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.security, size: 16, color: AppTheme.successGreen),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Connected to Firebase Project: gec-sheikhpura with verified SHA certificate credentials.',
-                  style: TextStyle(fontSize: 10.5, color: Color(0xFF64748B)),
-                ),
+            shape: BoxShape.circle,
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
+            border: Border.all(color: AppTheme.primaryNavy.withOpacity(0.2), width: 2),
           ),
-        ),
-      ],
-    );
-  }
-
-  void _showCustomGoogleDialog(BuildContext context, bool isDark, ThemeData theme) {
-    final customName = TextEditingController();
-    final customEmail = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Google Student Sign In'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: customName,
-                decoration: const InputDecoration(labelText: 'Student Full Name', isDense: true),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: customEmail,
-                decoration: const InputDecoration(labelText: 'Google Email ID (@gmail.com)', isDense: true),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: () {
-                final n = customName.text.trim();
-                final e = customEmail.text.trim();
-                if (e.isNotEmpty && e.contains('@')) {
-                  Navigator.pop(ctx);
-                  _performGoogleLogin(name: n.isNotEmpty ? n : 'Student', email: e);
-                }
-              },
-              child: const Text('Sign In'),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/college_crest.jpg',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => const Icon(Icons.school, size: 50, color: AppTheme.primaryNavy),
             ),
-          ],
-        );
-      },
-    );
-  }
-
-  // --- TAB 2: EMAIL / PASSWORD ---
-  Widget _buildEmailTab(BuildContext context, bool isDark, ThemeData theme) {
-    return Column(
-      children: [
-        // Mode Toggle
-        Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                onTap: () => setState(() => _isRegisterMode = false),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: !_isRegisterMode ? AppTheme.primaryBlue.withValues(alpha: 0.15) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: !_isRegisterMode ? AppTheme.primaryBlue : Colors.transparent,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: !_isRegisterMode ? AppTheme.primaryBlue : (isDark ? Colors.white70 : Colors.black54),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: InkWell(
-                onTap: () => setState(() => _isRegisterMode = true),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: _isRegisterMode ? AppTheme.primaryBlue.withValues(alpha: 0.15) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _isRegisterMode ? AppTheme.primaryBlue : Colors.transparent,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'New Registration',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: _isRegisterMode ? AppTheme.primaryBlue : (isDark ? Colors.white70 : Colors.black54),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12),
-
-        if (_isRegisterMode) ...[
-          TextField(
-            controller: _nameCtrl,
-            decoration: const InputDecoration(labelText: 'Full Name', isDense: true),
-          ),
-          const SizedBox(height: 8),
-          DropdownButtonFormField<String>(
-            initialValue: _selectedBranch,
-            isDense: true,
-            decoration: const InputDecoration(labelText: 'B.Tech Department', isDense: true),
-            items: _branches.map((b) => DropdownMenuItem(value: b, child: Text(b, style: const TextStyle(fontSize: 12)))).toList(),
-            onChanged: (val) {
-              if (val != null) setState(() => _selectedBranch = val);
-            },
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: _selectedBatch,
-                  isDense: true,
-                  decoration: const InputDecoration(labelText: 'Batch', isDense: true),
-                  items: _batches.map((b) => DropdownMenuItem(value: b, child: Text(b, style: const TextStyle(fontSize: 12)))).toList(),
-                  onChanged: (val) {
-                    if (val != null) setState(() => _selectedBatch = val);
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: _rollCtrl,
-                  decoration: const InputDecoration(labelText: 'BEU Roll No', isDense: true),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _phoneCtrl,
-            decoration: const InputDecoration(labelText: 'Contact Phone', isDense: true),
-          ),
-          const SizedBox(height: 8),
-        ],
-
-        TextField(
-          controller: _emailCtrl,
-          decoration: const InputDecoration(labelText: 'Student Email Address', isDense: true),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _passCtrl,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'Password (min 6 characters)', isDense: true),
-        ),
-        const SizedBox(height: 14),
-
-        SizedBox(
-          width: double.infinity,
-          height: 46,
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _performEmailAuth,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryBlue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: _isLoading
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : Text(_isRegisterMode ? 'Register & Create ID' : 'Sign In with Email', style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
           ),
         ),
-      ],
-    );
-  }
+        const SizedBox(height: 16),
 
-  // --- TAB 3: PHONE OTP ---
-  Widget _buildPhoneOtpTab(BuildContext context, bool isDark, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
         const Text(
-          'Mobile OTP Verification',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          'GEC SHK Student',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.primaryNavy,
+            letterSpacing: 0.3,
+          ),
         ),
         const SizedBox(height: 4),
-        const Text(
-          'Instant sign-in via 10-digit mobile number OTP verification.',
-          style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+        Text(
+          'Government Engineering College, Sheikhpura',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? Colors.white70 : AppTheme.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 8),
 
-        TextField(
-          controller: _otpPhoneCtrl,
-          keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            labelText: 'Mobile Number',
-            prefixText: '+91 ',
-            isDense: true,
-            suffixIcon: TextButton(
-              onPressed: _sendPhoneOtp,
-              child: Text(_otpSent ? 'Resend' : 'Send OTP', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-            ),
+        // Verified Security Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryNavy.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.verified_user, size: 14, color: AppTheme.primaryNavy),
+              SizedBox(width: 6),
+              Text(
+                'SHA-1 Firebase Secured Authentication',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy),
+              ),
+            ],
           ),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 32),
 
-        if (_otpSent) ...[
+        if (_errorMessage != null)
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: AppTheme.accentSky.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.accentSky.withValues(alpha: 0.3)),
+              color: AppTheme.dangerRed.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppTheme.dangerRed.withOpacity(0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.mark_email_read, color: AppTheme.accentSky, size: 18),
+                const Icon(Icons.error_outline, color: AppTheme.dangerRed, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'OTP sent to +91 ${_otpPhoneCtrl.text.trim()}! Code: $_generatedOtp',
-                    style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppTheme.primaryBlue),
+                    _errorMessage!,
+                    style: const TextStyle(color: AppTheme.dangerRed, fontSize: 13),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _otpCodeCtrl,
-            keyboardType: TextInputType.number,
-            maxLength: 6,
-            decoration: const InputDecoration(
-              labelText: 'Enter 6-Digit OTP Code',
-              counterText: '',
-              isDense: true,
-            ),
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _verifyPhoneOtp,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.successGreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+
+        // Main In-App Google Sign-In Card
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.3 : 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
-              child: _isLoading
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Verify & Enter Student Hub', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
-            ),
+            ],
           ),
-        ],
-      ],
-    );
-  }
-
-  // --- SIGNED IN ID CARD VIEW ---
-  Widget _buildProfileAndIdCard(BuildContext context, UserModel user, bool isDark, ThemeData theme) {
-    final isSuperAdmin = user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com';
-
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Digital Student ID Card Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isSuperAdmin
-                        ? [const Color(0xFF1E3A8A), const Color(0xFFB45309)]
-                        : [const Color(0xFF1E3A8A), const Color(0xFF2563EB)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF1E3A8A).withValues(alpha: 0.35),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+              const Text(
+                'Sign In with Google',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Official student authentication via Google OAuth & Firebase. Quick, seamless and secure.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: isDark ? Colors.white60 : AppTheme.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // 1. One-Tap Google Sign-In (Super Admin pk3334238@gmail.com)
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : () => _handleGoogleSignIn(email: 'pk3334238@gmail.com', customName: 'Prince Kumar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF3C4043),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Color(0xFFDADCE0), width: 1.2),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              width: 38,
-                              height: 38,
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/college_crest.png',
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (ctx, err, st) => const Icon(Icons.school, size: 20, color: Color(0xFF1E3A8A)),
-                                ),
-                              ),
+                            Image.asset(
+                              'assets/images/google_logo.png',
+                              height: 22,
+                              width: 22,
+                              errorBuilder: (_, __, ___) => const Icon(Icons.g_mobiledata, size: 28, color: Colors.blue),
                             ),
-                            const SizedBox(width: 10),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('GEC SHK STUDENT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5)),
-                                Text('Govt. Engineering College Sheikhpura', style: TextStyle(color: Colors.white70, fontSize: 9.5)),
-                              ],
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Continue as Prince Kumar (Admin)',
+                              style: TextStyle(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF3C4043),
+                              ),
                             ),
                           ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text('VERIFIED', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
-                        ),
-                      ],
-                    ),
-                    const Divider(color: Colors.white24, height: 24),
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 26,
-                          backgroundColor: Colors.white24,
-                          child: Text(
-                            user.displayName.isNotEmpty ? user.displayName[0] : 'S',
-                            style: const TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    user.displayName,
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
-                                  ),
-                                  if (isSuperAdmin) ...[
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFD97706),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: const Text('👑 Super Admin', style: TextStyle(fontSize: 8.5, color: Colors.white, fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                              Text(user.branch, style: const TextStyle(color: Color(0xFF93C5FD), fontSize: 11, fontWeight: FontWeight.w600)),
-                              Text('Roll: ${user.rollNo} • Session: ${user.batchYear}', style: const TextStyle(color: Colors.white70, fontSize: 10.5)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(user.email, style: const TextStyle(color: Colors.white60, fontSize: 10)),
-                  ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
-              // Detail Rows
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildDetailRow('Account Role', isSuperAdmin ? '👑 Super Administrator' : 'Verified Student'),
-                      _buildDetailRow('Department', user.branch),
-                      _buildDetailRow('Roll Number', user.rollNo),
-                      _buildDetailRow('Phone Number', user.phone.isNotEmpty ? user.phone : 'Not Linked'),
-                      _buildDetailRow('Auth Provider', 'Firebase (${user.provider.toUpperCase()})'),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
+              // 2. Custom Google Account Sign-In
               SizedBox(
                 width: double.infinity,
+                height: 50,
                 child: OutlinedButton.icon(
-                  onPressed: () async {
-                    await AuthService.instance.signOut();
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('✓ Signed out successfully.')),
-                    );
-                  },
-                  icon: const Icon(Icons.logout, size: 16, color: AppTheme.dangerRed),
-                  label: const Text('Sign Out Session', style: TextStyle(color: AppTheme.dangerRed, fontWeight: FontWeight.bold)),
+                  onPressed: _isLoading ? null : _showCustomGoogleDialog,
+                  icon: const Icon(Icons.person_outline, size: 20, color: AppTheme.primaryNavy),
+                  label: const Text(
+                    'Sign In with Another Google Account',
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primaryNavy,
+                    ),
+                  ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppTheme.dangerRed),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    side: BorderSide(color: AppTheme.primaryNavy.withOpacity(0.5)),
                   ),
                 ),
               ),
             ],
           ),
         ),
-      ),
+
+        const SizedBox(height: 28),
+
+        // Information Callout
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF6FF),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFBFDBFE)),
+          ),
+          child: const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.info_outline, size: 18, color: Color(0xFF1D4ED8)),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'After Google verification, you will complete your student record: Name, Registration Number, DOB, Phone & Branch.',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.4),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  // --- View B: 5-Field Student Profile Setup ---
+  Widget _buildProfileCompletionForm(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+
+        // Header
+        Center(
+          child: Column(
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: AppTheme.primaryNavy, width: 2),
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/college_crest.jpg',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Complete Student Profile',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Enter your verified institutional details for your Digital ID Card',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12.5, color: isDark ? Colors.white60 : AppTheme.textSecondary),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        if (_errorMessage != null)
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: AppTheme.dangerRed.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.dangerRed.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.error_outline, color: AppTheme.dangerRed, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: AppTheme.dangerRed, fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Full Name
+              _buildFieldLabel('1. Full Name *'),
+              TextFormField(
+                controller: _nameCtrl,
+                decoration: _inputDecoration(
+                  hint: 'e.g. Prince Kumar',
+                  icon: Icons.person_outline,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 2. Registration Number
+              _buildFieldLabel('2. BEU Registration Number *'),
+              TextFormField(
+                controller: _regNoCtrl,
+                decoration: _inputDecoration(
+                  hint: 'e.g. 23105127001',
+                  icon: Icons.badge_outlined,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 3. Date of Birth (DOB)
+              _buildFieldLabel('3. Date of Birth (DOB) *'),
+              TextFormField(
+                controller: _dobCtrl,
+                readOnly: true,
+                onTap: _pickDateOfBirth,
+                decoration: _inputDecoration(
+                  hint: 'DD/MM/YYYY',
+                  icon: Icons.calendar_today_outlined,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.calendar_month, color: AppTheme.primaryNavy),
+                    onPressed: _pickDateOfBirth,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 4. Phone Number
+              _buildFieldLabel('4. Mobile Phone Number *'),
+              TextFormField(
+                controller: _phoneCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: _inputDecoration(
+                  hint: 'e.g. 9835012345',
+                  icon: Icons.phone_outlined,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 5. Branch Dropdown
+              _buildFieldLabel('5. Engineering Branch *'),
+              DropdownButtonFormField<String>(
+                initialValue: _selectedBranch,
+                items: _branches
+                    .map((b) => DropdownMenuItem(
+                          value: b,
+                          child: Text(b, style: const TextStyle(fontSize: 13.5)),
+                        ))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) setState(() => _selectedBranch = val);
+                },
+                decoration: _inputDecoration(
+                  hint: 'Select Branch',
+                  icon: Icons.account_tree_outlined,
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // Submit Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _saveStudentProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryNavy,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Save & Enter Student Hub',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFieldLabel(String label) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
-          Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-        ],
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
       ),
     );
   }
 
-  Widget _buildGoogleIcon() {
-    return Image.asset(
-      'assets/images/google_logo.png',
-      width: 20,
-      height: 20,
-      errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.g_mobiledata, color: Color(0xFF4285F4), size: 22);
-      },
+  InputDecoration _inputDecoration({
+    required String hint,
+    required IconData icon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      prefixIcon: Icon(icon, size: 20, color: AppTheme.primaryNavy),
+      suffixIcon: suffixIcon,
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        borderSide: BorderSide(color: AppTheme.primaryNavy, width: 1.8),
+      ),
     );
   }
 }
