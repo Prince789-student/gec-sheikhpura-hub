@@ -10,6 +10,7 @@ import 'student_tools_screen.dart';
 import 'auth_screen.dart';
 import 'grievance_form_screen.dart';
 import 'admin_panel_screen.dart';
+import 'sports_events_dashboard_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final Function(int) onTabChange;
@@ -506,11 +507,13 @@ class HomeScreen extends StatelessWidget {
                         _buildFeatureCard(
                           context: context,
                           icon: Icons.sports_cricket_rounded,
-                          badge: 'Squads Open',
+                          badge: 'Live Scoring',
                           title: 'Sports & Matches',
-                          subtitle: 'Cricket, badminton squads',
+                          subtitle: 'Live fixtures, squads & points',
                           color: const Color(0xFF10B981),
-                          onTap: () => NavigationService.instance.openSports(),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const SportsEventsDashboardScreen()));
+                          },
                         ),
                         _buildFeatureCard(
                           context: context,

@@ -4,6 +4,7 @@ import '../services/data_service.dart';
 import '../services/auth_service.dart';
 import '../services/navigation_service.dart';
 import '../theme/app_theme.dart';
+import 'sports_events_dashboard_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -137,27 +138,48 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
                     await DataService.instance.fetchLiveEvents();
                     setState(() {});
                   },
-                  child: DataService.instance.sampleEvents.isEmpty
-                      ? ListView(
-                          padding: const EdgeInsets.all(32),
-                          children: const [
-                            SizedBox(height: 40),
-                            Icon(Icons.event_available, size: 48, color: Colors.grey),
-                            SizedBox(height: 12),
-                            Text('No active events scheduled.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
-                            SizedBox(height: 4),
-                            Text('Official college events published from the Admin Panel will appear here automatically.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          ],
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: DataService.instance.sampleEvents.length,
-                          itemBuilder: (context, index) {
-                            final event = DataService.instance.sampleEvents[index];
-                            final isRsvpd = _rsvpdEventIds.contains(event.id);
-                            return _buildEventCard(context, event, isRsvpd);
-                          },
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryNavy.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.primaryNavy.withValues(alpha: 0.2)),
                         ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.stars, color: AppTheme.primaryNavy, size: 20),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Text('Student Event Committee Portal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5)),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const SportsEventsDashboardScreen()));
+                              },
+                              child: const Text('Open Hub →', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      if (DataService.instance.sampleEvents.isEmpty) ...[
+                        const SizedBox(height: 40),
+                        const Icon(Icons.event_available, size: 48, color: Colors.grey),
+                        const SizedBox(height: 12),
+                        const Text('No active events scheduled.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        const Text('Official college events published from the Admin Panel will appear here automatically.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      ] else
+                        ...DataService.instance.sampleEvents.map((event) {
+                          final isRsvpd = _rsvpdEventIds.contains(event.id);
+                          return _buildEventCard(context, event, isRsvpd);
+                        }),
+                    ],
+                  ),
                 ),
 
                 // 2. Clubs Tab
@@ -183,27 +205,90 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
                       ),
 
                 // 3. Sports & Squads Tab
-                DataService.instance.sportsSquads.isEmpty
-                    ? ListView(
-                        padding: const EdgeInsets.all(32),
-                        children: const [
-                          SizedBox(height: 40),
-                          Icon(Icons.sports_cricket, size: 48, color: Colors.grey),
-                          SizedBox(height: 12),
-                          Text('No sports matches active today.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(height: 4),
-                          Text('Upcoming tournament fixtures from Sports Committee will appear here.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    // Official Sports & Events Portal Banner
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF0F172A), Color(0xFF1E3A8A)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF1E3A8A).withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
                         ],
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: DataService.instance.sportsSquads.length,
-                        itemBuilder: (context, index) {
-                          final squad = DataService.instance.sportsSquads[index];
-                          final isJoined = _joinedSquadIds.contains(squad.id);
-                          return _buildSportsCard(context, squad, isJoined, isDark);
-                        },
                       ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Colors.amber,
+                                child: Text('🏆', style: TextStyle(fontSize: 18)),
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'GEC Sports & Events Hub',
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                    Text(
+                                      'Live Matches • Squad Rosters • Points Tables',
+                                      style: TextStyle(color: Colors.white70, fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.accentSky,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: const Icon(Icons.open_in_new, size: 16),
+                              label: const Text('Open Sports & Events Hub', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const SportsEventsDashboardScreen()));
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    if (DataService.instance.sportsSquads.isEmpty) ...[
+                      const SizedBox(height: 20),
+                      const Icon(Icons.sports_cricket, size: 48, color: Colors.grey),
+                      const SizedBox(height: 12),
+                      const Text('No sports matches active today.', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      const Text('Upcoming tournament fixtures from Sports Committee will appear here.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    ] else
+                      ...DataService.instance.sportsSquads.map((squad) {
+                        final isJoined = _joinedSquadIds.contains(squad.id);
+                        return _buildSportsCard(context, squad, isJoined, isDark);
+                      }),
+                  ],
+                ),
 
                 // 4. Lost & Found Tab (Interactive Student Submission & Live Sync)
                 RefreshIndicator(

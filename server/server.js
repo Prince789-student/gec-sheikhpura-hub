@@ -6,6 +6,8 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+const sportsEventsRouter = require('./sports_events_router');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -73,6 +75,9 @@ let adminRoles = [
 ];
 
 // --- API ROUTES ---
+
+// Mount Master Sports & Events Management Router
+app.use('/api', sportsEventsRouter);
 
 // Health & Uptime
 app.get('/health', (req, res) => {
