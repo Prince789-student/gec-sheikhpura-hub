@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/data_service.dart';
+import '../services/navigation_service.dart';
 import '../theme/app_theme.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -19,12 +20,22 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    final initialTab = NavigationService.instance.exploreSubTab.value.clamp(0, 3);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: initialTab);
+    NavigationService.instance.exploreSubTab.addListener(_onSubTabNotified);
     _loadBookmarks();
+  }
+
+  void _onSubTabNotified() {
+    final target = NavigationService.instance.exploreSubTab.value.clamp(0, 3);
+    if (_tabController.index != target && mounted) {
+      _tabController.animateTo(target);
+    }
   }
 
   Future<void> _loadBookmarks() async {
     final list = await DataService.instance.getBookmarkedIds();
+    if (!mounted) return;
     setState(() {
       _bookmarkedIds = list.toSet();
     });
@@ -45,6 +56,7 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
 
   @override
   void dispose() {
+    NavigationService.instance.exploreSubTab.removeListener(_onSubTabNotified);
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();

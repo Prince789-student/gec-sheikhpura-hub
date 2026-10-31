@@ -266,8 +266,9 @@ function initFirebaseClient() {
           projectId: "gec-sheikhpura",
           authDomain: "gec-sheikhpura.firebaseapp.com",
           storageBucket: "gec-sheikhpura.firebasestorage.app",
-          apiKey: window.localStorage.getItem('gec_firebase_api_key') || "AIzaSy_GEC_Sheikhpura_Placeholder",
-          appId: window.localStorage.getItem('gec_firebase_app_id') || "1:gec-sheikhpura:web:hub"
+          apiKey: window.localStorage.getItem('gec_firebase_api_key') || "AIzaSyCGGk5H6GvBYwykQlk1RArPV-_IGctipRs",
+          messagingSenderId: "748172575005",
+          appId: window.localStorage.getItem('gec_firebase_app_id') || "1:748172575005:web:9c2758335e434a2580a2786bceg1fab8"
         };
         firebase.initializeApp(fallbackConfig);
       }

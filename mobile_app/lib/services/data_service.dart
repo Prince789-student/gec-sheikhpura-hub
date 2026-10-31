@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/models.dart';
@@ -7,11 +9,138 @@ class DataService {
   static final DataService instance = DataService._();
   DataService._();
 
+  static const String apiBase = 'https://gec-sheikhpura-backend.onrender.com';
+
   // SharedPreferences keys
   static const String _bookmarksKey = 'gec_saved_bookmarks';
   static const String _grievanceTicketsKey = 'gec_mobile_tickets';
   static const String _userSubmissionsKey = 'gec_user_submissions';
   static const String _themeModeKey = 'gec_theme_mode';
+
+  Future<void> init() async {
+    // Background fetch live data from Render backend without blocking UI
+    fetchLiveNotices();
+    fetchLiveListings();
+  }
+
+  Future<void> fetchLiveListings() async {
+    try {
+      final response = await http.get(Uri.parse('$apiBase/api/listings')).timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is Map && data['listings'] is List) {
+          final list = data['listings'] as List;
+          for (var item in list) {
+            final cat = (item['category'] ?? 'room').toString().toLowerCase();
+            final id = item['id'] ?? 'remote_${DateTime.now().millisecondsSinceEpoch}';
+            final title = item['title'] ?? 'Listing';
+            final contact = item['contact'] ?? '06341-224401';
+            final location = item['location'] ?? 'Sheikhpura';
+            final priceStr = item['price'] ?? 'Contact';
+            final amenitiesStr = item['amenities'] ?? '';
+            final amenitiesList = amenitiesStr.toString().split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+
+            if (cat == 'room') {
+              final rentNum = int.tryParse(priceStr.replaceAll(RegExp(r'[^\d]'), '')) ?? 2000;
+              if (!sampleRooms.any((r) => r.id == id || r.title == title)) {
+                sampleRooms.insert(
+                  0,
+                  RoomListing(
+                    id: id,
+                    title: title,
+                    roomType: 'Verified Listing',
+                    rentMonthly: rentNum,
+                    distanceToCampus: 'Near Campus',
+                    address: location,
+                    amenities: amenitiesList.isNotEmpty ? amenitiesList : ['Verified Owner', 'Electricity', 'Water'],
+                    phone: contact,
+                    isVerified: true,
+                  ),
+                );
+              }
+            } else if (cat == 'food') {
+              final priceNum = int.tryParse(priceStr.replaceAll(RegExp(r'[^\d]'), '')) ?? 2400;
+              if (!sampleFood.any((f) => f.id == id || f.name == title)) {
+                sampleFood.insert(
+                  0,
+                  FoodService(
+                    id: id,
+                    name: title,
+                    serviceType: 'Tiffin Mess',
+                    monthlyCharge: priceNum,
+                    deliveryAvailable: true,
+                    menuSummary: amenitiesStr.isNotEmpty ? amenitiesStr : 'Fresh meals twice daily',
+                    phone: contact,
+                    rating: 4.8,
+                  ),
+                );
+              }
+            } else if (cat == 'shop') {
+              if (!sampleShops.any((s) => s.id == id || s.name == title)) {
+                sampleShops.insert(
+                  0,
+                  NearbyShop(
+                    id: id,
+                    name: title,
+                    category: 'Stationery & Xerox',
+                    location: location,
+                    timing: '08:00 AM – 09:00 PM',
+                    phone: contact,
+                    services: amenitiesStr.isNotEmpty ? amenitiesStr : 'Student essentials & services',
+                  ),
+                );
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Live listings fetch notice: $e');
+    }
+  }
+
+  Future<void> fetchLiveNotices() async {
+    try {
+      final response = await http.get(Uri.parse('$apiBase/api/notices')).timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is Map && data['notices'] is List) {
+          final list = data['notices'] as List;
+          for (var item in list) {
+            final id = item['id'] ?? 'not_${DateTime.now().millisecondsSinceEpoch}';
+            final title = item['title'] ?? 'Notice';
+            final date = item['date'] ?? 'Recent';
+            final cat = item['category'] ?? 'Administration';
+            final url = item['url'] ?? '';
+            final isImp = item['isImportant'] ?? false;
+            if (!campusNotices.any((n) => n.id == id || n.title == title)) {
+              campusNotices.insert(
+                0,
+                CampusNotice(
+                  id: id,
+                  title: title,
+                  category: cat,
+                  dateStr: date,
+                  authority: 'GEC Sheikhpura Authority',
+                  description: 'Official circular from University & College Administration. $url',
+                  isUrgent: isImp,
+                ),
+              );
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Live notices fetch notice: $e');
+    }
+  }
+
+  Future<void> refreshAll() async {
+    await Future.wait([
+      fetchLiveNotices(),
+      fetchLiveListings(),
+    ]);
+  }
 
   Future<void> launchExternalUrl(String urlString) async {
     final uri = Uri.parse(urlString);
@@ -77,6 +206,23 @@ class DataService {
     
     ticketsJson.add(jsonEncode(newTicket));
     await prefs.setStringList(_grievanceTicketsKey, ticketsJson);
+
+    // Live broadcast to Render backend
+    try {
+      http.post(
+        Uri.parse('$apiBase/api/grievance'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': name,
+          'email': email,
+          'category': category,
+          'description': description,
+        }),
+      ).timeout(const Duration(seconds: 6));
+    } catch (e) {
+      debugPrint('Live grievance broadcast notice: $e');
+    }
+
     return ticketId;
   }
 
@@ -109,6 +255,27 @@ class DataService {
 
     submissions.add(jsonEncode(item));
     await prefs.setStringList(_userSubmissionsKey, submissions);
+
+    // Live broadcast to Render backend
+    try {
+      final cat = listingType.contains('Food') ? 'food' : (listingType.contains('Shop') ? 'shop' : 'room');
+      http.post(
+        Uri.parse('$apiBase/api/listings'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'category': cat,
+          'title': title,
+          'price': priceOrReward ?? 'Contact for price',
+          'contact': contactPhone,
+          'person': contactName,
+          'location': address,
+          'amenities': details,
+        }),
+      ).timeout(const Duration(seconds: 6));
+    } catch (e) {
+      debugPrint('Live listing broadcast notice: $e');
+    }
+
     return refId;
   }
 

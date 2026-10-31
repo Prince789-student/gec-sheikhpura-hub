@@ -169,6 +169,55 @@ class AuthService {
     return newUser;
   }
 
+  // --- Sign In with Phone OTP ---
+  Future<UserModel> signInWithPhone({
+    required String phone,
+    required String otp,
+    String? name,
+  }) async {
+    final cleanPhone = phone.trim().replaceAll(RegExp(r'\s+'), '');
+    if (cleanPhone.length < 10) {
+      throw Exception('Please enter a valid 10-digit mobile number.');
+    }
+    if (otp.trim().length != 6) {
+      throw Exception('Please enter the 6-digit verification code (OTP).');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final usersDb = prefs.getStringList(_usersDbKey) ?? [];
+
+    for (var uStr in usersDb) {
+      final map = jsonDecode(uStr) as Map<String, dynamic>;
+      final p = map['phone']?.toString().replaceAll(RegExp(r'\s+'), '') ?? '';
+      if (p.isNotEmpty && (p == cleanPhone || cleanPhone.endsWith(p) || p.endsWith(cleanPhone))) {
+        final existing = UserModel.fromMap(map);
+        await _saveSession(existing);
+        return existing;
+      }
+    }
+
+    final last4 = cleanPhone.length >= 4 ? cleanPhone.substring(cleanPhone.length - 4) : cleanPhone;
+    final displayName = (name != null && name.trim().isNotEmpty) ? name.trim() : 'GEC Student ($last4)';
+    final user = UserModel(
+      uid: 'ph_${DateTime.now().millisecondsSinceEpoch}',
+      displayName: displayName,
+      email: '${cleanPhone.substring(cleanPhone.length - 10)}@student.gecsheikhpura.ac.in',
+      phone: cleanPhone,
+      branch: 'Computer Science (CSE)',
+      batchYear: '2023-2027',
+      rollNo: '23CSE${(DateTime.now().millisecondsSinceEpoch % 60) + 1}',
+      provider: 'phone',
+      isVerified: true,
+      isAdmin: false, // Super Admin strictly locked to pk3334238@gmail.com
+      createdAt: DateTime.now().toIso8601String(),
+    );
+
+    usersDb.add(jsonEncode(user.toMap()));
+    await prefs.setStringList(_usersDbKey, usersDb);
+    await _saveSession(user);
+    return user;
+  }
+
   // --- Send Password Reset Email ---
   Future<void> sendPasswordResetEmail(String email) async {
     // In production, Firebase Auth sends recovery token

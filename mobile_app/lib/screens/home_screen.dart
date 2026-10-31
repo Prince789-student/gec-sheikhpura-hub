@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/data_service.dart';
 import '../services/auth_service.dart';
+import '../services/navigation_service.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
 import 'notices_screen.dart';
@@ -28,42 +29,48 @@ class HomeScreen extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Official GEC Sheikhpura Crest Logo - Clean fitted badge
+            // Official GEC Sheikhpura Crest Logo - Clean prominent circular badge
             Container(
-              width: isMobile ? 32 : 36,
-              height: isMobile ? 32 : 36,
-              padding: const EdgeInsets.all(1.5),
+              width: isMobile ? 38 : 42,
+              height: isMobile ? 38 : 42,
+              padding: const EdgeInsets.all(2.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFF1E3A8A).withValues(alpha: 0.35),
-                  width: 1.2,
+                  color: AppTheme.accentSky.withValues(alpha: 0.6),
+                  width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: ClipOval(
                 child: Image.asset(
-                  'assets/images/college_crest.jpg',
-                  width: isMobile ? 29 : 33,
-                  height: isMobile ? 29 : 33,
+                  'assets/images/college_crest.png',
+                  width: isMobile ? 34 : 38,
+                  height: isMobile ? 34 : 38,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: AppTheme.primaryNavy,
-                      child: const Icon(Icons.school, color: AppTheme.accentSky, size: 16),
+                    return Image.asset(
+                      'assets/images/college_crest.jpg',
+                      fit: BoxFit.contain,
+                      errorBuilder: (ctx, err, st) {
+                        return Container(
+                          color: AppTheme.primaryNavy,
+                          child: const Icon(Icons.school, color: AppTheme.accentSky, size: 20),
+                        );
+                      },
                     );
                   },
                 ),
               ),
             ),
-            SizedBox(width: isMobile ? 6 : 10),
+            SizedBox(width: isMobile ? 8 : 12),
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,26 +81,28 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          screenWidth < 380 ? 'GEC SKP' : 'GEC Sheikhpura',
+                          'GEC SHK Student',
                           style: TextStyle(
                             color: isDark ? Colors.white : AppTheme.primaryNavy,
                             fontWeight: FontWeight.w800,
-                            fontSize: isMobile ? 14 : 15.5,
+                            fontSize: isMobile ? 15 : 17,
                             letterSpacing: -0.2,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryBlue,
-                          borderRadius: BorderRadius.circular(3),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                          ),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
-                          'HUB',
+                          'OFFICIAL',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -104,28 +113,27 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (!isMobile)
-                    Text(
-                      'Campus Life, Living & Marketplace',
-                      style: TextStyle(
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  Text(
+                    'Govt. Engineering College, Sheikhpura',
+                    style: TextStyle(
+                      fontSize: isMobile ? 9.5 : 11,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
           ],
         ),
         actions: [
-          // Super Admin Quick Access Chip for pk3334238@gmail.com / prince86944@gmail.com
+          // Super Admin Quick Access Chip strictly for pk3334238@gmail.com
           ValueListenableBuilder<UserModel?>(
             valueListenable: AuthService.instance.currentUser,
             builder: (context, user, _) {
-              if (user != null && (user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com' || user.email.toLowerCase() == 'prince86944@gmail.com')) {
+              if (user != null && (user.isAdmin || user.email.toLowerCase() == 'pk3334238@gmail.com')) {
                 return Padding(
                   padding: const EdgeInsets.only(right: 2),
                   child: isMobile
@@ -401,7 +409,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Student Events',
                           subtitle: 'Fests, workshops & RSVP',
                           color: const Color(0xFF8B5CF6),
-                          onTap: () => onTabChange(2), // Community Tab
+                          onTap: () => NavigationService.instance.openEvents(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -410,7 +418,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Clubs & Societies',
                           subtitle: 'Coding, robotics & drama',
                           color: const Color(0xFFEC4899),
-                          onTap: () => onTabChange(2), // Community Tab
+                          onTap: () => NavigationService.instance.openClubs(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -419,7 +427,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Sports & Matches',
                           subtitle: 'Cricket, badminton squads',
                           color: const Color(0xFF10B981),
-                          onTap: () => onTabChange(2), // Community Tab
+                          onTap: () => NavigationService.instance.openSports(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -428,7 +436,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Lost & Found',
                           subtitle: 'Report or claim items',
                           color: const Color(0xFFF59E0B),
-                          onTap: () => onTabChange(2), // Community Tab
+                          onTap: () => NavigationService.instance.openLostFound(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -459,7 +467,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Faculty & Rooms',
                           subtitle: 'Departments & contacts',
                           color: const Color(0xFF06B6D4),
-                          onTap: () => _showFacultyModal(context),
+                          onTap: () => NavigationService.instance.openDepartments(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -507,7 +515,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Rooms & PGs',
                           subtitle: 'Hostels & private rooms',
                           color: const Color(0xFF0284C7),
-                          onTap: () => onTabChange(1), // Explore Tab (Rooms)
+                          onTap: () => NavigationService.instance.openRooms(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -516,7 +524,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Food & Tiffin',
                           subtitle: 'Monthly mess & meals',
                           color: const Color(0xFFF97316),
-                          onTap: () => onTabChange(1), // Explore Tab (Food)
+                          onTap: () => NavigationService.instance.openFood(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -525,7 +533,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Nearby Shops',
                           subtitle: 'Stationery, grocery & meds',
                           color: const Color(0xFF0D9488),
-                          onTap: () => onTabChange(1), // Explore Tab (Shops)
+                          onTap: () => NavigationService.instance.openShops(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -534,7 +542,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Laundry Services',
                           subtitle: 'Ironing & wash pickup',
                           color: const Color(0xFF6366F1),
-                          onTap: () => onTabChange(1), // Explore Tab (Laundry)
+                          onTap: () => NavigationService.instance.openLaundry(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -543,7 +551,7 @@ class HomeScreen extends StatelessWidget {
                           title: 'Sheikhpura Transit',
                           subtitle: 'Auto, buses & trains',
                           color: const Color(0xFF8B5CF6),
-                          onTap: () => onTabChange(1), // Explore Tab (Transport)
+                          onTap: () => NavigationService.instance.openTransport(),
                         ),
                         _buildFeatureCard(
                           context: context,
@@ -688,7 +696,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           OutlinedButton.icon(
-                            onPressed: () => onTabChange(3), // Academics Tab
+                            onPressed: () => NavigationService.instance.openCutoffs(), // Academics Tab (Cutoffs & Seats)
                             icon: const Icon(Icons.analytics_outlined, size: 14),
                             label: const Text('Cutoffs & Placements'),
                             style: OutlinedButton.styleFrom(
@@ -1030,85 +1038,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-        );
-      },
-    );
-  }
-
-  void _showFacultyModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          maxChildSize: 0.9,
-          minChildSize: 0.5,
-          expand: false,
-          builder: (context, scrollController) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '🏛️ Faculty & Room Directory',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  Expanded(
-                    child: ListView(
-                      controller: scrollController,
-                      children: const [
-                        ListTile(
-                          leading: Text('👨‍🏫', style: TextStyle(fontSize: 22)),
-                          title: Text('Dr. Ramesh Kumar (HOD, CSE)'),
-                          subtitle: Text('Room: Academic Block 201 • hod.cse@gecsheikhpura.ac.in'),
-                        ),
-                        ListTile(
-                          leading: Text('👩‍🏫', style: TextStyle(fontSize: 22)),
-                          title: Text('Prof. Sunita Kumari (HOD, Civil)'),
-                          subtitle: Text('Room: Civil Labs Block • hod.civil@gecsheikhpura.ac.in'),
-                        ),
-                        ListTile(
-                          leading: Text('👨‍🏫', style: TextStyle(fontSize: 22)),
-                          title: Text('Prof. Rajesh Sharma (HOD, ME)'),
-                          subtitle: Text('Room: Mechanical Workshop • hod.me@gecsheikhpura.ac.in'),
-                        ),
-                        ListTile(
-                          leading: Text('👩‍🏫', style: TextStyle(fontSize: 22)),
-                          title: Text('Dr. Anjali Verma (HOD, EE)'),
-                          subtitle: Text('Room: Electrical Block 102 • hod.ee@gecsheikhpura.ac.in'),
-                        ),
-                        ListTile(
-                          leading: Text('🏛️', style: TextStyle(fontSize: 22)),
-                          title: Text('Principal Secretariat & Admin Office'),
-                          subtitle: Text('Room: Administrative Building Ground Floor • 06341-224401'),
-                        ),
-                        ListTile(
-                          leading: Text('📚', style: TextStyle(fontSize: 22)),
-                          title: Text('Central College Library & Reading Hall'),
-                          subtitle: Text('Room: 2nd Floor Library Wing (Open 9 AM – 7 PM)'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
         );
       },
     );

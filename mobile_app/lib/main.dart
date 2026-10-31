@@ -5,13 +5,14 @@ import 'screens/community_screen.dart';
 import 'screens/academics_screen.dart';
 import 'screens/profile_screen.dart';
 import 'services/data_service.dart';
-import 'theme/app_theme.dart';
-
 import 'services/auth_service.dart';
+import 'services/navigation_service.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AuthService.instance.init();
+  await DataService.instance.init();
   runApp(const GecStudentHubApp());
 }
 
@@ -44,7 +45,7 @@ class _GecStudentHubAppState extends State<GecStudentHubApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'GEC Sheikhpura Hub',
+      title: 'GEC SHK Student',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
@@ -74,8 +75,27 @@ class MainNavigationScaffold extends StatefulWidget {
 class _MainNavigationScaffoldState extends State<MainNavigationScaffold> {
   int _currentIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    NavigationService.instance.mainTabNotifier.addListener(_onMainTabNotified);
+  }
+
+  @override
+  void dispose() {
+    NavigationService.instance.mainTabNotifier.removeListener(_onMainTabNotified);
+    super.dispose();
+  }
+
+  void _onMainTabNotified() {
+    final nextIndex = NavigationService.instance.mainTabNotifier.value;
+    if (nextIndex != _currentIndex && mounted) {
+      setState(() => _currentIndex = nextIndex);
+    }
+  }
+
   void _onTabChange(int index) {
-    setState(() => _currentIndex = index);
+    NavigationService.instance.navigateTo(index);
   }
 
   @override

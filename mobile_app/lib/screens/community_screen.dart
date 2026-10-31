@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/data_service.dart';
+import '../services/navigation_service.dart';
 import '../theme/app_theme.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -18,11 +19,21 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    final initialTab = NavigationService.instance.communitySubTab.value.clamp(0, 4);
+    _tabController = TabController(length: 5, vsync: this, initialIndex: initialTab);
+    NavigationService.instance.communitySubTab.addListener(_onSubTabNotified);
+  }
+
+  void _onSubTabNotified() {
+    final target = NavigationService.instance.communitySubTab.value.clamp(0, 4);
+    if (_tabController.index != target && mounted) {
+      _tabController.animateTo(target);
+    }
   }
 
   @override
   void dispose() {
+    NavigationService.instance.communitySubTab.removeListener(_onSubTabNotified);
     _tabController.dispose();
     super.dispose();
   }

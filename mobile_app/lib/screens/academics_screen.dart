@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/data_service.dart';
+import '../services/navigation_service.dart';
 import '../theme/app_theme.dart';
 
 class AcademicsScreen extends StatefulWidget {
@@ -15,11 +16,21 @@ class _AcademicsScreenState extends State<AcademicsScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    final initialTab = NavigationService.instance.academicsSubTab.value.clamp(0, 3);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: initialTab);
+    NavigationService.instance.academicsSubTab.addListener(_onSubTabNotified);
+  }
+
+  void _onSubTabNotified() {
+    final target = NavigationService.instance.academicsSubTab.value.clamp(0, 3);
+    if (_tabController.index != target && mounted) {
+      _tabController.animateTo(target);
+    }
   }
 
   @override
   void dispose() {
+    NavigationService.instance.academicsSubTab.removeListener(_onSubTabNotified);
     _tabController.dispose();
     super.dispose();
   }
