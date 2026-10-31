@@ -15,8 +15,13 @@ if ($gitStatus) {
     Write-Host "`n[1/4] Working tree clean." -ForegroundColor Green
 }
 
-Write-Host "`n[2/4] Pushing to GitHub remotes..." -ForegroundColor Yellow
+Write-Host "`n[2/4] Pushing to GitHub remotes (origin & web)..." -ForegroundColor Yellow
 git push origin main
+try {
+    git push web main
+} catch {
+    Write-Host "Notice: web remote push skipped or up to date." -ForegroundColor Gray
+}
 
 Write-Host "`n[3/4] Triggering Vercel Production Deployment..." -ForegroundColor Yellow
 npx -y vercel deploy --prod --yes

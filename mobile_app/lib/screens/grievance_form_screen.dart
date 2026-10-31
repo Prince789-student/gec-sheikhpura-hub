@@ -1,67 +1,36 @@
 import 'package:flutter/material.dart';
-import '../services/data_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 
-class GrievanceFormScreen extends StatefulWidget {
+class GrievanceFormScreen extends StatelessWidget {
   const GrievanceFormScreen({super.key});
 
-  @override
-  State<GrievanceFormScreen> createState() => _GrievanceFormScreenState();
-}
+  static const String googleFormUrl = 'https://forms.gle/ZPhVzzvshT6E5Yfp7';
 
-class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  String _selectedCategory = 'Room / PG Rental Fraud or Scam';
-  bool _agreedToTerms = false;
-  bool _isSubmitting = false;
-  String? _generatedTicketId;
-
-  final List<String> _categories = [
-    'Room / PG Rental Fraud or Scam',
-    'Anti-Ragging / Harassment Incident',
-    'Unauthorized Phone / Data Disclosure',
-    'Copyright / IP Infringement',
-    'Food / Tiffin Vendor Dispute',
-    'Delay in Data Deletion Request',
-    'Other Platform Grievance',
-  ];
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
+  Future<void> _launchGoogleForm(BuildContext context) async {
+    final uri = Uri.parse(googleFormUrl);
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched && context.mounted) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not open form automatically. Please visit: $googleFormUrl'),
+            backgroundColor: AppTheme.dangerRed,
+          ),
+        );
+      }
+    }
   }
 
-  Future<void> _submitGrievance() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (!_agreedToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please certify that your statements are true to submit.'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-
-    final ticketId = await DataService.instance.submitGrievanceTicket(
-      name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      category: _selectedCategory,
-      description: _descriptionController.text.trim(),
-    );
-
-    setState(() {
-      _isSubmitting = false;
-      _generatedTicketId = ticketId;
-    });
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final uri = Uri.parse('tel:$phoneNumber');
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {}
   }
 
   @override
@@ -71,265 +40,193 @@ class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('File a Grievance'),
+        title: const Text('Grievance Redressal Cell'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: _generatedTicketId != null
-            ? _buildSuccessView(context, isDark)
-            : _buildFormView(context, isDark, theme),
-      ),
-    );
-  }
-
-  Widget _buildFormView(BuildContext context, bool isDark, ThemeData theme) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Grievance Officer details card
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: theme.dividerColor),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Row(
-                  children: [
-                    Icon(Icons.gavel, color: AppTheme.accentSky, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Statutory Grievance Redressal',
-                      style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
-                    ),
-                  ],
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Statutory Header Card
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark ? Colors.blue.withValues(alpha: 0.3) : const Color(0xFFBFDBFE),
+                  width: 1.5,
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  'IT Rules, 2021 (Rule 3(2)) Compliance Desk\nOfficer Email: grievance@gecsheikhpura.in\nSLA: 24–48h Acknowledgement • 15-Day Resolution',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                    height: 1.4,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryNavy,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.gavel, color: Colors.white, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Official Redressal Portal',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.primaryNavy,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'GEC Sheikhpura Student Life Hub',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppTheme.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'All complaints regarding hostel accommodation, student disputes, mess food hygiene, anti-ragging incidents, or personal data concerns are officially recorded and tracked through our official Google Redressal Form.',
+                    style: TextStyle(fontSize: 13, height: 1.5),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Primary Google Form Callout Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(
+                  color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
+                ),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.assignment, size: 48, color: AppTheme.accentSky),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Official Grievance Google Form',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Tap below to open and submit your official grievance ticket directly to the Grievance Officer.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.4),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Open Google Form Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _launchGoogleForm(context),
+                      icon: const Icon(Icons.open_in_new, size: 20),
+                      label: const Text(
+                        'Open Grievance Form (Google Form)',
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryNavy,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 3,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  SelectableText(
+                    googleFormUrl,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.accentSky,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            // Emergency Helplines
+            const Text(
+              'Urgent & Emergency Statutory Helplines',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.primaryNavy,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _makePhoneCall('112'),
+                    icon: const Icon(Icons.local_police, color: AppTheme.dangerRed, size: 18),
+                    label: const Text('Police 112', style: TextStyle(color: AppTheme.dangerRed, fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: const BorderSide(color: AppTheme.dangerRed),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _makePhoneCall('18001805522'),
+                    icon: const Icon(Icons.shield, color: Color(0xFFD97706), size: 18),
+                    label: const Text('Anti-Ragging', style: TextStyle(color: Color(0xFFD97706), fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: const BorderSide(color: Color(0xFFD97706)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-
-          const SizedBox(height: 20),
-
-          Text(
-            'Full Name *',
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : AppTheme.primaryNavy,
-            ),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: _nameController,
-            decoration: _inputDecoration('e.g. Rahul Kumar', theme, isDark),
-            validator: (val) => val == null || val.trim().isEmpty ? 'Enter your full name' : null,
-          ),
-
-          const SizedBox(height: 14),
-
-          Text(
-            'Contact Email *',
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : AppTheme.primaryNavy,
-            ),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: _inputDecoration('e.g. rahul@example.com', theme, isDark),
-            validator: (val) {
-              if (val == null || val.trim().isEmpty) return 'Enter your email address';
-              if (!val.contains('@')) return 'Enter a valid email address';
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 14),
-
-          Text(
-            'Grievance Category *',
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : AppTheme.primaryNavy,
-            ),
-          ),
-          const SizedBox(height: 6),
-          DropdownButtonFormField<String>(
-            initialValue: _selectedCategory,
-            isExpanded: true,
-            decoration: _inputDecoration('', theme, isDark),
-            items: _categories.map((c) {
-              return DropdownMenuItem(value: c, child: Text(c, style: const TextStyle(fontSize: 12.5)));
-            }).toList(),
-            onChanged: (val) {
-              if (val != null) setState(() => _selectedCategory = val);
-            },
-          ),
-
-          const SizedBox(height: 14),
-
-          Text(
-            'Description of Incident & Evidence *',
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : AppTheme.primaryNavy,
-            ),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: _descriptionController,
-            maxLines: 4,
-            decoration: _inputDecoration('Describe facts, phone numbers, or advance requests...', theme, isDark),
-            validator: (val) => val == null || val.trim().length < 10 ? 'Please provide detailed facts' : null,
-          ),
-
-          const SizedBox(height: 14),
-
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Checkbox(
-                value: _agreedToTerms,
-                activeColor: AppTheme.accentSky,
-                onChanged: (v) => setState(() => _agreedToTerms = v ?? false),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    'I certify that statements in this submission are true to the best of my knowledge.',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submitGrievance,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryBlue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                    )
-                  : const Text(
-                      'Submit Grievance to Officer',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                    ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSuccessView(BuildContext context, bool isDark) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 30),
-        const Icon(Icons.check_circle, color: AppTheme.successGreen, size: 64),
-        const SizedBox(height: 16),
-        Text(
-          'Grievance Lodged Successfully',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            color: isDark ? Colors.white : AppTheme.primaryNavy,
-          ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppTheme.accentSky.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            'Case Tracking ID: $_generatedTicketId',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.accentSky,
-              fontFamily: 'monospace',
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'In accordance with Information Technology Rules, 2021:\n• A formal acknowledgement has been generated.\n• The Grievance Officer will review within 24–48 hours.\n• Resolution will be communicated within 15 days.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-            height: 1.5,
-          ),
-        ),
-        const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.primaryBlue,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          child: const Text('Back to Profile & Settings'),
-        ),
-      ],
-    );
-  }
-
-  InputDecoration _inputDecoration(String hint, ThemeData theme, bool isDark) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(
-        fontSize: 12,
-        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-      ),
-      filled: true,
-      fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: theme.dividerColor),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: theme.dividerColor),
       ),
     );
   }

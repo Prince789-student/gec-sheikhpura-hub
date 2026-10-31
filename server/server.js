@@ -37,61 +37,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// In-Memory Database with Seeded GEC Sheikhpura Data
-let listings = [
-  {
-    id: 'lst_1',
-    category: 'room',
-    title: 'Maa Sharda Boys Hostel & PG',
-    price: '₹2,200/mo',
-    contact: '9835012345',
-    person: 'Ramesh Singh',
-    location: 'Bajidpur Main Road, Near Police Line, Sheikhpura',
-    amenities: 'Wi-Fi, 24x7 Water, In-house Mess, Generator Power Backup',
-    status: 'approved',
-    featured: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'lst_2',
-    category: 'room',
-    title: 'Annapurna Student Residency',
-    price: '₹3,200/mo',
-    contact: '9431098765',
-    person: 'Suresh Verma',
-    location: 'Bajidpur Chowk, Behind Canteen, Sheikhpura',
-    amenities: 'Single & Double Rooms, High-Speed Wi-Fi, CCTV, Purified Water',
-    status: 'approved',
-    featured: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'lst_3',
-    category: 'food',
-    title: 'Bhojan Griha Student Mess & Tiffin Service',
-    price: '₹2,600/mo',
-    contact: '9876543210',
-    person: 'Mukesh Kumar',
-    location: 'Near College Gate, Sheikhpura',
-    amenities: 'Pure Veg & Non-Veg 2 times/day, Free Tiffin Delivery to Hostels',
-    status: 'approved',
-    featured: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'lst_4',
-    category: 'shop',
-    title: 'Anand Stationery & Fast Xerox Desk',
-    price: 'Affordable Student Rates',
-    contact: '9431098765',
-    person: 'Anand Verma',
-    location: 'Gate No. 1, GEC Sheikhpura',
-    amenities: 'Spiral Binding, BEU Syllabus Prints, Lab Manuals, Stationery',
-    status: 'approved',
-    featured: false,
-    createdAt: new Date().toISOString()
-  }
-];
+// In-Memory Database for Live Student Hub
+let listings = [];
 
 let notices = [
   {
@@ -108,29 +55,20 @@ let events = [];
 
 let grievances = [];
 
-// Lost & Found Items Store
-let lostFound = [
+// Lost & Found Items Store (Live student submissions)
+let lostFound = [];
+
+// Laundry Orders Store (Privacy Protected - Student & Authorized Staff only)
+let laundryOrders = [];
+
+// Staff & Admin Role-Based Access Control Store
+let adminRoles = [
   {
-    id: 'lf_1',
-    title: 'Casio fx-991ES Plus Scientific Calculator',
-    type: 'Lost',
-    category: 'Electronics',
-    location: 'Classroom 204 (Academic Building)',
-    dateStr: '30 Oct 2026',
-    contactName: 'Aman Kumar (CSE 3rd Year)',
-    contactPhone: '06341-224401',
-    description: 'Black scientific calculator with blue batch sticker on back. Please return to guard room.'
-  },
-  {
-    id: 'lf_2',
-    title: 'Civil Engg 2nd Year Student ID Card',
-    type: 'Found',
-    category: 'Document',
-    location: 'Central Library Reading Desk',
-    dateStr: '29 Oct 2026',
-    contactName: 'Library Security Desk',
-    contactPhone: '06341-224402',
-    description: 'Deposited at central library reception desk. Please collect with registration proof.'
+    email: 'pk3334238@gmail.com',
+    name: 'Prince Kumar',
+    role: 'super_admin',
+    permissions: ['all'],
+    updatedAt: new Date().toISOString()
   }
 ];
 
@@ -337,6 +275,152 @@ app.patch('/api/admin/listings/:id', (req, res) => {
 
   item.status = status || 'approved';
   res.json({ message: `Listing marked as ${item.status}`, listing: item });
+});
+
+// --- LAUNDRY SERVICES API (Student Booking & Role Protected) ---
+
+// Student submits laundry clothes count & room details
+app.post('/api/laundry/orders', (req, res) => {
+  const {
+    studentName,
+    studentEmail,
+    studentPhone,
+    regNo,
+    shirtsCount,
+    pantsCount,
+    bedsheetsCount,
+    othersCount,
+    roomNo,
+    hostelName,
+    locationDetails,
+    notes
+  } = req.body;
+
+  if (!studentName || !studentPhone || !roomNo) {
+    return res.status(400).json({ error: 'Student name, phone, and room number are required.' });
+  }
+
+  const shirts = parseInt(shirtsCount) || 0;
+  const pants = parseInt(pantsCount) || 0;
+  const bedsheets = parseInt(bedsheetsCount) || 0;
+  const others = parseInt(othersCount) || 0;
+  const total = shirts + pants + bedsheets + others;
+
+  if (total <= 0) {
+    return res.status(400).json({ error: 'Please enter at least 1 item of clothing.' });
+  }
+
+  const newOrder = {
+    id: `lnd_${Date.now()}`,
+    studentName: studentName.trim(),
+    studentEmail: (studentEmail || '').trim().toLowerCase(),
+    studentPhone: studentPhone.trim(),
+    regNo: (regNo || '').trim(),
+    shirtsCount: shirts,
+    pantsCount: pants,
+    bedsheetsCount: bedsheets,
+    othersCount: others,
+    totalClothes: total,
+    roomNo: roomNo.trim(),
+    hostelName: hostelName ? hostelName.trim() : 'Hostel 1',
+    locationDetails: (locationDetails || '').trim(),
+    notes: (notes || '').trim(),
+    status: 'Pending Pickup', // 'Pending Pickup', 'In Wash', 'Ironing / Ready', 'Delivered'
+    createdAt: new Date().toISOString()
+  };
+
+  laundryOrders.unshift(newOrder);
+  res.status(201).json({
+    message: '✓ Laundry pickup requested! Staff has been notified.',
+    order: newOrder
+  });
+});
+
+// View laundry orders: Students only see their own orders; authorized laundry staff sees all
+app.get('/api/laundry/orders', (req, res) => {
+  const { email, role } = req.query;
+  const cleanEmail = (email || '').toLowerCase().trim();
+
+  // If role is laundry or admin, or Prince Kumar, return all orders
+  const isSuperAdmin = (cleanEmail === 'pk3334238@gmail.com');
+  const staff = adminRoles.find(r => r.email === cleanEmail && (r.permissions.includes('all') || r.permissions.includes('laundry')));
+
+  if (isSuperAdmin || staff || role === 'admin' || role === 'laundry_manager') {
+    return res.json({ count: laundryOrders.length, orders: laundryOrders });
+  }
+
+  // Student privacy guard: only return orders submitted by this student's email or phone
+  if (cleanEmail) {
+    const studentOrders = laundryOrders.filter(o => o.studentEmail === cleanEmail);
+    return res.json({ count: studentOrders.length, orders: studentOrders });
+  }
+
+  // If no auth query given, return empty list for privacy
+  res.json({ count: 0, orders: [] });
+});
+
+// Update laundry order status (Laundry staff or admin only)
+app.patch('/api/laundry/orders/:id', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const order = laundryOrders.find(o => o.id === id);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+
+  if (status) order.status = status;
+  order.updatedAt = new Date().toISOString();
+
+  res.json({ message: `Laundry order status updated to ${order.status}`, order });
+});
+
+// Delete laundry order
+app.delete('/api/laundry/orders/:id', (req, res) => {
+  const { id } = req.params;
+  laundryOrders = laundryOrders.filter(o => o.id !== id);
+  res.json({ message: 'Order removed successfully', count: laundryOrders.length });
+});
+
+// --- ADMIN ROLES & RBAC PERMISSIONS API ---
+
+// List all assigned admin roles
+app.get('/api/admin/roles', (req, res) => {
+  res.json({ count: adminRoles.length, roles: adminRoles });
+});
+
+// Assign or update a user's admin role / permissions
+app.post('/api/admin/roles', (req, res) => {
+  const { email, name, role, permissions } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required.' });
+
+  const cleanEmail = email.toLowerCase().trim();
+  const existingIndex = adminRoles.findIndex(r => r.email === cleanEmail);
+
+  const roleObj = {
+    email: cleanEmail,
+    name: name ? name.trim() : cleanEmail.split('@')[0],
+    role: role || 'laundry_manager',
+    permissions: Array.isArray(permissions) ? permissions : [(role || 'laundry')],
+    updatedAt: new Date().toISOString()
+  };
+
+  if (existingIndex >= 0) {
+    adminRoles[existingIndex] = roleObj;
+  } else {
+    adminRoles.push(roleObj);
+  }
+
+  res.json({ message: `Permissions updated for ${cleanEmail}`, role: roleObj });
+});
+
+// Remove role
+app.delete('/api/admin/roles/:email', (req, res) => {
+  const cleanEmail = req.params.email.toLowerCase().trim();
+  if (cleanEmail === 'pk3334238@gmail.com') {
+    return res.status(403).json({ error: 'Cannot remove root Super Admin.' });
+  }
+
+  adminRoles = adminRoles.filter(r => r.email !== cleanEmail);
+  res.json({ message: `Role removed for ${cleanEmail}`, count: adminRoles.length });
 });
 
 // Google Firebase Auth Verification

@@ -272,32 +272,115 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Campus Broadcast Notice Ticker
+                // 1. Campus Notices & Broadcast Column (Click to View All Notices)
                 InkWell(
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const NoticesScreen()));
                   },
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppTheme.dangerRed.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppTheme.dangerRed.withValues(alpha: 0.25)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.campaign, size: 18, color: AppTheme.dangerRed),
-                        const SizedBox(width: 8),
-                        const Expanded(
-                          child: Text(
-                            'LIVE NOTICE: BEU 3rd & 5th Semester Exam Forms Live • Tap to View All Notices',
-                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: AppTheme.dangerRed),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                            : [const Color(0xFFEFF6FF), const Color(0xFFDBEAFE)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF3B82F6).withValues(alpha: 0.3) : const Color(0xFF93C5FD),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3B82F6).withValues(alpha: isDark ? 0.2 : 0.08),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        const Icon(Icons.arrow_forward_ios, size: 12, color: AppTheme.dangerRed),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppTheme.dangerRed,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.campaign, size: 14, color: Colors.white),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'CAMPUS NOTICES & CIRCULARS',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            const Row(
+                              children: [
+                                Text(
+                                  'View All',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppTheme.primaryBlue,
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Icon(Icons.arrow_forward, size: 14, color: AppTheme.primaryBlue),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        // Dynamic Notice Title from DataService
+                        Text(
+                          DataService.instance.campusNotices.isNotEmpty
+                              ? DataService.instance.campusNotices.first.title
+                              : 'Revised B.Tech Mid-Term Exam Schedule & Campus Circulars Announced',
+                          style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? Colors.white : AppTheme.primaryNavy,
+                            height: 1.35,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'Tap to open all announcements & circulars',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

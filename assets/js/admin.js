@@ -171,6 +171,33 @@ async function initAdminDashboard() {
         }
       });
     });
+
+    // Role-Based Access Control UI Guard
+    const isSuperAdmin = Boolean(window.IS_SUPER_ADMIN);
+    const perms = window.CURRENT_ADMIN_PERMISSIONS || (isSuperAdmin ? ['all'] : ['laundry']);
+
+    // Non-super-admins cannot see Staff Roles Controller
+    const btnStaff = document.getElementById('btnStaffRolesTab');
+    if (btnStaff && !isSuperAdmin) {
+      btnStaff.style.display = 'none';
+    }
+
+    // Scoped Laundry Manager View: hide other admin tabs so laundry staff only sees student laundry orders!
+    if (!isSuperAdmin && !perms.includes('all')) {
+      if (perms.includes('laundry')) {
+        document.querySelectorAll('.tools-tab-bar [data-admin-tab]').forEach(t => {
+          if (t.getAttribute('data-admin-tab') !== 'laundryOrdersTab') {
+            t.style.display = 'none';
+          }
+        });
+        const filterBar = document.querySelector('.tab-category-filter-bar');
+        if (filterBar) filterBar.style.display = 'none';
+        const statsGrid = document.querySelector('.admin-stats-grid');
+        if (statsGrid) statsGrid.style.display = 'none';
+        const lndBtn = document.getElementById('btnLaundryOrdersTab');
+        if (lndBtn) lndBtn.click();
+      }
+    }
   }
 }
 
@@ -201,7 +228,9 @@ async function loadDashboardData() {
     loadAdminCorrectionsTable(),
     loadAcademicPartnerHub(),
     loadExpenseBenchmarks(),
-    loadFoodMessManager()
+    loadFoodMessManager(),
+    loadAdminLaundryOrders(),
+    loadAdminStaffRoles()
   ]);
 }
 
@@ -3671,4 +3700,292 @@ window.adminDeleteAccommodationItem = async function(id) {
   localStorage.setItem('gec_accommodations_override', JSON.stringify(updated));
   showToast('Accommodation removed from live directory.');
   await loadAccommodationsTable();
+};
+
+/* ==========================================================================
+   Phase 12: Laundry Orders Management & Student Clothes Tracking
+   ========================================================================== */
+let allAdminLaundryOrders = [];
+
+window.loadAdminLaundryOrders = async function() {
+  const tbody = document.getElementById('adminLaundryOrdersBody');
+  const countBadge = document.getElementById('tabLaundryCount');
+  if (!tbody) return;
+
+  try {
+    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/laundry/orders?role=laundry_manager');
+    if (res.ok) {
+      const data = await res.json();
+      allAdminLaundryOrders = data.orders || [];
+    } else {
+      allAdminLaundryOrders = JSON.parse(localStorage.getItem('gec_laundry_orders_local') || '[]');
+    }
+  } catch (e) {
+    allAdminLaundryOrders = JSON.parse(localStorage.getItem('gec_laundry_orders_local') || '[]');
+  }
+
+  if (countBadge) countBadge.textContent = allAdminLaundryOrders.length;
+  filterAdminLaundryOrders();
+};
+
+window.filterAdminLaundryOrders = function() {
+  const tbody = document.getElementById('adminLaundryOrdersBody');
+  if (!tbody) return;
+
+  const q = (document.getElementById('searchLaundryOrders')?.value || '').toLowerCase().trim();
+  const hostel = document.getElementById('filterLaundryHostel')?.value || 'all';
+  const status = document.getElementById('filterLaundryStatus')?.value || 'all';
+
+  let filtered = allAdminLaundryOrders.filter(o => {
+    const matchQ = !q || (o.studentName || '').toLowerCase().includes(q) ||
+                          (o.roomNo || '').toLowerCase().includes(q) ||
+                          (o.studentPhone || '').includes(q) ||
+                          (o.regNo || '').toLowerCase().includes(q);
+    const matchHostel = (hostel === 'all') || (o.hostelName === hostel) ||
+                        (hostel === 'other' && o.hostelName !== 'Hostel 1' && o.hostelName !== 'Hostel 2');
+    const matchStatus = (status === 'all') || (o.status === status);
+    return matchQ && matchHostel && matchStatus;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+          🧺 No laundry pickup orders found matching current filters.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(o => {
+    let statusBadge = '<span class="badge" style="background: rgba(245,158,11,0.15); color: #d97706; font-weight:700;">Pending Pickup</span>';
+    if (o.status === 'In Wash') {
+      statusBadge = '<span class="badge" style="background: rgba(59,130,246,0.15); color: #2563eb; font-weight:700;">In Wash</span>';
+    } else if (o.status === 'Ironing / Ready') {
+      statusBadge = '<span class="badge" style="background: rgba(139,92,246,0.15); color: #7c3aed; font-weight:700;">Ironing / Ready</span>';
+    } else if (o.status === 'Delivered') {
+      statusBadge = '<span class="badge" style="background: rgba(16,185,129,0.15); color: #059669; font-weight:700;">✓ Delivered</span>';
+    }
+
+    const dateFormatted = o.createdAt ? new Date(o.createdAt).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'Recent';
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight: 700; font-family: monospace; font-size: 0.85rem;">#${o.id.slice(-6)}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${dateFormatted}</div>
+        </td>
+        <td>
+          <div style="font-weight: 700; color: var(--text-main);">${escapeHtml(o.studentName || 'Student')}</div>
+          <div style="font-size: 0.75rem; color: var(--color-accent);">BEU: ${escapeHtml(o.regNo || 'N/A')}</div>
+          <a href="tel:${escapeHtml(o.studentPhone)}" style="font-size: 0.8rem; color: #2563eb; font-weight: 600;">📞 ${escapeHtml(o.studentPhone)}</a>
+        </td>
+        <td>
+          <div style="font-weight: 700; color: #1e40af;">${escapeHtml(o.hostelName || 'Hostel 1')}</div>
+          <div style="font-size: 0.8rem; font-weight: 600;">Room: ${escapeHtml(o.roomNo || '')}</div>
+          ${o.locationDetails ? `<div style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(o.locationDetails)}</div>` : ''}
+        </td>
+        <td style="text-align: center;">
+          <span style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">${o.totalClothes || 0}</span>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Clothes</div>
+        </td>
+        <td>
+          <div style="font-size: 0.8rem; line-height: 1.4;">
+            <div>👕 <strong>${o.shirtsCount || 0}</strong> Shirts/T-shirts</div>
+            <div>👖 <strong>${o.pantsCount || 0}</strong> Pants/Jeans</div>
+            <div>🛏️ <strong>${o.bedsheetsCount || 0}</strong> Bedsheets/Others</div>
+            ${o.notes ? `<div style="font-size: 0.75rem; color: #b45309; margin-top: 4px;">📝 ${escapeHtml(o.notes)}</div>` : ''}
+          </div>
+        </td>
+        <td>${statusBadge}</td>
+        <td>
+          <select class="form-control" style="font-size: 0.775rem; padding: 0.25rem 0.5rem;" onchange="updateLaundryStatus('${o.id}', this.value)">
+            <option value="Pending Pickup" ${o.status === 'Pending Pickup' ? 'selected' : ''}>Pending Pickup</option>
+            <option value="In Wash" ${o.status === 'In Wash' ? 'selected' : ''}>In Wash</option>
+            <option value="Ironing / Ready" ${o.status === 'Ironing / Ready' ? 'selected' : ''}>Ironing / Ready</option>
+            <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+          </select>
+        </td>
+        <td>
+          <button type="button" class="btn btn-ghost btn-sm" style="color: #ef4444;" onclick="deleteLaundryOrder('${o.id}')" title="Delete Order">
+            🗑️
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+};
+
+window.updateLaundryStatus = async function(orderId, newStatus) {
+  try {
+    await fetch(`https://gec-sheikhpura-backend.onrender.com/api/laundry/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+  } catch (e) {}
+
+  const order = allAdminLaundryOrders.find(o => o.id === orderId);
+  if (order) order.status = newStatus;
+  localStorage.setItem('gec_laundry_orders_local', JSON.stringify(allAdminLaundryOrders));
+  showToast(`Order #${orderId.slice(-6)} marked as ${newStatus}`);
+  filterAdminLaundryOrders();
+};
+
+window.deleteLaundryOrder = async function(orderId) {
+  if (!confirm(`Are you sure you want to delete laundry order #${orderId.slice(-6)}?`)) return;
+  try {
+    await fetch(`https://gec-sheikhpura-backend.onrender.com/api/laundry/orders/${orderId}`, {
+      method: 'DELETE'
+    });
+  } catch (e) {}
+
+  allAdminLaundryOrders = allAdminLaundryOrders.filter(o => o.id !== orderId);
+  localStorage.setItem('gec_laundry_orders_local', JSON.stringify(allAdminLaundryOrders));
+  showToast('Laundry order deleted.');
+  window.loadAdminLaundryOrders();
+};
+
+/* ==========================================================================
+   Phase 13: Staff Roles & Granular Access Controller
+   ========================================================================== */
+let allStaffRoles = [
+  {
+    email: 'pk3334238@gmail.com',
+    name: 'Prince Kumar',
+    role: 'Root Super Admin',
+    permissions: ['all']
+  }
+];
+
+window.loadAdminStaffRoles = async function() {
+  const tbody = document.getElementById('adminStaffRolesBody');
+  if (!tbody) return;
+
+  try {
+    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/admin/roles');
+    if (res.ok) {
+      const data = await res.json();
+      allStaffRoles = data.roles || [];
+    } else {
+      allStaffRoles = JSON.parse(localStorage.getItem('gec_assigned_roles') || '[]');
+    }
+  } catch (e) {
+    allStaffRoles = JSON.parse(localStorage.getItem('gec_assigned_roles') || '[]');
+  }
+
+  // Ensure root Super Admin Prince Kumar is always present
+  if (!allStaffRoles.some(r => r.email === 'pk3334238@gmail.com')) {
+    allStaffRoles.unshift({
+      email: 'pk3334238@gmail.com',
+      name: 'Prince Kumar',
+      role: 'Root Super Admin',
+      permissions: ['all']
+    });
+  }
+
+  localStorage.setItem('gec_assigned_roles', JSON.stringify(allStaffRoles));
+
+  tbody.innerHTML = allStaffRoles.map(r => {
+    const isRoot = (r.email === 'pk3334238@gmail.com');
+    const permBadges = (r.permissions || []).map(p => {
+      if (p === 'all') return '<span class="badge" style="background:#dbeafe; color:#1e40af; font-weight:700;">Full Access</span>';
+      if (p === 'laundry') return '<span class="badge" style="background:#e0e7ff; color:#4338ca; font-weight:700;">🧺 Laundry Orders Only</span>';
+      if (p === 'notices') return '<span class="badge" style="background:#fef3c7; color:#b45309; font-weight:700;">📢 Notices Only</span>';
+      if (p === 'lostfound') return '<span class="badge" style="background:#f1f5f9; color:#475569; font-weight:700;">🎒 Lost &amp; Found Only</span>';
+      return `<span class="badge">${escapeHtml(p)}</span>`;
+    }).join(' ');
+
+    return `
+      <tr>
+        <td style="font-weight: 700; font-family: monospace;">${escapeHtml(r.email)}</td>
+        <td>${escapeHtml(r.name || 'Staff')}</td>
+        <td>
+          <span style="font-weight: 700; color: ${isRoot ? '#d97706' : '#2563eb'};">
+            ${isRoot ? '👑 ' : '🛡️ '} ${escapeHtml(r.role || 'Staff Manager')}
+          </span>
+        </td>
+        <td>${permBadges}</td>
+        <td><span class="badge badge-success">✓ Active</span></td>
+        <td>
+          ${isRoot ? '<span style="font-size:0.75rem; color:var(--text-muted);">Protected Root</span>' : `
+            <button type="button" class="btn btn-ghost btn-sm" style="color: #ef4444;" onclick="deleteStaffRole('${escapeHtml(r.email)}')">
+              Revoke
+            </button>
+          `}
+        </td>
+      </tr>
+    `;
+  }).join('');
+};
+
+window.handleAssignStaffRole = async function(event) {
+  event.preventDefault();
+  const emailInput = document.getElementById('staffUserEmail');
+  const nameInput = document.getElementById('staffUserName');
+  const roleSelect = document.getElementById('staffRoleSelect');
+
+  const email = (emailInput?.value || '').toLowerCase().trim();
+  const name = (nameInput?.value || '').trim();
+  const scope = roleSelect?.value || 'laundry';
+
+  if (!email || !name) {
+    alert('Please provide both email and staff name.');
+    return;
+  }
+
+  let roleLabel = 'Staff Manager';
+  let permissions = [scope];
+  if (scope === 'laundry') roleLabel = 'Laundry In-Charge';
+  else if (scope === 'notices') roleLabel = 'Notices Manager';
+  else if (scope === 'lostfound') roleLabel = 'Lost & Found Moderator';
+  else if (scope === 'listings') roleLabel = 'Listings Moderator';
+  else if (scope === 'all') {
+    roleLabel = 'Co-Admin';
+    permissions = ['all'];
+  }
+
+  const roleObj = { email, name, role: roleLabel, permissions };
+
+  try {
+    await fetch('https://gec-sheikhpura-backend.onrender.com/api/admin/roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(roleObj)
+    });
+  } catch (e) {}
+
+  const existingIdx = allStaffRoles.findIndex(r => r.email === email);
+  if (existingIdx >= 0) {
+    allStaffRoles[existingIdx] = roleObj;
+  } else {
+    allStaffRoles.push(roleObj);
+  }
+
+  localStorage.setItem('gec_assigned_roles', JSON.stringify(allStaffRoles));
+  showToast(`Staff permission granted to ${email} (${roleLabel})!`);
+
+  emailInput.value = '';
+  nameInput.value = '';
+  window.loadAdminStaffRoles();
+};
+
+window.deleteStaffRole = async function(email) {
+  if (email === 'pk3334238@gmail.com') {
+    alert('Root Super Admin cannot be removed.');
+    return;
+  }
+  if (!confirm(`Revoke admin/staff permissions for ${email}?`)) return;
+
+  try {
+    await fetch(`https://gec-sheikhpura-backend.onrender.com/api/admin/roles/${encodeURIComponent(email)}`, {
+      method: 'DELETE'
+    });
+  } catch (e) {}
+
+  allStaffRoles = allStaffRoles.filter(r => r.email !== email);
+  localStorage.setItem('gec_assigned_roles', JSON.stringify(allStaffRoles));
+  showToast(`Permissions revoked for ${email}`);
+  window.loadAdminStaffRoles();
 };

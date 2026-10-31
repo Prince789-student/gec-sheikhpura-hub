@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/components.css">
-  <!-- Strict Super Admin Authentication Guard -->
+  <!-- Admin Authentication & Role-Based Access Guard -->
   <script>
     (function() {
       try {
@@ -18,10 +18,31 @@
           return;
         }
         const session = JSON.parse(raw);
-        if (!session || (session.email || '').toLowerCase() !== 'pk3334238@gmail.com') {
+        if (!session || !session.email) {
+          localStorage.removeItem('gec_admin_session');
+          window.location.replace('login.html?notice=admin_auth_required');
+          return;
+        }
+
+        const email = (session.email || '').toLowerCase().trim();
+        const isSuperAdmin = (email === 'pk3334238@gmail.com');
+
+        // Check if assigned role exists
+        let assignedRoles = [];
+        try {
+          assignedRoles = JSON.parse(localStorage.getItem('gec_assigned_roles') || '[]');
+        } catch(e) {}
+        const staffRole = assignedRoles.find(r => (r.email || '').toLowerCase().trim() === email);
+
+        if (!isSuperAdmin && !staffRole && session.role !== 'Super Admin' && !session.permissions) {
           localStorage.removeItem('gec_admin_session');
           window.location.replace('login.html?notice=admin_unauthorized');
+          return;
         }
+
+        window.CURRENT_ADMIN_PERMISSIONS = isSuperAdmin ? ['all'] : ((staffRole && staffRole.permissions) || session.permissions || ['laundry']);
+        window.IS_SUPER_ADMIN = isSuperAdmin;
+        window.CURRENT_ADMIN_EMAIL = email;
       } catch (e) {
         window.location.replace('login.html?notice=admin_auth_required');
       }
@@ -320,8 +341,14 @@
           <button class="tool-nav-btn" data-admin-tab="lostFoundTab" data-category="alerts">
             🎒 Lost &amp; Found (<span id="tabLostFoundCount">0</span>)
           </button>
+          <button class="tool-nav-btn" data-admin-tab="laundryOrdersTab" data-category="alerts" id="btnLaundryOrdersTab">
+            🧺 Laundry Bookings (<span id="tabLaundryCount">0</span>)
+          </button>
 
           <!-- 5. System Operations & Logs Group -->
+          <button class="tool-nav-btn" data-admin-tab="staffRolesTab" data-category="system" id="btnStaffRolesTab">
+            👑 Staff Roles &amp; Permissions
+          </button>
           <button class="tool-nav-btn" data-admin-tab="analyticsTab" data-category="system">
             📊 Platform Analytics
           </button>
@@ -1701,6 +1728,141 @@
                   </tr>
                 </thead>
                 <tbody id="foodMessTableBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Student Laundry & Clothes Booking Management -->
+        <div class="admin-tab-panel" id="laundryOrdersTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge badge-primary" style="background: rgba(59, 130, 246, 0.15); color: #2563eb; font-weight: 700;">Hostel Laundry Services</span>
+                  <h3 class="calc-title" style="margin: 0;">🧺 Student Clothes &amp; Laundry Pickup Management</h3>
+                </div>
+                <p class="calc-desc" style="margin: 0; max-width: 820px;">
+                  Exclusive access for authorized laundry staff &amp; college admin. View student room numbers, hostel locations, and exact counts of shirts, pants, and bedsheets for pickup &amp; delivery.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminLaundryOrders()">
+                  🔄 Refresh Orders
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; background: var(--surface-2); padding: 0.75rem; border-radius: 8px;">
+              <div style="flex: 1; min-width: 200px;">
+                <input type="text" id="searchLaundryOrders" class="form-control" placeholder="Search by student name, room no, or phone..." oninput="filterAdminLaundryOrders()">
+              </div>
+              <div style="min-width: 170px;">
+                <select id="filterLaundryHostel" class="form-control" onchange="filterAdminLaundryOrders()">
+                  <option value="all">All Hostels / Locations</option>
+                  <option value="Hostel 1">Hostel 1 (Boys)</option>
+                  <option value="Hostel 2">Hostel 2 (Girls)</option>
+                  <option value="other">Other / Day Scholar</option>
+                </select>
+              </div>
+              <div style="min-width: 170px;">
+                <select id="filterLaundryStatus" class="form-control" onchange="filterAdminLaundryOrders()">
+                  <option value="all">All Pickup Status</option>
+                  <option value="Pending Pickup">Pending Pickup</option>
+                  <option value="In Wash">In Wash</option>
+                  <option value="Ironing / Ready">Ironing / Ready</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Table of Laundry Orders -->
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Order ID &amp; Time</th>
+                    <th>Student Details</th>
+                    <th>Hostel &amp; Room No</th>
+                    <th>Total Clothes</th>
+                    <th>Breakdown (Shirt / Pant / Bed)</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminLaundryOrdersBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Staff Roles & RBAC Permissions (Super Admin Prince Kumar Only) -->
+        <div class="admin-tab-panel" id="staffRolesTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge" style="background: rgba(217, 119, 6, 0.15); color: #d97706; font-weight: 700;">👑 Super Admin Controller</span>
+                  <h3 class="calc-title" style="margin: 0;">Staff Roles &amp; Scoped Permissions</h3>
+                </div>
+                <p class="calc-desc" style="margin: 0; max-width: 820px;">
+                  Root Super Admin: <strong>pk3334238@gmail.com (Prince Kumar)</strong>. Assign specific staff roles to any Google account (e.g. Laundry staff can only see and manage laundry clothes; Notices staff can only post notices).
+                </p>
+              </div>
+            </div>
+
+            <!-- Add / Assign Staff Permission Card -->
+            <div style="background: var(--surface-2); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border-light);">
+              <h4 style="margin: 0 0 0.75rem 0; font-size: 1rem;">+ Grant Scoped Staff Role to User</h4>
+              <form id="assignStaffRoleForm" onsubmit="handleAssignStaffRole(event)">
+                <div class="grid-cards-2" style="gap: 1rem; margin-bottom: 1rem;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="staffUserEmail">User Google Email *</label>
+                    <input type="email" id="staffUserEmail" class="form-control" placeholder="staff.gec@gmail.com" required>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="staffUserName">Staff Full Name / Label *</label>
+                    <input type="text" id="staffUserName" class="form-control" placeholder="e.g. Ramesh (Laundry In-Charge)" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="staffRoleSelect">Assigned Permission Scope *</label>
+                  <select id="staffRoleSelect" class="form-control" required>
+                    <option value="laundry" selected>🧺 Laundry Orders Only (Can ONLY view &amp; manage student laundry)</option>
+                    <option value="notices">📢 Notices &amp; Circulars Manager Only</option>
+                    <option value="lostfound">🎒 Lost &amp; Found Desk Manager Only</option>
+                    <option value="listings">🏪 PG, Food &amp; Shop Listings Moderator</option>
+                    <option value="all">👑 Co-Admin (Full Hub Access)</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-sm" id="btnSaveStaffRole">
+                  ✓ Grant Staff Permission
+                </button>
+              </form>
+            </div>
+
+            <!-- Table of Assigned Roles -->
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Email Address</th>
+                    <th>Staff Name</th>
+                    <th>Role Designation</th>
+                    <th>Authorized Permissions</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminStaffRolesBody">
                   <!-- Injected via admin.js -->
                 </tbody>
               </table>

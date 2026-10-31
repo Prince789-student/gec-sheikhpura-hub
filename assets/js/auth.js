@@ -58,8 +58,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     clientIdInput.value = getGoogleClientId();
   }
 
-  // If already logged in, check profile completeness
+  // If already logged in, check admin or profile completeness
   if (window.DB) {
+    const adminSession = await window.DB.getAdminSession();
+    if (adminSession && adminSession.email && !window.location.search.includes('force=1')) {
+      window.location.href = 'admin.html';
+      return;
+    }
+
     const sessionUser = await window.DB.getStudentSession();
     if (sessionUser) {
       const profile = await window.DB.getStudentProfile(sessionUser.id);
@@ -78,6 +84,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     switchAuthTab('signup');
   } else if (params.get('tab') === 'reset' || params.get('type') === 'recovery') {
     switchAuthTab('reset');
+  }
+
+  // Display user-friendly banner if redirected from protected pages
+  const notice = params.get('notice');
+  if (notice === 'admin_auth_required') {
+    showAuthAlert('🔒 Admin sign-in required: Please sign in with your authorized Google Account.', 'info');
+  } else if (notice === 'admin_unauthorized') {
+    showAuthAlert('⚠️ Access Restricted: This email is not assigned admin or staff permissions.', 'error');
   }
 });
 
@@ -315,15 +329,36 @@ async function processFirebaseAuthenticatedUser(u) {
     }
   }
 
+  // Check for assigned staff roles
+  let assignedRoles = [];
+  try {
+    assignedRoles = JSON.parse(localStorage.getItem('gec_assigned_roles') || '[]');
+  } catch (e) {}
+  const staffRole = assignedRoles.find(r => (r.email || '').toLowerCase().trim() === email);
+
   if (isSuperAdmin) {
     localStorage.setItem('gec_admin_session', JSON.stringify({
       admin_id: 'adm_prince',
       email: 'pk3334238@gmail.com',
       role: 'Super Admin',
+      permissions: ['all'],
       full_name: 'Prince Kumar',
       login_time: new Date().toISOString()
     }));
     showAuthAlert(`👑 Welcome Prince Kumar! Super Admin verified. Opening Admin Panel...`, 'success');
+    setTimeout(() => {
+      window.location.href = 'admin.html';
+    }, 600);
+  } else if (staffRole) {
+    localStorage.setItem('gec_admin_session', JSON.stringify({
+      admin_id: 'adm_' + (staffRole.id || Math.random().toString(36).substring(2, 8)),
+      email: email,
+      role: staffRole.role || 'Staff Manager',
+      permissions: staffRole.permissions || ['laundry'],
+      full_name: staffRole.name || name,
+      login_time: new Date().toISOString()
+    }));
+    showAuthAlert(`🛡️ Welcome ${name}! Staff access verified (${staffRole.role}). Opening Admin Panel...`, 'success');
     setTimeout(() => {
       window.location.href = 'admin.html';
     }, 600);

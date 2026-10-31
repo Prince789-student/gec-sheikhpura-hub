@@ -244,12 +244,90 @@ class DataService {
     }
   }
 
+  Future<void> fetchLiveLaundryOrders({String? studentEmail, bool isStaffOrAdmin = false}) async {
+    try {
+      final url = isStaffOrAdmin
+          ? '$apiBase/api/laundry/orders?role=laundry_manager'
+          : (studentEmail != null && studentEmail.isNotEmpty
+              ? '$apiBase/api/laundry/orders?email=${Uri.encodeComponent(studentEmail)}'
+              : '$apiBase/api/laundry/orders');
+      final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        if (data is Map && data['orders'] is List) {
+          final list = (data['orders'] as List)
+              .map((m) => LaundryOrder.fromMap(m as Map<String, dynamic>))
+              .toList();
+          if (isStaffOrAdmin) {
+            allLaundryOrders.clear();
+            allLaundryOrders.addAll(list);
+          } else {
+            studentLaundryOrders.clear();
+            studentLaundryOrders.addAll(list);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Live laundry orders fetch notice: $e');
+    }
+  }
+
+  Future<bool> submitLaundryOrder(LaundryOrder order) async {
+    studentLaundryOrders.insert(0, order);
+    try {
+      final res = await http.post(
+        Uri.parse('$apiBase/api/laundry/orders'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(order.toMap()),
+      ).timeout(const Duration(seconds: 8));
+      return (res.statusCode == 200 || res.statusCode == 201);
+    } catch (e) {
+      debugPrint('Laundry submit notice: $e');
+      return true; // Saved locally
+    }
+  }
+
+  Future<void> updateLaundryOrderStatus(String orderId, String newStatus) async {
+    final idx = allLaundryOrders.indexWhere((o) => o.id == orderId);
+    if (idx != -1) {
+      final old = allLaundryOrders[idx];
+      allLaundryOrders[idx] = LaundryOrder(
+        id: old.id,
+        studentName: old.studentName,
+        studentEmail: old.studentEmail,
+        studentPhone: old.studentPhone,
+        regNo: old.regNo,
+        shirtsCount: old.shirtsCount,
+        pantsCount: old.pantsCount,
+        bedsheetsCount: old.bedsheetsCount,
+        othersCount: old.othersCount,
+        totalClothes: old.totalClothes,
+        roomNo: old.roomNo,
+        hostelName: old.hostelName,
+        locationDetails: old.locationDetails,
+        notes: old.notes,
+        status: newStatus,
+        createdAt: old.createdAt,
+      );
+    }
+    try {
+      await http.patch(
+        Uri.parse('$apiBase/api/laundry/orders/$orderId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'status': newStatus}),
+      ).timeout(const Duration(seconds: 8));
+    } catch (e) {
+      debugPrint('Update laundry status notice: $e');
+    }
+  }
+
   Future<void> refreshAll() async {
     await Future.wait([
       fetchLiveNotices(),
       fetchLiveListings(),
       fetchLiveLostFound(),
       fetchLiveEvents(),
+      fetchLiveLaundryOrders(),
     ]);
   }
 
@@ -401,127 +479,14 @@ class DataService {
     await prefs.setBool(_themeModeKey, isDark);
   }
 
-  // --- 1. Seed Rooms Repository ---
-  final List<RoomListing> sampleRooms = [
-    const RoomListing(
-      id: 'room-1',
-      title: 'Maa Sharda Boys Hostel & PG',
-      roomType: 'Double Sharing',
-      rentMonthly: 2200,
-      distanceToCampus: '400m from College Gate',
-      address: 'Bajidpur Main Road, Near Police Line, Sheikhpura',
-      amenities: ['24x7 Water', 'Inverter Backup', 'Wi-Fi 50Mbps', 'Bike Parking'],
-      phone: '06341-223401',
-      isVerified: true,
-    ),
-    const RoomListing(
-      id: 'room-2',
-      title: 'Annapurna Student Residency',
-      roomType: 'Single Room',
-      rentMonthly: 3200,
-      distanceToCampus: '650m from Campus',
-      address: 'Bajidpur Chowk, Behind Canteen, Sheikhpura',
-      amenities: ['Attached Washroom', 'Ceiling Fan', 'Study Desk', 'RO Purifier'],
-      phone: '06341-223402',
-      isVerified: true,
-    ),
-    const RoomListing(
-      id: 'room-3',
-      title: 'Shree Balaji Girls PG & Safe Stay',
-      roomType: 'Double Sharing + Food',
-      rentMonthly: 4500,
-      distanceToCampus: '500m from Campus',
-      address: 'Near Old Circuit House, Sheikhpura',
-      amenities: ['3 Times Meals', 'CCTV Security', 'Female Warden', 'Full Power Backup'],
-      phone: '06341-223403',
-      isVerified: true,
-    ),
-    const RoomListing(
-      id: 'room-4',
-      title: 'Kishan Bhavan Shared Student Flat',
-      roomType: '3-Bed Shared',
-      rentMonthly: 1600,
-      distanceToCampus: '900m from Campus',
-      address: 'Station Road, Near Bypass, Sheikhpura',
-      amenities: ['Self-Cooking Kitchen', 'Water Cooler', 'Open Balcony'],
-      phone: '06341-223404',
-      isVerified: true,
-    ),
-  ];
+  // --- 1. Rooms Repository (Live from Admin / Server) ---
+  final List<RoomListing> sampleRooms = [];
 
-  // --- 2. Seed Food Services ---
-  final List<FoodService> sampleFood = [
-    const FoodService(
-      id: 'food-1',
-      name: 'Maa Vaishno Tiffin Service',
-      serviceType: 'Monthly Mess / Tiffin',
-      monthlyCharge: 2400,
-      deliveryAvailable: true,
-      menuSummary: 'Roti (4), Sabzi, Dal Tadka, Jeera Rice, Salad, Pickle. Kheer on Sundays.',
-      phone: '06341-224501',
-      rating: 4.8,
-    ),
-    const FoodService(
-      id: 'food-2',
-      name: 'Bajidpur Student Canteen & Bhojanalaya',
-      serviceType: 'Dine-In / Quick Lunch',
-      monthlyCharge: 2200,
-      deliveryAvailable: false,
-      menuSummary: 'Unlimited Rice + Dal + seasonal vegetable sabzi, Roti combo ₹40.',
-      phone: '06341-224502',
-      rating: 4.5,
-    ),
-    const FoodService(
-      id: 'food-3',
-      name: 'Pooja Tiffin & Home Delivery',
-      serviceType: 'Doorstep Hostel Delivery',
-      monthlyCharge: 2600,
-      deliveryAvailable: true,
-      menuSummary: 'Fresh home-style cooking, pure mustard oil, special Paneer on Wednesday.',
-      phone: '06341-224503',
-      rating: 4.7,
-    ),
-  ];
+  // --- 2. Food & Mess Services (Live from Admin / Server) ---
+  final List<FoodService> sampleFood = [];
 
-  // --- 3. Nearby Shops & Laundry ---
-  final List<NearbyShop> sampleShops = [
-    const NearbyShop(
-      id: 'shop-1',
-      name: 'Gayatri Stationery, Xerox & Cyber Desk',
-      category: 'Stationery & Printing',
-      location: 'Opposite GEC College Gate, Bajidpur',
-      timing: '08:00 AM – 09:30 PM',
-      phone: '06341-225601',
-      services: 'BEU Exam forms printout, B.Tech Lab manuals spiral binding, drafters, chart papers, ₹1 xerox.',
-    ),
-    const NearbyShop(
-      id: 'shop-2',
-      name: 'Bajidpur Student Laundry & Ironing Hub',
-      category: 'Laundry & Ironing',
-      location: 'Near Police Line More, Bajidpur',
-      timing: '07:00 AM – 08:00 PM',
-      phone: '06341-225602',
-      services: '₹8/shirt, ₹10/jeans steam press. Monthly hostel pickup & delivery plan at ₹450 (40 clothes).',
-    ),
-    const NearbyShop(
-      id: 'shop-3',
-      name: 'Sanjeevani Medicos & First Aid Store',
-      category: 'Pharmacy & Medical',
-      location: 'Bajidpur Hospital More, Sheikhpura',
-      timing: '24 Hours Open',
-      phone: '06341-225603',
-      services: 'All generic medicines, ORS, fever tablets, bandages, antiseptic, BP/Sugar testing.',
-    ),
-    const NearbyShop(
-      id: 'shop-4',
-      name: 'Maa Durga General & Student Grocery Store',
-      category: 'Groceries & Daily Essentials',
-      location: 'Near Hostel 1 Lane, Bajidpur',
-      timing: '06:30 AM – 10:00 PM',
-      phone: '06341-225604',
-      services: 'Milk, bread, eggs, Maggie, room dustbins, buckets, LED bulbs, electric kettle.',
-    ),
-  ];
+  // --- 3. Nearby Shops (Live from Admin / Server) ---
+  final List<NearbyShop> sampleShops = [];
 
   // --- 4. Sheikhpura Transport Routes ---
   final List<TransportRoute> transportRoutes = [
@@ -570,76 +535,18 @@ class DataService {
   // --- 5. College Events Directory (Live from Backend / Admin) ---
   final List<EventItem> sampleEvents = [];
 
-  // --- 6. Clubs & Societies ---
-  final List<ClubItem> sampleClubs = [
-    const ClubItem(
-      id: 'club-1',
-      name: 'CodeCraft CSE & Dev Club',
-      category: 'Technical & Coding',
-      memberCount: 86,
-      leadName: 'Aman Verma (CSE 4th Year)',
-      leadContact: 'codecraft.gecskp@gmail.com',
-      description: 'Open source development, competitive programming, web frameworks, and hackathons.',
-    ),
-    const ClubItem(
-      id: 'club-2',
-      name: 'Yantrika Robotics & Innovation Society',
-      category: 'Robotics & Hardware',
-      memberCount: 54,
-      leadName: 'Priya Sharma (EE 3rd Year)',
-      leadContact: 'robotics.gecskp@gmail.com',
-      description: 'Arduino, drone prototyping, IoT campus automation, and national robotics challenges.',
-    ),
-    const ClubItem(
-      id: 'club-3',
-      name: 'Sheikhpura Sports & Athletics Association',
-      category: 'Recreation & Fitness',
-      memberCount: 112,
-      leadName: 'Rohit Raj (Civil 4th Year)',
-      leadContact: 'sports.gecskp@gmail.com',
-      description: 'Coordinates annual sports meet, weekend badminton matches, and cricket league.',
-    ),
-  ];
+  // --- 6. Clubs & Societies (Live from Admin) ---
+  final List<ClubItem> sampleClubs = [];
 
   // --- 7. Sports & Squads Matches (Live Student & Admin Matches) ---
   final List<SportsSquad> sportsSquads = [];
 
-  // --- 8. Lost & Found Items ---
-  final List<LostFoundItem> lostFoundItems = [
-    const LostFoundItem(
-      id: 'lf-1',
-      title: 'Lost Casio fx-991ES Plus Scientific Calculator',
-      itemType: 'Lost',
-      category: 'Electronics',
-      location: 'Classroom 204 (after 3rd period)',
-      dateStr: '28 Oct 2026',
-      contactPerson: 'Aman Kumar (CSE 3rd Year)',
-      contactPhone: '06341-224401',
-      description: 'Black calculator with blue batch sticker on back cover. Urgent for maths internals.',
-    ),
-    const LostFoundItem(
-      id: 'lf-2',
-      title: 'Found College ID Card (Civil 2nd Year)',
-      itemType: 'Found',
-      category: 'Document',
-      location: 'Central Library Reading Desk 4',
-      dateStr: '29 Oct 2026',
-      contactPerson: 'Library Security Desk',
-      contactPhone: '06341-224402',
-      description: 'Belongs to Roll 23CE14. Deposited with central librarian counter.',
-    ),
-    const LostFoundItem(
-      id: 'lf-3',
-      title: 'Found Room Key Bundle with Marvel Keychain',
-      itemType: 'Found',
-      category: 'Keys',
-      location: 'Campus Canteen Entrance',
-      dateStr: '30 Oct 2026',
-      contactPerson: 'Canteen Cash Counter',
-      contactPhone: '06341-224403',
-      description: 'Set of 3 keys with Iron Man metallic ring. Claim from canteen owner.',
-    ),
-  ];
+  // --- 8. Lost & Found Items (Live from Backend) ---
+  final List<LostFoundItem> lostFoundItems = [];
+
+  // --- 9. Student Laundry Orders (Live & Role-Gated) ---
+  final List<LaundryOrder> studentLaundryOrders = [];
+  final List<LaundryOrder> allLaundryOrders = [];
 
   // --- 9. Campus Notices & Circulars ---
   final List<CampusNotice> campusNotices = [

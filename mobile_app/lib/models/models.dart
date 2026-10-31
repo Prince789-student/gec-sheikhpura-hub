@@ -319,3 +319,88 @@ class UserModel {
   }
 }
 
+class LaundryOrder {
+  final String id;
+  final String studentName;
+  final String studentEmail;
+  final String studentPhone;
+  final String regNo;
+  final int shirtsCount;
+  final int pantsCount;
+  final int bedsheetsCount;
+  final int othersCount;
+  final int totalClothes;
+  final String roomNo;
+  final String hostelName;
+  final String locationDetails;
+  final String notes;
+  final String status;
+  final String createdAt;
+
+  const LaundryOrder({
+    required this.id,
+    required this.studentName,
+    required this.studentEmail,
+    required this.studentPhone,
+    this.regNo = '',
+    required this.shirtsCount,
+    required this.pantsCount,
+    required this.bedsheetsCount,
+    this.othersCount = 0,
+    required this.totalClothes,
+    required this.roomNo,
+    required this.hostelName,
+    this.locationDetails = '',
+    this.notes = '',
+    this.status = 'Pending Pickup',
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'studentName': studentName,
+      'studentEmail': studentEmail,
+      'studentPhone': studentPhone,
+      'regNo': regNo,
+      'shirtsCount': shirtsCount,
+      'pantsCount': pantsCount,
+      'bedsheetsCount': bedsheetsCount,
+      'othersCount': othersCount,
+      'totalClothes': totalClothes,
+      'roomNo': roomNo,
+      'hostelName': hostelName,
+      'locationDetails': locationDetails,
+      'notes': notes,
+      'status': status,
+      'createdAt': createdAt,
+    };
+  }
+
+  factory LaundryOrder.fromMap(Map<String, dynamic> map) {
+    return LaundryOrder(
+      id: map['id'] as String? ?? 'lnd_${DateTime.now().millisecondsSinceEpoch}',
+      studentName: map['studentName'] as String? ?? 'Student',
+      studentEmail: map['studentEmail'] as String? ?? '',
+      studentPhone: map['studentPhone'] as String? ?? '',
+      regNo: map['regNo'] as String? ?? '',
+      shirtsCount: map['shirtsCount'] as int? ?? 0,
+      pantsCount: map['pantsCount'] as int? ?? 0,
+      bedsheetsCount: map['bedsheetsCount'] as int? ?? 0,
+      othersCount: map['othersCount'] as int? ?? 0,
+      totalClothes: map['totalClothes'] as int? ??
+          ((map['shirtsCount'] as int? ?? 0) +
+              (map['pantsCount'] as int? ?? 0) +
+              (map['bedsheetsCount'] as int? ?? 0) +
+              (map['othersCount'] as int? ?? 0)),
+      roomNo: map['roomNo'] as String? ?? '',
+      hostelName: map['hostelName'] as String? ?? 'Hostel 1',
+      locationDetails: map['locationDetails'] as String? ?? '',
+      notes: map['notes'] as String? ?? '',
+      status: map['status'] as String? ?? 'Pending Pickup',
+      createdAt: map['createdAt'] as String? ?? DateTime.now().toIso8601String(),
+    );
+  }
+}
+
+

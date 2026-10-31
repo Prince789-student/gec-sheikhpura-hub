@@ -238,60 +238,6 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  void _showCustomGoogleDialog() {
-    final emailCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.account_circle, color: AppTheme.primaryNavy),
-            SizedBox(width: 8),
-            Text('Sign in with Google ID', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Enter your Google account email to log in:',
-              style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: emailCtrl,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Google Email',
-                hintText: 'student@gmail.com',
-                prefixIcon: Icon(Icons.email_outlined),
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryNavy),
-            onPressed: () {
-              final em = emailCtrl.text.trim();
-              if (em.isNotEmpty) {
-                Navigator.pop(ctx);
-                _handleDirectSignIn(email: em);
-              }
-            },
-            child: const Text('Sign In', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -501,41 +447,6 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           ],
                         ),
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              // 2. Direct Admin Sign-in (pk3334238@gmail.com)
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton.icon(
-                  onPressed: _isLoading ? null : () => _handleDirectSignIn(email: 'pk3334238@gmail.com', customName: 'Prince Kumar'),
-                  icon: const Icon(Icons.shield, size: 18, color: Color(0xFFD97706)),
-                  label: const Text(
-                    'Login as College Admin (Prince Kumar)',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFD97706),
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    side: const BorderSide(color: Color(0xFFD97706), width: 1.2),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              // 3. Or enter another Google ID
-              TextButton(
-                onPressed: _isLoading ? null : _showCustomGoogleDialog,
-                child: const Text(
-                  'Or enter another Google email manually',
-                  style: TextStyle(fontSize: 12.5, color: AppTheme.accentSky),
                 ),
               ),
             ],

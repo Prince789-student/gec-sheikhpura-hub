@@ -706,20 +706,40 @@ class HubDatabaseService {
   }
 
   async getStudentSession() {
-    if (this.isLive()) {
-      const { data } = await this.client.auth.getSession();
-      return (data && data.session && data.session.user) || null;
-    }
+    // 1. Primary check: localStorage student session (from Google Auth / Firebase / Phone)
     try {
-      return JSON.parse(localStorage.getItem('gec_student_session') || 'null');
+      const local = JSON.parse(localStorage.getItem('gec_student_session') || 'null');
+      if (local && (local.id || local.email)) {
+        return local;
+      }
     } catch (e) {
-      console.warn("Corrupted gec_student_session in localStorage, resetting:", e);
-      localStorage.removeItem('gec_student_session');
-      return null;
+      console.warn("Corrupted gec_student_session in localStorage:", e);
     }
+
+    // 2. Fallback check: Supabase live auth session
+    if (this.isLive()) {
+      try {
+        const { data } = await this.client.auth.getSession();
+        if (data && data.session && data.session.user) {
+          return data.session.user;
+        }
+      } catch (e) {}
+    }
+    return null;
   }
 
   async getAdminSession() {
+    // 1. Primary check: localStorage admin session (from Super Admin or scoped admin)
+    try {
+      const localAdmin = JSON.parse(localStorage.getItem('gec_admin_session') || 'null');
+      if (localAdmin && (localAdmin.email || localAdmin.admin_id)) {
+        return localAdmin;
+      }
+    } catch (e) {
+      console.warn("Corrupted gec_admin_session in localStorage:", e);
+    }
+
+    // 2. Fallback check: Supabase live admin session
     if (this.isLive()) {
       try {
         const { data } = await this.client.auth.getSession();
@@ -733,9 +753,8 @@ class HubDatabaseService {
       } catch (e) {
         console.warn("Could not check live admin session:", e);
       }
-      return null;
     }
-    return JSON.parse(localStorage.getItem('gec_admin_session') || 'null');
+    return null;
   }
 
   async adminSignIn(email, password) {
