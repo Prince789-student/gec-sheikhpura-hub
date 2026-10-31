@@ -157,3 +157,4 @@ graph LR
 1. **Student Data Privacy**: Registration numbers, mobile phone numbers, and hostel room numbers are strictly masked from unverified users and public API endpoints.
 2. **Authoritative State Transitions**: Match timers (especially Kabaddi 20m + 20m and Basketball quarters) use server timestamps rather than client timers to prevent clock manipulation.
 3. **Audit Trail**: Every score correction, tie resolution, and administrative permission grant creates a timestamped record in `audit_logs`.
+

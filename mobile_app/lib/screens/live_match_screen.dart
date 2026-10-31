@@ -223,6 +223,8 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final isCricket = _match.sportName.toLowerCase().contains('cricket');
     final isKabaddi = _match.sportName.toLowerCase().contains('kabaddi');
+    final isBasketball = _match.sportName.toLowerCase().contains('basketball');
+    final isFootball = _match.sportName.toLowerCase().contains('football') || _match.sportName.toLowerCase().contains('soccer');
 
     final currentUser = AuthService.instance.currentUser.value;
     final canScore = currentUser != null && (currentUser.isAdmin || currentUser.email == 'pk3334238@gmail.com' || currentUser.email == _match.scorekeeperName);
@@ -477,8 +479,10 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                           runSpacing: 8,
                           children: [
                             _buildScoreBtn('+1 Raid Pt', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'raid', pointsDelta: 1, notes: 'Touch Point')),
+                            _buildScoreBtn('+1 Bonus', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'bonus', pointsDelta: 1, notes: 'Bonus Point')),
                             _buildScoreBtn('+2 Super Raid', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'super_raid', pointsDelta: 2, notes: 'Super Raid!'), color: AppTheme.accentSky),
                             _buildScoreBtn('+1 Tackle', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'tackle', pointsDelta: 1, notes: 'Successful Tackle')),
+                            _buildScoreBtn('+2 Super Tackle', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'super_tackle', pointsDelta: 2, notes: 'Super Tackle!'), color: AppTheme.primaryBlue),
                             _buildScoreBtn('+2 All Out', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'all_out', pointsDelta: 2, notes: 'Opponent All Out'), color: AppTheme.primaryNavy),
                           ],
                         ),
@@ -490,8 +494,69 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                           runSpacing: 8,
                           children: [
                             _buildScoreBtn('+1 Raid Pt', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'raid', pointsDelta: 1, notes: 'Touch Point')),
+                            _buildScoreBtn('+1 Bonus', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'bonus', pointsDelta: 1, notes: 'Bonus Point')),
+                            _buildScoreBtn('+2 Super Raid', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'super_raid', pointsDelta: 2, notes: 'Super Raid!'), color: AppTheme.accentSky),
                             _buildScoreBtn('+1 Tackle', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'tackle', pointsDelta: 1, notes: 'Successful Tackle')),
+                            _buildScoreBtn('+2 Super Tackle', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'super_tackle', pointsDelta: 2, notes: 'Super Tackle!'), color: AppTheme.primaryBlue),
                             _buildScoreBtn('+2 All Out', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'all_out', pointsDelta: 2, notes: 'Opponent All Out'), color: AppTheme.primaryNavy),
+                          ],
+                        ),
+                      ],
+
+                      // Scoring Actions for Basketball (Module 3.3)
+                      if (isBasketball) ...[
+                        Text('Basketball Scoring for ${_match.teamAName}:', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _buildScoreBtn('+1 Free Throw', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'basketball_1pt', pointsDelta: 1, notes: 'Free throw')),
+                            _buildScoreBtn('+2 Field Goal', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'basketball_2pt', pointsDelta: 2, notes: '2-pt basket'), color: AppTheme.primaryBlue),
+                            _buildScoreBtn('+3 Three-Pointer', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'basketball_3pt', pointsDelta: 3, notes: '3-pt shot!'), color: AppTheme.accentSky),
+                            _buildScoreBtn('Personal Foul', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'basketball_foul', pointsDelta: 0, notes: 'Personal foul charged'), color: AppTheme.warningAmber),
+                            _buildScoreBtn('Timeout', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'basketball_timeout', pointsDelta: 0, notes: 'Timeout called')),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text('Basketball Scoring for ${_match.teamBName}:', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _buildScoreBtn('+1 Free Throw', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'basketball_1pt', pointsDelta: 1, notes: 'Free throw')),
+                            _buildScoreBtn('+2 Field Goal', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'basketball_2pt', pointsDelta: 2, notes: '2-pt basket'), color: AppTheme.primaryBlue),
+                            _buildScoreBtn('+3 Three-Pointer', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'basketball_3pt', pointsDelta: 3, notes: '3-pt shot!'), color: AppTheme.accentSky),
+                            _buildScoreBtn('Personal Foul', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'basketball_foul', pointsDelta: 0, notes: 'Personal foul charged'), color: AppTheme.warningAmber),
+                            _buildScoreBtn('Timeout', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'basketball_timeout', pointsDelta: 0, notes: 'Timeout called')),
+                          ],
+                        ),
+                      ],
+
+                      // General Other Sports Scoring (Football, Volleyball, Badminton, Table Tennis)
+                      if (!isCricket && !isKabaddi && !isBasketball) ...[
+                        Text('Score for ${_match.teamAName}:', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _buildScoreBtn(isFootball ? '+1 Goal' : '+1 Point', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'point', pointsDelta: 1, notes: 'Score point'), color: AppTheme.primaryBlue),
+                            _buildScoreBtn('+2 Points', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'point', pointsDelta: 2, notes: 'Two points')),
+                            _buildScoreBtn('Card / Penalty', () => _recordScoringEvent(teamName: _match.teamAName, eventType: 'penalty', pointsDelta: 0, notes: 'Penalty / Card issued'), color: AppTheme.dangerRed),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text('Score for ${_match.teamBName}:', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _buildScoreBtn(isFootball ? '+1 Goal' : '+1 Point', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'point', pointsDelta: 1, notes: 'Score point'), color: AppTheme.primaryBlue),
+                            _buildScoreBtn('+2 Points', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'point', pointsDelta: 2, notes: 'Two points')),
+                            _buildScoreBtn('Card / Penalty', () => _recordScoringEvent(teamName: _match.teamBName, eventType: 'penalty', pointsDelta: 0, notes: 'Penalty / Card issued'), color: AppTheme.dangerRed),
                           ],
                         ),
                       ],

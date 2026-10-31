@@ -263,7 +263,8 @@
 
         <!-- Category Filter Bar (Ergonomic Navigation across 24 Hubs) -->
         <div class="tab-category-filter-bar">
-          <button type="button" class="tab-cat-btn active" data-tab-cat="all">All Management Hubs (24)</button>
+          <button type="button" class="tab-cat-btn active" data-tab-cat="all">All Management Hubs (28)</button>
+          <button type="button" class="tab-cat-btn" data-tab-cat="sports">🏆 Sports &amp; Tournaments (4)</button>
           <button type="button" class="tab-cat-btn" data-tab-cat="moderation">🛡️ Moderation &amp; Reviews (6)</button>
           <button type="button" class="tab-cat-btn" data-tab-cat="directory">🏛️ Campus Directory (7)</button>
           <button type="button" class="tab-cat-btn" data-tab-cat="academic">🎓 Academic &amp; External (3)</button>
@@ -357,6 +358,20 @@
           </button>
           <button class="tool-nav-btn" data-admin-tab="verificationsTab" data-category="system">
             🛡️ Verification &amp; Audit Logs
+          </button>
+
+          <!-- 6. Sports & Tournaments Master Admin Group -->
+          <button class="tool-nav-btn" data-admin-tab="sportsDirectoryTab" data-category="sports" id="btnSportsDirectoryTab">
+            🏅 38 Sports Directory (<span id="tabSportsCount">38</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="matchFixturesTab" data-category="sports" id="btnMatchFixturesTab">
+            ⚡ Match Fixtures &amp; Scheduler (<span id="tabMatchesCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="teamRegistrationsTab" data-category="sports" id="btnTeamRegistrationsTab">
+            👥 Squad Registrations (<span id="tabTeamsCount">0</span>)
+          </button>
+          <button class="tool-nav-btn" data-admin-tab="culturalCompetitionsTab" data-category="sports" id="btnCulturalCompetitionsTab">
+            🎭 Cultural Competitions (<span id="tabCulturalCount">10</span>)
           </button>
         </div>
 
@@ -1802,6 +1817,192 @@
           </div>
         </div>
 
+        <!-- Tab: 38 Sports Directory Desk -->
+        <div class="admin-tab-panel" id="sportsDirectoryTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0 0 0.25rem 0;">🏅 Official 38 Sports Directory &amp; Rules</h3>
+                <p class="calc-desc" style="margin: 0;">Configure active sports, squad boundaries (Playing XI / 7s / Relays), and isolated scoring engines.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminSportsDirectory()">↻ Refresh Sports</button>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Sport Name</th>
+                    <th>Code</th>
+                    <th>Category</th>
+                    <th>Playing Squad</th>
+                    <th>Total Squad</th>
+                    <th>Scoring Engine</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="adminSportsDirectoryBody">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Manual Match Fixtures & Scheduler Desk -->
+        <div class="admin-tab-panel" id="matchFixturesTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0 0 0.25rem 0;">⚡ Manual Fixture &amp; Match Scheduler Desk</h3>
+                <p class="calc-desc" style="margin: 0;">Strictly manual pairing per tournament guidelines. Pair Team A vs Team B with authoritative venue, referee and scorekeeper.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminMatches()">↻ Refresh Fixtures</button>
+            </div>
+
+            <!-- Manual Scheduling Form -->
+            <div style="background: var(--surface-2); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border-light);">
+              <h4 style="margin: 0 0 0.75rem 0; font-size: 1rem;">+ Schedule New Match (Manual Pairing)</h4>
+              <form id="adminScheduleMatchForm" onsubmit="handleAdminScheduleMatch(event)">
+                <div class="grid-cards-2" style="gap: 1rem; margin-bottom: 1rem;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Sport *</label>
+                    <select id="adminSchedSport" class="form-control" required>
+                      <option value="Cricket">Cricket (T20 / 10-Over)</option>
+                      <option value="Kabaddi">Kabaddi (20m Halves)</option>
+                      <option value="Basketball">Basketball (4 Quarters)</option>
+                      <option value="Volleyball">Volleyball</option>
+                      <option value="Football">Football</option>
+                      <option value="Badminton">Badminton</option>
+                      <option value="Table Tennis">Table Tennis</option>
+                      <option value="Chess">Chess</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Tournament / Round *</label>
+                    <input type="text" id="adminSchedRound" class="form-control" placeholder="e.g. Shaurya Cup — Quarter Final 1" required>
+                  </div>
+                </div>
+
+                <div class="grid-cards-2" style="gap: 1rem; margin-bottom: 1rem;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Team A Name *</label>
+                    <input type="text" id="adminSchedTeamA" class="form-control" placeholder="e.g. CSE Titans" required>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Team B Name *</label>
+                    <input type="text" id="adminSchedTeamB" class="form-control" placeholder="e.g. Mechanical Royals" required>
+                  </div>
+                </div>
+
+                <div class="grid-cards-2" style="gap: 1rem; margin-bottom: 1rem;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Match Date &amp; Time *</label>
+                    <input type="datetime-local" id="adminSchedDateTime" class="form-control" required>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Venue / Court *</label>
+                    <input type="text" id="adminSchedVenue" class="form-control" placeholder="e.g. College Main Sports Ground, Bajidpur" required>
+                  </div>
+                </div>
+
+                <div class="grid-cards-2" style="gap: 1rem; margin-bottom: 1rem;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Designated Referee / Umpire</label>
+                    <input type="text" id="adminSchedReferee" class="form-control" placeholder="e.g. Prof. R. Sharma (Sports Officer)">
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Authorized Scorekeeper (Google Email)</label>
+                    <input type="email" id="adminSchedScorekeeper" class="form-control" placeholder="scorekeeper@gmail.com">
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-sm" id="btnAdminScheduleSubmit">
+                  ✓ Schedule &amp; Publish Fixture
+                </button>
+              </form>
+            </div>
+
+            <!-- Table of Scheduled & Live Matches -->
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Match ID</th>
+                    <th>Sport</th>
+                    <th>Round</th>
+                    <th>Team A vs Team B</th>
+                    <th>Score / Status</th>
+                    <th>Venue &amp; Time</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminMatchesBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Team Registrations Desk -->
+        <div class="admin-tab-panel" id="teamRegistrationsTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0 0 0.25rem 0;">👥 Team &amp; Squad Registrations Review Desk</h3>
+                <p class="calc-desc" style="margin: 0;">Review submitted squads (Cricket Playing XI, Kabaddi 7s, Basketball). Mandatory organizer approval — no automatic approvals.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminTeams()">↻ Refresh Teams</button>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Team Name</th>
+                    <th>Sport</th>
+                    <th>Captain</th>
+                    <th>Branch</th>
+                    <th>Playing / Squad</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTeamsBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Cultural Competitions Desk -->
+        <div class="admin-tab-panel" id="culturalCompetitionsTab" style="display: none;">
+          <div class="calc-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 class="calc-title" style="margin: 0 0 0.25rem 0;">🎭 Cultural Competitions &amp; Judge Scoring Desk</h3>
+                <p class="calc-desc" style="margin: 0;">10 official categories. 3-criteria judge scoring (Content 40, Delivery 30, Originality 30) with official podium publication.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadAdminCultural()">↻ Refresh Cultural Desk</button>
+            </div>
+            <div class="table-responsive">
+              <table class="hub-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Venue &amp; Time</th>
+                    <th>Registered</th>
+                    <th>Judge Criteria</th>
+                    <th>Podium (1st, 2nd, 3rd)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminCulturalBody">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         <!-- Tab: Staff Roles & RBAC Permissions (Super Admin Prince Kumar Only) -->
         <div class="admin-tab-panel" id="staffRolesTab" style="display: none;">
           <div class="calc-card">

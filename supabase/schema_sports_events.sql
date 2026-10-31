@@ -747,3 +747,4 @@ CREATE POLICY "Super admin manage teams" ON public.teams FOR ALL TO authenticate
 CREATE POLICY "Super admin manage tournaments" ON public.tournaments FOR ALL TO authenticated USING (auth.jwt() ->> 'email' = 'pk3334238@gmail.com');
 CREATE POLICY "Super admin manage matches" ON public.matches FOR ALL TO authenticated USING (auth.jwt() ->> 'email' = 'pk3334238@gmail.com');
 CREATE POLICY "Super admin manage audit logs" ON public.sports_audit_logs FOR ALL TO authenticated USING (auth.jwt() ->> 'email' = 'pk3334238@gmail.com');
+

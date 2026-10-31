@@ -506,3 +506,4 @@ class _TeamRegistrationScreenState extends State<TeamRegistrationScreen> {
     );
   }
 }
+

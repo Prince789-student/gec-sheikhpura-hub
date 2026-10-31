@@ -441,3 +441,4 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 }
+

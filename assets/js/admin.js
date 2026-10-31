@@ -3938,6 +3938,7 @@ window.handleAssignStaffRole = async function(event) {
   let roleLabel = 'Staff Manager';
   let permissions = [scope];
   if (scope === 'laundry') roleLabel = 'Laundry In-Charge';
+  else if (scope === 'sports') roleLabel = 'Sports & Tournaments Desk';
   else if (scope === 'notices') roleLabel = 'Notices Manager';
   else if (scope === 'lostfound') roleLabel = 'Lost & Found Moderator';
   else if (scope === 'listings') roleLabel = 'Listings Moderator';
@@ -3989,3 +3990,320 @@ window.deleteStaffRole = async function(email) {
   showToast(`Permissions revoked for ${email}`);
   window.loadAdminStaffRoles();
 };
+
+// ==========================================
+// SPORTS & EVENTS MASTER ADMIN SUITE (MODULES 1-11)
+// ==========================================
+
+window.loadAdminSportsDirectory = async function() {
+  const tbody = document.getElementById('adminSportsDirectoryBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 1.5rem;">Loading 38 sports directory...</td></tr>';
+
+  try {
+    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/sports');
+    const data = await res.json();
+    const sports = data.sports || [];
+
+    const countBadge = document.getElementById('tabSportsCount');
+    if (countBadge) countBadge.textContent = sports.length;
+
+    if (sports.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">No sports found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = sports.map(s => `
+      <tr>
+        <td><strong>${s.icon || '🏅'} ${escapeHtml(s.name)}</strong></td>
+        <td><code>${escapeHtml(s.code)}</code></td>
+        <td><span class="branch-badge">${escapeHtml(s.sportType.toUpperCase())}</span></td>
+        <td><strong>${s.playingSquadSize}</strong> Playing</td>
+        <td>${s.minSquadSize} - ${s.maxSquadSize} Players</td>
+        <td style="font-size: 0.8rem; font-family: monospace;">${escapeHtml(s.scoringSystem || 'standard')}</td>
+        <td>
+          <span class="status-badge ${s.isActive !== false ? 'status-verified' : 'status-flagged'}">
+            ${s.isActive !== false ? 'Active' : 'Disabled'}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: 1.5rem;">Failed to load sports directory.</td></tr>';
+  }
+};
+
+window.loadAdminMatches = async function() {
+  const tbody = document.getElementById('adminMatchesBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 1.5rem;">Loading fixtures and live matches...</td></tr>';
+
+  try {
+    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/matches');
+    const data = await res.json();
+    const matches = data.matches || [];
+
+    const countBadge = document.getElementById('tabMatchesCount');
+    if (countBadge) countBadge.textContent = matches.length;
+
+    if (matches.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">No scheduled matches found. Use the form above to pair teams.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = matches.map(m => `
+      <tr>
+        <td><code>${escapeHtml(m.id)}</code></td>
+        <td><strong>${escapeHtml(m.sportName)}</strong></td>
+        <td>${escapeHtml(m.roundName)}</td>
+        <td>
+          <strong>${escapeHtml(m.teamAName)}</strong> <span style="color:var(--text-muted);">vs</span> <strong>${escapeHtml(m.teamBName)}</strong>
+        </td>
+        <td>
+          <span class="status-badge ${m.status === 'live' ? 'status-urgent' : (m.status === 'completed' ? 'status-verified' : 'status-sample')}">
+            ${escapeHtml(m.status.toUpperCase())}
+          </span>
+          <br>
+          <small><strong>${m.teamAScore}</strong> - <strong>${m.teamBScore}</strong></small>
+        </td>
+        <td style="font-size: 0.8rem;">
+          ${escapeHtml(m.venue)}<br>
+          <small style="color:var(--text-muted);">${escapeHtml(m.scheduledDate)} ${escapeHtml(m.scheduledTime)}</small>
+        </td>
+        <td>
+          <a href="app/#/live-match?id=${encodeURIComponent(m.id)}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:0.75rem; text-decoration:none;">
+            Live Console ↗
+          </a>
+        </td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: 1.5rem;">Failed to load match fixtures.</td></tr>';
+  }
+};
+
+window.handleAdminScheduleMatch = async function(event) {
+  event.preventDefault();
+  const sport = document.getElementById('adminSchedSport').value;
+  const round = document.getElementById('adminSchedRound').value.trim();
+  const teamA = document.getElementById('adminSchedTeamA').value.trim();
+  const teamB = document.getElementById('adminSchedTeamB').value.trim();
+  const dtVal = document.getElementById('adminSchedDateTime').value;
+  const venue = document.getElementById('adminSchedVenue').value.trim();
+  const referee = document.getElementById('adminSchedReferee').value.trim();
+  const scorekeeper = document.getElementById('adminSchedScorekeeper').value.trim();
+
+  if (!sport || !round || !teamA || !teamB || !dtVal || !venue) {
+    alert('Please fill all mandatory match fields.');
+    return;
+  }
+
+  const dateObj = new Date(dtVal);
+  const scheduledDate = dateObj.toLocaleDateString('en-IN');
+  const scheduledTime = dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+  const payload = {
+    sportId: sport.toLowerCase().replace(/\s+/g, '-'),
+    sportName: sport,
+    tournamentId: 'shaurya-cup-2026',
+    roundName: round,
+    teamAId: 'tm-' + btoa(teamA).slice(0, 8),
+    teamAName: teamA,
+    teamBId: 'tm-' + btoa(teamB).slice(0, 8),
+    teamBName: teamB,
+    scheduledDate: scheduledDate,
+    scheduledTime: scheduledTime,
+    venue: venue,
+    refereeName: referee || 'Chief Tournament Referee',
+    scorekeeperName: scorekeeper || 'pk3334238@gmail.com',
+    timerState: { isRunning: false, elapsedSeconds: 0, periodDurationSeconds: 1200, period: '1st Half' }
+  };
+
+  const btn = document.getElementById('btnAdminScheduleSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Scheduling fixture...';
+
+  try {
+    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/matches/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      showToast(`✓ Fixture scheduled: ${teamA} vs ${teamB} (${sport})!`);
+      document.getElementById('adminScheduleMatchForm').reset();
+      window.loadAdminMatches();
+    } else {
+      alert(result.error || 'Failed to schedule match.');
+    }
+  } catch (e) {
+    alert('Network error while scheduling fixture.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✓ Schedule & Publish Fixture';
+  }
+};
+
+window.loadAdminTeams = async function() {
+  const tbody = document.getElementById('adminTeamsBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 1.5rem;">Loading team registrations...</td></tr>';
+
+  try {
+    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/sports/teams');
+    const data = await res.json();
+    const teams = data.teams || [];
+
+    const countBadge = document.getElementById('tabTeamsCount');
+    if (countBadge) countBadge.textContent = teams.length;
+
+    if (teams.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">No student teams registered yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = teams.map(t => {
+      const isPending = t.status === 'pending';
+      const isApproved = t.status === 'approved';
+
+      return `
+        <tr>
+          <td><strong>${escapeHtml(t.teamName)}</strong></td>
+          <td><span class="branch-badge">${escapeHtml(t.sportName)}</span></td>
+          <td>${escapeHtml(t.captainName)}<br><small style="color:var(--text-muted);">${escapeHtml(t.captainPhone || '')}</small></td>
+          <td>${escapeHtml(t.branch || 'Inter-Branch')}</td>
+          <td>${(t.players || []).length} Players</td>
+          <td>
+            <span class="status-badge ${isApproved ? 'status-verified' : (isPending ? 'status-urgent' : 'status-flagged')}">
+              ${escapeHtml(t.status.toUpperCase())}
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 0.35rem;">
+              ${isPending ? `
+                <button type="button" class="btn btn-primary btn-sm" onclick="handleAdminTeamStatus('${t.id}', 'approved')">Approve</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="handleAdminTeamStatus('${t.id}', 'rejected')">Reject</button>
+              ` : (isApproved ? `
+                <button type="button" class="btn btn-secondary btn-sm" onclick="handleAdminTeamStatus('${t.id}', 'rejected')">Revoke</button>
+              ` : `
+                <button type="button" class="btn btn-primary btn-sm" onclick="handleAdminTeamStatus('${t.id}', 'approved')">Re-Approve</button>
+              `)}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: 1.5rem;">Failed to load team registrations.</td></tr>';
+  }
+};
+
+window.handleAdminTeamStatus = async function(teamId, status) {
+  let rejectionReason = '';
+  if (status === 'rejected') {
+    rejectionReason = prompt('Rejection reason (e.g. Incomplete squad or unverified players):', 'Incomplete squad size');
+    if (rejectionReason === null) return;
+  }
+
+  try {
+    const res = await fetch(`https://gec-sheikhpura-backend.onrender.com/api/sports/teams/${teamId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, rejectionReason })
+    });
+    if (res.ok) {
+      showToast(`Team status updated to ${status}!`);
+      window.loadAdminTeams();
+    } else {
+      alert('Failed to update team status.');
+    }
+  } catch (e) {
+    alert('Network error updating team status.');
+  }
+};
+
+window.loadAdminCultural = async function() {
+  const tbody = document.getElementById('adminCulturalBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 1.5rem;">Loading cultural competitions...</td></tr>';
+
+  try {
+    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/cultural/competitions');
+    const data = await res.json();
+    const competitions = data.competitions || [];
+
+    const countBadge = document.getElementById('tabCulturalCount');
+    if (countBadge) countBadge.textContent = competitions.length;
+
+    if (competitions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">No cultural competitions found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = competitions.map(c => `
+      <tr>
+        <td><strong>${escapeHtml(c.categoryName)}</strong></td>
+        <td style="font-size: 0.8rem;">${escapeHtml(c.venue)}<br><small style="color:var(--text-muted);">${escapeHtml(c.scheduledTime)}</small></td>
+        <td><strong>${(c.participants || []).length}</strong> Contestants</td>
+        <td style="font-size: 0.78rem;">Content (40%) • Delivery (30%) • Originality (30%)</td>
+        <td>
+          ${c.podium && c.podium.firstPlace ? `
+            <span style="font-weight:700; color:#d97706;">🥇 ${escapeHtml(c.podium.firstPlace)}</span><br>
+            <small>🥈 ${escapeHtml(c.podium.secondPlace || '')} • 🥉 ${escapeHtml(c.podium.thirdPlace || '')}</small>
+          ` : '<span style="color:var(--text-muted);">Awaiting Judgement</span>'}
+        </td>
+        <td>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="handleAdminPublishPodium('${c.id}')">
+            ${c.podium ? 'Update Podium' : 'Publish Podium'}
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-danger); padding: 1.5rem;">Failed to load cultural desk.</td></tr>';
+  }
+};
+
+window.handleAdminPublishPodium = async function(catId) {
+  const first = prompt('Enter 1st Place Winner Name (Gold Medal 🥇):');
+  if (!first) return;
+  const second = prompt('Enter 2nd Place Winner Name (Silver Medal 🥈):') || '';
+  const third = prompt('Enter 3rd Place Winner Name (Bronze Medal 🥉):') || '';
+
+  try {
+    const res = await fetch(`https://gec-sheikhpura-backend.onrender.com/api/cultural/competitions/${catId}/podium`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstPlace: first,
+        secondPlace: second,
+        thirdPlace: third,
+        publishedBy: 'pk3334238@gmail.com'
+      })
+    });
+    if (res.ok) {
+      showToast('✓ Cultural Competition podium published successfully!');
+      window.loadAdminCultural();
+    } else {
+      alert('Failed to publish podium.');
+    }
+  } catch (e) {
+    alert('Network error publishing podium.');
+  }
+};
+
+// Automatic loader hook when switching to sports desks
+document.addEventListener('DOMContentLoaded', () => {
+  const sportsBtn = document.getElementById('btnSportsDirectoryTab');
+  if (sportsBtn) sportsBtn.addEventListener('click', () => window.loadAdminSportsDirectory());
+
+  const matchBtn = document.getElementById('btnMatchFixturesTab');
+  if (matchBtn) matchBtn.addEventListener('click', () => window.loadAdminMatches());
+
+  const teamBtn = document.getElementById('btnTeamRegistrationsTab');
+  if (teamBtn) teamBtn.addEventListener('click', () => window.loadAdminTeams());
+
+  const cultBtn = document.getElementById('btnCulturalCompetitionsTab');
+  if (cultBtn) cultBtn.addEventListener('click', () => window.loadAdminCultural());
+});

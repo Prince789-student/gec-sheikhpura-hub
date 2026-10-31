@@ -28,7 +28,10 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
   List<TournamentStanding> _standings = [];
   List<CulturalCompetition> _cultural = [];
 
-  String _eventFilter = 'all'; // 'all', 'upcoming', 'ongoing', 'completed'
+  String _eventFilter = 'all'; // 'all', 'upcoming', 'ongoing', 'completed', 'my_registered', 'my_managed'
+  String _selectedCategory = 'all';
+  String _sportsCategoryFilter = 'all'; // 'all', 'team', 'indoor', 'track', 'field', 'other'
+  final TextEditingController _searchCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -63,6 +66,7 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
   @override
   void dispose() {
     _tabController.dispose();
+    _searchCtrl.dispose();
     super.dispose();
   }
 
@@ -178,43 +182,151 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
     );
   }
 
-  // --- TAB 1: EVENTS VIEW ---
+  // --- TAB 1: ALL EVENTS DASHBOARD (Module 1.1) ---
   Widget _buildEventsTab(BuildContext context, bool isDark) {
-    final filteredEvents = _eventFilter == 'all'
-        ? _events
-        : _events.filter((e) => e.status == _eventFilter).toList();
+    final currentUser = AuthService.instance.currentUser.value;
+    final currentEmail = currentUser?.email.toLowerCase() ?? '';
+    final currentName = currentUser?.displayName.toLowerCase() ?? '';
+
+    final filteredEvents = _events.where((e) {
+      // 1. Status Filter
+      if (_eventFilter == 'upcoming' && e.status != 'upcoming') return false;
+      if (_eventFilter == 'ongoing' && (e.status != 'ongoing' && e.status != 'live')) return false;
+      if (_eventFilter == 'completed' && e.status != 'completed') return false;
+      if (_eventFilter == 'my_registered') {
+        // Filter registered events
+        if (e.registeredCount == 0) return false;
+      }
+      if (_eventFilter == 'my_managed') {
+        final isHead = e.eventHeadName.toLowerCase() == currentName || e.contactEmail.toLowerCase() == currentEmail;
+        final isMember = e.members.any((m) => m.name.toLowerCase() == currentName);
+        if (!isHead && !isMember) return false;
+      }
+
+      // 2. Category Filter
+      if (_selectedCategory != 'all') {
+        if (!e.categoryName.toLowerCase().contains(_selectedCategory.toLowerCase()) &&
+            !e.categoryId.toLowerCase().contains(_selectedCategory.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 3. Search Query Filter
+      final query = _searchCtrl.text.trim().toLowerCase();
+      if (query.isNotEmpty) {
+        final inTitle = e.title.toLowerCase().contains(query);
+        final inDesc = e.description.toLowerCase().contains(query);
+        final inVenue = e.venue.toLowerCase().contains(query);
+        final inHead = e.eventHeadName.toLowerCase().contains(query);
+        if (!inTitle && !inDesc && !inVenue && !inHead) return false;
+      }
+
+      return true;
+    }).toList();
 
     return RefreshIndicator(
       onRefresh: _loadAllData,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Filter Chips
+          // Search Bar
+          TextField(
+            controller: _searchCtrl,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: 'Search college events, workshops, fests, venue...',
+              prefixIcon: const Icon(Icons.search, size: 20, color: AppTheme.primaryBlue),
+              suffixIcon: _searchCtrl.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, size: 18),
+                      onPressed: () {
+                        _searchCtrl.clear();
+                        setState(() {});
+                      },
+                    )
+                  : null,
+              filled: true,
+              fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // 6 Module 1.1 Status Tabs
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
                 _buildFilterChip('All Events', 'all'),
-                const SizedBox(width: 8),
-                _buildFilterChip('Upcoming', 'upcoming'),
-                const SizedBox(width: 8),
-                _buildFilterChip('Ongoing', 'ongoing'),
-                const SizedBox(width: 8),
-                _buildFilterChip('Completed', 'completed'),
+                const SizedBox(width: 6),
+                _buildFilterChip('Upcoming Events', 'upcoming'),
+                const SizedBox(width: 6),
+                _buildFilterChip('Ongoing Events', 'ongoing'),
+                const SizedBox(width: 6),
+                _buildFilterChip('Completed Events', 'completed'),
+                const SizedBox(width: 6),
+                _buildFilterChip('My Registered', 'my_registered'),
+                const SizedBox(width: 6),
+                _buildFilterChip('Events I Manage', 'my_managed'),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
+
+          // Category Pills
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildCategoryPill('All Categories', 'all'),
+                _buildCategoryPill('Technical', 'technical'),
+                _buildCategoryPill('Cultural', 'cultural'),
+                _buildCategoryPill('Sports', 'sports'),
+                _buildCategoryPill('Academic', 'academic'),
+                _buildCategoryPill('Workshop', 'workshop'),
+                _buildCategoryPill('Seminar', 'seminar'),
+                _buildCategoryPill('Competition', 'competition'),
+                _buildCategoryPill('Festival', 'festival'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
 
           if (filteredEvents.isEmpty)
             _buildEmptyState(
               icon: Icons.event_available,
-              title: 'No events found in this category',
-              desc: 'Tap "+ Create Event" below to host an official verified student event.',
+              title: 'No matching events found',
+              desc: 'Try clearing your search query or filters. Verified students can tap "+ Create Event" to host a new college event.',
             )
           else
             ...filteredEvents.map((evt) => _buildEventCard(context, evt, isDark)),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryPill(String label, String value) {
+    final isSelected = _selectedCategory == value;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: FilterChip(
+        label: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? Colors.white : null,
+          ),
+        ),
+        selected: isSelected,
+        selectedColor: AppTheme.accentSky,
+        checkmarkColor: Colors.white,
+        onSelected: (_) => setState(() => _selectedCategory = value),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       ),
     );
   }
@@ -422,56 +534,163 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
     );
   }
 
-  // --- TAB 3: SPORTS DIRECTORY ---
+  // --- TAB 3: 38 SPORTS DIRECTORY (Module 2.1) ---
   Widget _buildSportsDirectoryTab(BuildContext context, bool isDark) {
+    // Categorize sports based on sportType or name
+    final filteredSports = _sports.where((s) {
+      if (_sportsCategoryFilter == 'all') return true;
+      if (_sportsCategoryFilter == 'team') {
+        return s.sportType == 'team' || ['cricket', 'kabaddi', 'basketball', 'volleyball', 'football', 'handball', 'hockey', 'tug of war', 'kho-kho'].contains(s.name.toLowerCase());
+      }
+      if (_sportsCategoryFilter == 'indoor') {
+        return s.sportType == 'indoor' || s.sportType == 'racket' || ['badminton', 'table tennis', 'chess', 'carrom', 'table football'].contains(s.name.toLowerCase());
+      }
+      if (_sportsCategoryFilter == 'track') {
+        return (s.sportType == 'athletics' && (s.name.contains('m') || s.name.toLowerCase().contains('relay') || s.name.toLowerCase().contains('hurdle') || s.name.toLowerCase().contains('marathon') || s.name.toLowerCase().contains('cross country')));
+      }
+      if (_sportsCategoryFilter == 'field') {
+        return ['shot put', 'discus throw', 'javelin throw', 'long jump', 'high jump'].any((f) => s.name.toLowerCase().contains(f));
+      }
+      if (_sportsCategoryFilter == 'other') {
+        return ['arm wrestling', 'weightlifting', 'powerlifting', 'yoga', 'cycling', 'swimming'].any((o) => s.name.toLowerCase().contains(o));
+      }
+      return true;
+    }).toList();
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text('Inter-Branch & Campus Sports Directory', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        const Text('Official 38 Sports Directory', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         const SizedBox(height: 4),
-        Text('Configurable rules, custom squad sizes, and sport-specific scoring algorithms.', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+        Text(
+          'Inter-branch tournament directory with individual sport scoring rules, squad boundaries, and authoritative match clocks.',
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
+        const SizedBox(height: 12),
+
+        // 5 Official Groups Filter Bar
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildSportsFilterChip('All Sports (38)', 'all'),
+              const SizedBox(width: 6),
+              _buildSportsFilterChip('Team Sports (9)', 'team'),
+              const SizedBox(width: 6),
+              _buildSportsFilterChip('Indoor & Racket (5)', 'indoor'),
+              const SizedBox(width: 6),
+              _buildSportsFilterChip('Track Events (13)', 'track'),
+              const SizedBox(width: 6),
+              _buildSportsFilterChip('Field Events (5)', 'field'),
+              const SizedBox(width: 6),
+              _buildSportsFilterChip('Other Sports (6)', 'other'),
+            ],
+          ),
+        ),
         const SizedBox(height: 16),
+
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.25,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.15,
           ),
-          itemCount: _sports.length,
+          itemCount: filteredSports.length,
           itemBuilder: (ctx, idx) {
-            final s = _sports[idx];
+            final s = filteredSports[idx];
             return Card(
-              elevation: 1.5,
+              elevation: 2,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(s.icon, style: const TextStyle(fontSize: 24)),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: AppTheme.primaryBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-                          child: Text(s.code, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
-                        ),
-                      ],
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TeamRegistrationScreen(initialSport: s),
                     ),
-                    Text(s.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    Text('Playing: ${s.playingSquadSize} • Squad: ${s.minSquadSize}-${s.maxSquadSize}', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-                  ],
+                  ).then((_) => _loadAllData());
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(s.icon, style: const TextStyle(fontSize: 22)),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryBlue.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              s.code,
+                              style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Squad: ${s.playingSquadSize} Playing (${s.minSquadSize}-${s.maxSquadSize})',
+                            style: TextStyle(fontSize: 9.5, color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryNavy.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'Register Squad →',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildSportsFilterChip(String label, String value) {
+    final isSelected = _sportsCategoryFilter == value;
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 11.5,
+          color: isSelected ? Colors.white : null,
+        ),
+      ),
+      selected: isSelected,
+      selectedColor: AppTheme.primaryBlue,
+      onSelected: (_) => setState(() => _sportsCategoryFilter = value),
     );
   }
 

@@ -40,6 +40,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const params = new URLSearchParams(window.location.search);
+  const notice = params.get('notice');
+
+  // Immediately clear stale credentials on auth error / logout redirects to prevent infinite redirect loop
+  if (notice) {
+    if (notice === 'admin_auth_required' || notice === 'admin_unauthorized') {
+      localStorage.removeItem('gec_admin_session');
+    }
+    if (notice === 'logout') {
+      localStorage.removeItem('gec_admin_session');
+      localStorage.removeItem('gec_student_session');
+    }
+  }
+
   const isGoogle = params.get('provider') === 'google' || params.get('oauth') === 'success';
   const googleEmail = params.get('email');
   const googleName = params.get('name');
@@ -58,10 +71,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     clientIdInput.value = getGoogleClientId();
   }
 
-  // If already logged in, check admin or profile completeness
-  if (window.DB) {
+  // If already logged in, check admin or profile completeness (ONLY if no redirect notices present)
+  if (window.DB && !notice && !window.location.search.includes('force=1')) {
     const adminSession = await window.DB.getAdminSession();
-    if (adminSession && adminSession.email && !window.location.search.includes('force=1')) {
+    if (adminSession && adminSession.email && (adminSession.email.toLowerCase() === 'pk3334238@gmail.com' || adminSession.role === 'Super Admin')) {
       window.location.href = 'admin.html';
       return;
     }
@@ -72,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!window.DB.isProfileComplete(profile)) {
         openProfileOnboarding(sessionUser, profile);
         return;
-      } else if (!window.location.search.includes('force=1')) {
+      } else {
         window.location.href = 'dashboard.html';
         return;
       }

@@ -132,6 +132,82 @@ class SportsEventsService {
     }
   }
 
+  // --- Task Management Methods ---
+  Future<bool> createEventTask(String eventId, Map<String, dynamic> payload) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$_apiBase/events/$eventId/tasks'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 8));
+      return (res.statusCode == 200 || res.statusCode == 201);
+    } catch (e) {
+      debugPrint('Error creating event task: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateEventTask(String eventId, String taskId, Map<String, dynamic> payload) async {
+    try {
+      final res = await http.patch(
+        Uri.parse('$_apiBase/events/$eventId/tasks/$taskId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 8));
+      return res.statusCode == 200;
+    } catch (e) {
+      debugPrint('Error updating event task: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteEventTask(String eventId, String taskId) async {
+    try {
+      final res = await http.delete(
+        Uri.parse('$_apiBase/events/$eventId/tasks/$taskId'),
+      ).timeout(const Duration(seconds: 8));
+      return res.statusCode == 200;
+    } catch (e) {
+      debugPrint('Error deleting event task: $e');
+      return false;
+    }
+  }
+
+  // --- Participant Management Methods ---
+  Future<List<Map<String, dynamic>>> fetchEventParticipants(String eventId, {String? status, String? query}) async {
+    try {
+      final qp = <String, String>{};
+      if (status != null && status != 'all') qp['status'] = status;
+      if (query != null && query.isNotEmpty) qp['query'] = query;
+
+      final uri = Uri.parse('$_apiBase/events/$eventId/participants').replace(queryParameters: qp.isNotEmpty ? qp : null);
+      final res = await http.get(uri).timeout(const Duration(seconds: 8));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        if (data is Map && data['participants'] is List) {
+          return (data['participants'] as List).map((p) => Map<String, dynamic>.from(p)).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching event participants: $e');
+    }
+    return [];
+  }
+
+  Future<bool> updateParticipantStatus(String eventId, String regId, Map<String, dynamic> payload) async {
+    try {
+      final res = await http.patch(
+        Uri.parse('$_apiBase/events/$eventId/participants/$regId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 8));
+      return res.statusCode == 200;
+    } catch (e) {
+      debugPrint('Error updating participant status: $e');
+      return false;
+    }
+  }
+
   // ==========================================
   // MODULE B: SPORTS & SQUADS METHODS
   // ==========================================
@@ -522,3 +598,4 @@ class SportsEventsService {
     return cachedNotifications;
   }
 }
+

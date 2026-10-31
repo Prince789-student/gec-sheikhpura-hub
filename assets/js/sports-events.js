@@ -243,3 +243,4 @@
 
   window.SportsEventsClient = SportsEventsClient;
 })(window);
+
