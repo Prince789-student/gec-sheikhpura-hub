@@ -85,3 +85,4 @@ window.FIREBASE_CONFIG = {
 if (typeof firebase !== 'undefined') {
   window.FIREBASE_CONFIG.init();
 }
+

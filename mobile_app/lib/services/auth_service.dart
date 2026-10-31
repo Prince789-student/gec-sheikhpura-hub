@@ -61,9 +61,7 @@ class AuthService {
         ? name.trim()
         : (safeEmail.split('@')[0].replaceAll('.', ' '));
 
-    final isSuperAdmin = safeEmail.toLowerCase() == 'pk3334238@gmail.com' ||
-        safeEmail.toLowerCase() == 'prince86944@gmail.com' ||
-        safeEmail.toLowerCase().contains('admin');
+    final isSuperAdmin = safeEmail.toLowerCase() == 'pk3334238@gmail.com';
 
     final user = UserModel(
       uid: 'goog_${DateTime.now().millisecondsSinceEpoch}',
