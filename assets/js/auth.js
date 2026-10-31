@@ -4,7 +4,7 @@
  * real Google OAuth 2.0 integration (accounts.google.com), and Google Identity Services.
  */
 
-const DEFAULT_GOOGLE_CLIENT_ID = '818059891079-kh6vpef04bkov0ic1ajk7a5g100oaejt.apps.googleusercontent.com';
+const DEFAULT_GOOGLE_CLIENT_ID = '748172575005-400n0tange3otfpelk47uhvre79a70s2.apps.googleusercontent.com';
 
 function getGoogleClientId() {
   return localStorage.getItem('gec_google_client_id') || DEFAULT_GOOGLE_CLIENT_ID;

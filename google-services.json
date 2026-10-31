@@ -12,7 +12,20 @@
           "package_name": "com.gecsheikhpura.gec_student_hub"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "748172575005-b6g8ldrt5lt8jpirom5nrsvu9rjrt817.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gecsheikhpura.gec_student_hub",
+            "certificate_hash": "ab86da0ed7e37afc87468e27b2d44a8bbc8d2a0a"
+          }
+        },
+        {
+          "client_id": "748172575005-400n0tange3otfpelk47uhvre79a70s2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCGGk5H6GvBYwykQlk1RArPV-_IGctipRs"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "748172575005-400n0tange3otfpelk47uhvre79a70s2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
