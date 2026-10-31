@@ -248,12 +248,80 @@ function saveGoogleClientIdSetting() {
 window.saveGoogleClientIdSetting = saveGoogleClientIdSetting;
 
 /* ==========================================================================
-   Google Sign-In & Profile Onboarding Handlers
+   Google Sign-In & Profile Onboarding Handlers (Firebase Auth Integration)
    ========================================================================== */
 let activeGooglePopup = null;
 
-function handleContinueWithGoogle() {
+const firebaseConfig = {
+  apiKey: "AIzaSyBIvnhJLz_ucsxuFEnZeYSAq2L6vJ4DcKo",
+  authDomain: "apna-college-bihar.firebaseapp.com",
+  projectId: "apna-college-bihar",
+  storageBucket: "apna-college-bihar.firebasestorage.app",
+  messagingSenderId: "818059891079",
+  appId: "1:818059891079:web:395df6af749da04ae80322"
+};
+
+let firebaseAuth = null;
+let googleAuthProvider = null;
+
+function initFirebaseClient() {
+  if (typeof firebase !== 'undefined') {
+    try {
+      if (!firebase.apps || !firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      firebaseAuth = firebase.auth();
+      googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+      googleAuthProvider.setCustomParameters({ prompt: 'select_account' });
+    } catch (e) {
+      console.warn("Firebase Auth setup notice:", e);
+    }
+  }
+}
+initFirebaseClient();
+
+async function handleContinueWithGoogle() {
   hideAuthAlert();
+  initFirebaseClient();
+
+  if (firebaseAuth && googleAuthProvider) {
+    showAuthAlert('Opening official Google Sign-In popup via Firebase...', 'info');
+    try {
+      const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
+      if (result && result.user) {
+        const u = result.user;
+        const email = u.email || '';
+        const name = u.displayName || email.split('@')[0] || 'Student';
+        const photo = u.photoURL || '';
+
+        const isPrince = (email.toLowerCase() === 'pk3334238@gmail.com' || email.toLowerCase() === 'prince86944@gmail.com');
+
+        showAuthAlert(`✓ Authenticated as ${name} (${email}) via Google Firebase!`, 'success');
+
+        if (window.DB) {
+          await window.DB.signInWithGoogleDemo(email, name, photo);
+        }
+
+        setTimeout(() => {
+          window.location.href = isPrince ? 'admin.html' : 'dashboard.html';
+        }, 600);
+        return;
+      }
+    } catch (error) {
+      console.error("Firebase signInWithPopup error:", error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        showAuthAlert('Google Sign-In popup was closed.', 'info');
+        return;
+      }
+      if (error.code === 'auth/unauthorized-domain') {
+        showAuthAlert(`Domain ${window.location.hostname} not authorized in Firebase Console yet. Please add it in Firebase Console -> Authentication -> Settings -> Authorized Domains. Opening chooser...`, 'warning');
+      } else {
+        showAuthAlert('Google Firebase popup: ' + (error.message || error.code), 'error');
+      }
+    }
+  }
+
+  // Fallback to Google Account Chooser modal if popup blocked or not authorized
   const modal = document.getElementById('googleAuthModal');
   if (modal) {
     modal.style.display = 'flex';
