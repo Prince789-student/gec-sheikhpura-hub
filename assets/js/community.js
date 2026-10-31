@@ -692,10 +692,10 @@ function bindModalForms() {
       const category = document.getElementById('evtCategory').value;
       const startTime = document.getElementById('evtStartTime').value;
       const venue = document.getElementById('evtVenue').value.trim();
-      const organizerName = document.getElementById('evtOrganizer').value.trim();
+      const organizerName = document.getElementById('evtOrganizer') ? document.getElementById('evtOrganizer').value.trim() : 'GEC Sheikhpura Student Body';
       const shortDescription = document.getElementById('evtDescription').value.trim();
-      const capacity = document.getElementById('evtCapacity').value;
-      const entryFee = document.getElementById('evtFee').value;
+      const capacity = document.getElementById('evtCapacity') ? document.getElementById('evtCapacity').value : null;
+      const entryFee = document.getElementById('evtFee') ? document.getElementById('evtFee').value : 0;
 
       const res = await window.DB.submitEvent({
         title,
@@ -709,7 +709,7 @@ function bindModalForms() {
       });
 
       if (res.success) {
-        showToast('✅ Event submitted for admin review!');
+        showToast('✓ Event published live successfully!');
         closeSubmitEventModal();
         eventForm.reset();
         await loadEventsSection();

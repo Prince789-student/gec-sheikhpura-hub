@@ -452,19 +452,11 @@ function showGoogleAccountModalFallback(reason) {
         <button type="button" onclick="document.getElementById('googleDirectAuthModal').remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted, #64748b); line-height: 1;">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted, #64748b); margin-bottom: 1.25rem;">
-        Choose your Google account to proceed without any redirect loop:
+        Enter your Google account email to sign in:
       </p>
       <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-        <button type="button" onclick="processDirectGoogleSelect('pk3334238@gmail.com', 'Prince Kumar')" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; border-radius: 12px; border: 1.5px solid #d97706; background: rgba(217,119,6,0.06); text-align: left; cursor: pointer; width: 100%;">
-          <div>
-            <div style="font-weight: 700; color: #b45309; font-size: 0.95rem;">👑 Prince Kumar (Super Admin)</div>
-            <div style="font-size: 0.78rem; color: #64748b;">pk3334238@gmail.com &bull; Super Admin Control Panel</div>
-          </div>
-          <span style="font-size: 0.8rem; font-weight: 700; color: #d97706;">Open &rarr;</span>
-        </button>
-        <div style="border-top: 1px solid var(--border-light, #e2e8f0); margin: 0.35rem 0;"></div>
         <div>
-          <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">Student Google Email Sign In:</label>
+          <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">Google Email Address:</label>
           <div style="display: flex; gap: 0.5rem;">
             <input type="email" id="directStudentEmailInput" placeholder="your.name@gmail.com" class="form-control" style="flex: 1; font-size: 0.875rem; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-medium, #cbd5e1);">
             <button type="button" class="btn btn-primary" onclick="submitDirectStudentEmail()" style="font-size: 0.85rem; white-space: nowrap; padding: 0.6rem 1rem; border-radius: 8px; background: var(--color-primary, #1e3a8a); color: #fff; font-weight: 700; border: none; cursor: pointer;">Sign In</button>

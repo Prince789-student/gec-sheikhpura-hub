@@ -14,6 +14,69 @@ const router = express.Router();
 // In-Memory Authoritative Datastores (Synced with Supabase & Client Apps)
 let eventsList = [
   {
+    id: 'evt_umang_2026',
+    title: 'Umang 2026: Annual Inter-College Cultural & Sports Extravaganza',
+    slug: 'umang-2026',
+    description: 'The flagship annual fest of GEC Sheikhpura featuring live music bands, battle of the branches, solo & group dance, drama, and sports grand finals.',
+    categoryId: 'umang',
+    categoryName: 'Umang Annual Fest',
+    posterUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80',
+    venue: 'Main Campus Open Air Theatre & Central Grounds, Bajidpur',
+    venueDetails: 'OAT, Badminton Floodlit Court & Football Ground',
+    startDate: '2026-11-20',
+    endDate: '2026-11-22',
+    startTime: '10:00',
+    endTime: '22:00',
+    regStartDate: '2026-10-25T00:00:00.000Z',
+    regDeadline: '2026-11-18T23:59:59.000Z',
+    maxParticipants: null,
+    registeredCount: 88,
+    eventRules: 'Open to all verified college students. College ID card is mandatory.',
+    requiredResources: 'Live concert stage, line array acoustics, stage LED walls, floodlights.',
+    contactPhone: '9801234567',
+    contactEmail: 'umang.gecskp@gmail.com',
+    eventHeadId: 'usr_prince_admin',
+    eventHeadName: 'Prince Kumar',
+    eventHeadRegNo: '22105128001',
+    status: 'upcoming',
+    isVerified: true,
+    members: [
+      {
+        id: 'mem_umang_1',
+        name: 'Prince Kumar',
+        regNo: '22105128001',
+        role: 'Event Head',
+        responsibilities: 'Overall Fest Convener and Committee Oversight.',
+        phone: '9801234567',
+        isSensitive: true,
+        isApproved: true,
+        permissions: {
+          canViewParticipants: true,
+          canManageRegistrations: true,
+          canUpdateSchedule: true,
+          canUploadDocuments: true,
+          canPublishAnnouncements: true,
+          canManageTasks: true,
+          canManageResources: true
+        }
+      }
+    ],
+    updates: [
+      {
+        id: 'upd_umang_1',
+        authorName: 'Prince Kumar',
+        authorRole: 'Event Head',
+        updateType: 'text',
+        title: 'Umang 2026 Schedule & Guidelines Announced',
+        content: 'Battle of the bands and inter-branch dance audition rounds start Nov 20th.',
+        isImportant: true,
+        createdAt: new Date().toISOString()
+      }
+    ],
+    tasks: [],
+    registrations: []
+  },
+  {
     id: 'evt_tech_fest_2026',
     title: 'TechnoUtsav 2026: Annual Inter-College Technical Hackathon',
     slug: 'technoutsav-2026',

@@ -25,8 +25,6 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
   List<StudentEvent> _events = [];
   List<SportItem> _sports = [];
   List<TournamentMatch> _matches = [];
-  List<TournamentStanding> _standings = [];
-  List<CulturalCompetition> _cultural = [];
 
   String _eventFilter = 'all'; // 'all', 'upcoming', 'ongoing', 'completed', 'my_registered', 'my_managed'
   String _selectedCategory = 'all';
@@ -47,8 +45,6 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
       srv.fetchEvents(),
       srv.fetchSports(),
       srv.fetchMatches(),
-      srv.fetchStandings(),
-      srv.fetchCulturalCompetitions(),
     ]);
 
     if (mounted) {
@@ -56,8 +52,6 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
         _events = results[0] as List<StudentEvent>;
         _sports = results[1] as List<SportItem>;
         _matches = results[2] as List<TournamentMatch>;
-        _standings = results[3] as List<TournamentStanding>;
-        _cultural = results[4] as List<CulturalCompetition>;
         _isLoading = false;
       });
     }
@@ -283,6 +277,7 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
             child: Row(
               children: [
                 _buildCategoryPill('All Categories', 'all'),
+                _buildCategoryPill('🎉 Umang Fest', 'umang'),
                 _buildCategoryPill('Technical', 'technical'),
                 _buildCategoryPill('Cultural', 'cultural'),
                 _buildCategoryPill('Sports', 'sports'),
@@ -291,6 +286,7 @@ class _SportsEventsDashboardScreenState extends State<SportsEventsDashboardScree
                 _buildCategoryPill('Seminar', 'seminar'),
                 _buildCategoryPill('Competition', 'competition'),
                 _buildCategoryPill('Festival', 'festival'),
+                _buildCategoryPill('Other', 'other'),
               ],
             ),
           ),

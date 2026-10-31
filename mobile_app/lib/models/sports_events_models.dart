@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 // --- MODULE A: STUDENT EVENTS MODELS ---
 
 class EventPermissions {

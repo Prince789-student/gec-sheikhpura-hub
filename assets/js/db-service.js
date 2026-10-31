@@ -3206,9 +3206,9 @@ class HubDatabaseService {
       entryFee: eventData.entryFee ? parseInt(eventData.entryFee, 10) : 0,
       capacity: eventData.capacity ? parseInt(eventData.capacity, 10) : null,
       registeredCount: 0,
-      status: 'pending', // Requires admin review
-      verificationStatus: 'community_submitted',
-      isVerified: false,
+      status: 'published', // Instant publication active per student policy
+      verificationStatus: 'verified_active',
+      isVerified: true,
       submittedBy: userId,
       createdAt: new Date().toISOString()
     };
@@ -3221,8 +3221,8 @@ class HubDatabaseService {
       action_type: 'submit_event',
       target_type: 'event',
       target_id: newEvent.id,
-      reason: `Event submitted: "${newEvent.title}" pending admin verification`,
-      new_state: { status: 'pending' }
+      reason: `Event published: "${newEvent.title}" live on campus feed`,
+      new_state: { status: 'published' }
     });
 
     return { success: true, event: newEvent };
@@ -3230,8 +3230,13 @@ class HubDatabaseService {
 
   getEventCategoryLabel(cat) {
     const map = {
+      umang: 'Umang Annual Fest',
+      sports: 'Sports & Tournaments',
       cultural: 'Cultural & Drama',
-      sports: 'Sports & Athletics',
+      technical: 'Technical & Coding',
+      academic: 'Academic & Workshop',
+      orientation: 'Orientation & Induction',
+      other: 'Other Activities',
       tech_recreation: 'Tech Recreation',
       arts: 'Photography & Art',
       social_service: 'Social Volunteering',
@@ -3243,8 +3248,13 @@ class HubDatabaseService {
 
   getEventCategoryIcon(cat) {
     const map = {
-      cultural: '🎭',
+      umang: '🎉',
       sports: '🏆',
+      cultural: '🎭',
+      technical: '💻',
+      academic: '📚',
+      orientation: '🤝',
+      other: '✨',
       tech_recreation: '💻',
       arts: '📸',
       social_service: '🌱',

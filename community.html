@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>Student Community, Events &amp; Campus Life | GEC Sheikhpura Hub</title>
   <meta name="description" content="College Events Directory, Clubs &amp; Societies, Sports Activities, and Campus Announcements for students of Government Engineering College Sheikhpura.">
-  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="icon" type="image/jpeg" href="assets/images/college_crest.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -34,8 +34,8 @@
   <header class="site-header">
     <div class="container header-container">
       <a href="index.html" class="brand">
-        <div class="brand-crest" style="background: none; overflow: hidden;">
-          <img src="assets/images/college_crest.jpg" alt="GEC Sheikhpura Logo" width="38" height="38" style="object-fit: contain; border-radius: 50%;">
+        <div class="brand-crest" style="background: none; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%;">
+          <img src="assets/images/college_crest.jpg" alt="GEC Sheikhpura Logo" width="42" height="42" style="width: 42px; height: 42px; object-fit: contain; border-radius: 50%;">
         </div>
         <div class="brand-text">
           <span class="brand-title">GEC Sheikhpura <span style="font-weight: 500; font-size: 0.85rem; color: var(--color-accent);">Hub</span></span>
@@ -241,11 +241,13 @@
           <input type="text" id="eventSearchInput" class="form-control" placeholder="Search events..." style="max-width: 260px;">
           <select id="eventCategoryFilter" class="form-control" style="max-width: 200px;">
             <option value="all">All Categories</option>
-            <option value="cultural">Cultural</option>
-            <option value="technical">Technical</option>
-            <option value="sports">Sports</option>
-            <option value="academic">Academic &amp; Workshop</option>
-            <option value="orientation">Orientation</option>
+            <option value="umang">🎉 Umang Fest</option>
+            <option value="sports">🏅 Sports</option>
+            <option value="cultural">🎭 Cultural</option>
+            <option value="technical">💻 Technical</option>
+            <option value="academic">📚 Academic &amp; Workshop</option>
+            <option value="orientation">🤝 Orientation</option>
+            <option value="other">✨ Other</option>
           </select>
           <select id="eventUpcomingFilter" class="form-control" style="max-width: 180px;">
             <option value="all">All Events</option>
@@ -326,11 +328,13 @@
           <div class="form-group">
             <label class="form-label" for="evtCategory">Category *</label>
             <select id="evtCategory" class="form-control" required>
-              <option value="technical">Technical</option>
-              <option value="cultural">Cultural</option>
-              <option value="sports">Sports</option>
-              <option value="academic">Academic / Workshop</option>
-              <option value="orientation">Orientation</option>
+              <option value="umang">🎉 Umang (Annual College Fest)</option>
+              <option value="sports">🏅 Sports &amp; Tournaments</option>
+              <option value="cultural">🎭 Cultural</option>
+              <option value="technical">💻 Technical</option>
+              <option value="academic">📚 Academic / Workshop</option>
+              <option value="orientation">🤝 Orientation</option>
+              <option value="other">✨ Other</option>
             </select>
           </div>
           <div class="grid-cards-2">
@@ -341,16 +345,6 @@
             <div class="form-group">
               <label class="form-label" for="evtVenue">Venue / Room *</label>
               <input type="text" id="evtVenue" class="form-control" placeholder="e.g. Main Auditorium" required>
-            </div>
-          </div>
-          <div class="grid-cards-2">
-            <div class="form-group">
-              <label class="form-label" for="evtOrganizer">Organizer / Department *</label>
-              <input type="text" id="evtOrganizer" class="form-control" placeholder="e.g. Coding Club" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="evtCapacity">Max Capacity</label>
-              <input type="number" id="evtCapacity" class="form-control" placeholder="100">
             </div>
           </div>
           <div class="form-group">
@@ -364,7 +358,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" onclick="closeSubmitEventModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm">Submit for Verification</button>
+          <button type="submit" class="btn btn-primary btn-sm">🚀 Publish Event Now</button>
         </div>
       </form>
     </div>
@@ -618,8 +612,8 @@
       <!-- 1. Brand Section -->
       <div class="footer-brand-col">
         <div class="footer-brand-header">
-          <div class="footer-brand-crest">
-            <img src="assets/images/logo.svg" alt="GEC Sheikhpura Logo" width="24" height="24">
+          <div class="footer-brand-crest" style="background: none; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%;">
+            <img src="assets/images/college_crest.jpg" alt="GEC Sheikhpura Logo" width="34" height="34" style="width: 34px; height: 34px; object-fit: contain; border-radius: 50%;">
           </div>
           <div>
             <div class="footer-brand-title">GEC Sheikhpura <span>Hub</span></div>

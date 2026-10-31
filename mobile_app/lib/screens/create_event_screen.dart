@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/sports_events_models.dart';
 import '../services/sports_events_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
@@ -18,14 +17,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _venueCtrl = TextEditingController();
-  final _maxParticipantsCtrl = TextEditingController();
   final _rulesCtrl = TextEditingController();
   final _resourcesCtrl = TextEditingController();
   final _contactNameCtrl = TextEditingController();
   final _contactPhoneCtrl = TextEditingController();
   final _posterUrlCtrl = TextEditingController();
 
-  String _selectedCategory = 'Technical';
+  String _selectedCategory = 'Umang (Annual College Fest)';
   DateTime _startDate = DateTime.now().add(const Duration(days: 3));
   TimeOfDay _startTime = const TimeOfDay(hour: 10, minute: 0);
   DateTime _endDate = DateTime.now().add(const Duration(days: 3));
@@ -36,9 +34,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   String? _errorMessage;
 
   final List<String> _categories = [
+    'Umang (Annual College Fest)',
+    'Sports & Tournaments',
     'Technical',
     'Cultural',
-    'Sports',
     'Academic',
     'Workshop',
     'Seminar',
@@ -64,7 +63,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _venueCtrl.dispose();
-    _maxParticipantsCtrl.dispose();
     _rulesCtrl.dispose();
     _resourcesCtrl.dispose();
     _contactNameCtrl.dispose();
@@ -113,7 +111,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       'startTime': '${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}',
       'endTime': '${_endTime.hour.toString().padLeft(2, '0')}:${_endTime.minute.toString().padLeft(2, '0')}',
       'registrationDeadline': _regDeadline.toIso8601String(),
-      'maxParticipants': int.tryParse(_maxParticipantsCtrl.text.trim()) ?? 0,
+      'maxParticipants': 0,
       'rules': _rulesCtrl.text.trim(),
       'requiredResources': _resourcesCtrl.text.trim(),
       'contactName': _contactNameCtrl.text.trim(),
@@ -149,9 +147,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Student Event', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
@@ -332,19 +327,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               const SizedBox(height: 20),
 
-              // 3. Capacity & Rules
-              const Text('Capacity, Rules & Logistics', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              // 3. Rules & Logistics
+              const Text('Event Rules & Logistics', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-
-              TextFormField(
-                controller: _maxParticipantsCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Maximum Participants (0 for Unlimited)',
-                  prefixIcon: Icon(Icons.people),
-                ),
-              ),
-              const SizedBox(height: 14),
 
               TextFormField(
                 controller: _rulesCtrl,
