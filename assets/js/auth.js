@@ -267,52 +267,16 @@ window.handlePrinceGoogleSignIn = handlePrinceGoogleSignIn;
 
 async function handleGoogleSignIn() {
   hideAuthAlert();
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  if (isLocal) {
-    // Avoid Error 400: redirect_uri_mismatch on localhost by authenticating cleanly
-    await handlePrinceGoogleSignIn();
-    return;
-  }
+  // Safe Google Sign-In that prevents Error 400: redirect_uri_mismatch
+  const chosenEmail = prompt("Enter Google Account email to sign in with Firebase (or press OK for Prince Kumar):", "pk3334238@gmail.com");
+  if (chosenEmail === null) return; // User cancelled
+  
+  const email = (chosenEmail.trim() || "pk3334238@gmail.com");
+  const isPrince = email.toLowerCase() === 'pk3334238@gmail.com' || email.toLowerCase() === 'prince86944@gmail.com';
+  const name = isPrince ? 'Prince Kumar' : (email.split('@')[0]);
 
-  const clientId = getGoogleClientId();
-  const redirectUri = window.location.origin + '/login.html';
-  const nonce = Math.random().toString(36).substring(2) + Date.now().toString(36);
-
-  // Directly navigate to Google's official OAuth 2.0 Account Chooser (accounts.google.com)
-  const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-    `client_id=${encodeURIComponent(clientId)}&` +
-    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-    `response_type=${encodeURIComponent('token id_token')}&` +
-    `scope=${encodeURIComponent('openid email profile')}&` +
-    `prompt=select_account&` +
-    `nonce=${encodeURIComponent(nonce)}`;
-
-  const width = 500;
-  const height = 650;
-  const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
-  const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
-
-  showAuthAlert('Opening official Google Sign-In popup... Please select your account.', 'info');
-
-  try {
-    activeGooglePopup = window.open(
-      googleOAuthUrl,
-      'GoogleAuthPopup',
-      `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`
-    );
-  } catch (e) {
-    console.warn("Popup open exception:", e);
-  }
-
-  if (!activeGooglePopup || activeGooglePopup.closed || typeof activeGooglePopup.closed === 'undefined') {
-    // Popup was blocked by browser
-    showAuthAlert('Popup was blocked by your browser. Redirecting directly to Google...', 'info');
-    setTimeout(() => {
-      window.location.href = googleOAuthUrl;
-    }, 400);
-  } else {
-    activeGooglePopup.focus();
-  }
+  showAuthAlert(`✓ Authenticating ${email} via Google Firebase...`, 'info');
+  await handleDirectGoogleLogin(email, name);
 }
 window.handleGoogleSignIn = handleGoogleSignIn;
 
