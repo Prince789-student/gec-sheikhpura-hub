@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -18,7 +18,7 @@
           return;
         }
         const session = JSON.parse(raw);
-        if (!session || ((session.email || '').toLowerCase() !== 'pk3334238@gmail.com' && (session.email || '').toLowerCase() !== 'prince86944@gmail.com')) {
+        if (!session || (session.email || '').toLowerCase() !== 'pk3334238@gmail.com') {
           localStorage.removeItem('gec_admin_session');
           window.location.replace('login.html?notice=admin_unauthorized');
         }

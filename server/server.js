@@ -260,7 +260,7 @@ app.post('/api/auth/verify', (req, res) => {
   const { email, displayName } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
 
-  const isAdmin = email.toLowerCase() === 'prince86944@gmail.com' || email.toLowerCase() === 'pk3334238@gmail.com';
+  const isAdmin = email.toLowerCase() === 'pk3334238@gmail.com';
   res.json({
     uid: `user_${Date.now()}`,
     email,

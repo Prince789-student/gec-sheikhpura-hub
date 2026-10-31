@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -20,7 +20,7 @@
           var pKey = 'gec_profile_' + session.id;
           var prof = JSON.parse(localStorage.getItem(pKey) || 'null');
           if (prof && prof.name && prof.name.toLowerCase().includes('ankot')) {
-            var realName = (session.email === 'pk3334238@gmail.com' || session.email === 'prince86944@gmail.com') ? 'Prince Kumar' : (session.display_name || 'Prince Kumar');
+            var realName = (session.email === 'pk3334238@gmail.com') ? 'Prince Kumar' : (session.display_name || 'Student');
             prof.name = realName;
             prof.display_name = realName;
             localStorage.setItem(pKey, JSON.stringify(prof));

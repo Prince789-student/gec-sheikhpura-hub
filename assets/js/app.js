@@ -200,7 +200,7 @@ async function openGlobalStudentProfileModal(user) {
   document.getElementById('gProfileEmail').textContent = user.email || 'Not provided';
 
   // Super Admin Action in Student Profile Modal (Strictly pk3334238@gmail.com)
-  const isSuperAdmin = user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com');
+  const isSuperAdmin = user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com');
   const existingAdminBtn = document.getElementById('gProfileSuperAdminBtn');
   if (isSuperAdmin) {
     if (!existingAdminBtn) {
@@ -246,7 +246,7 @@ async function initUserSessionHeader() {
       }
 
       // Strictly only pk3334238@gmail.com gets 👑 Admin Panel badge directly in the navbar
-      const isSuperAdminUser = user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com' || user.email.toLowerCase() === 'prince86944@gmail.com');
+      const isSuperAdminUser = user.email && (user.email.toLowerCase() === 'pk3334238@gmail.com');
       let navAdminBadge = document.getElementById('headerAdminBadge');
       if (isSuperAdminUser) {
         if (!navAdminBadge && userBtn && userBtn.parentElement) {

@@ -548,7 +548,7 @@ class HubDatabaseService {
   }
 
   async signInWithGoogleDemo(customEmail, customName, customAvatar) {
-    const isPrince = (customEmail || '').trim().toLowerCase() === 'pk3334238@gmail.com' || (customEmail || '').trim().toLowerCase() === 'prince86944@gmail.com';
+    const isPrince = (customEmail || '').trim().toLowerCase() === 'pk3334238@gmail.com';
     const email = customEmail || 'pk3334238@gmail.com';
     const displayName = isPrince ? 'Prince Kumar' : (customName || 'BEU Student (Google)');
     const dummyUser = {
@@ -615,7 +615,7 @@ class HubDatabaseService {
     }
 
     // Offline / Demo sign in
-    const isPrince = email && (email.trim().toLowerCase() === 'pk3334238@gmail.com' || email.trim().toLowerCase() === 'prince86944@gmail.com');
+    const isPrince = email && (email.trim().toLowerCase() === 'pk3334238@gmail.com');
     const dummyUser = {
       id: isPrince ? 'admin-prince-super-id' : 'demo-student-id',
       email: email.trim(),
@@ -686,7 +686,7 @@ class HubDatabaseService {
     }
 
     // Authorized Super Admin pk3334238@gmail.com check
-    if (email && (email.trim().toLowerCase() === 'pk3334238@gmail.com' || email.trim().toLowerCase() === 'prince86944@gmail.com')) {
+    if (email && email.trim().toLowerCase() === 'pk3334238@gmail.com') {
       const princeUser = {
         id: 'admin-prince-super-id',
         email: email.trim().toLowerCase(),

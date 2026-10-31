@@ -29,8 +29,8 @@ async function initDashboard() {
   // 2. Load Profile
   currentProfile = await window.DB.getStudentProfile(currentUser.id);
 
-  // If user is pk3334238@gmail.com or prince86944@gmail.com, ensure name displays Prince Kumar and show Super Admin badge
-  if (currentUser.email === 'pk3334238@gmail.com' || currentUser.email === 'prince86944@gmail.com') {
+  // If user is pk3334238@gmail.com, ensure name displays Prince Kumar and show Super Admin badge
+  if (currentUser.email === 'pk3334238@gmail.com') {
     if (!currentProfile.name || currentProfile.name.toLowerCase().includes('ankot') || currentProfile.name === 'Student') {
       currentProfile.name = 'Prince Kumar';
       currentProfile.display_name = 'Prince Kumar';
@@ -43,7 +43,7 @@ async function initDashboard() {
   renderProfileUI(currentProfile);
 
   // Control Admin Portal Link Visibility strictly for pk3334238@gmail.com
-  const isPrinceAdmin = (currentUser && currentUser.email && (currentUser.email.toLowerCase() === 'pk3334238@gmail.com' || currentUser.email.toLowerCase() === 'prince86944@gmail.com'));
+  const isPrinceAdmin = (currentUser && currentUser.email && currentUser.email.toLowerCase() === 'pk3334238@gmail.com');
   const dashAdminLink = document.getElementById('dashAdminPortalLink');
   const headerAdminBtn = document.getElementById('headerAdminQuickBtn');
   if (isPrinceAdmin) {
@@ -289,7 +289,7 @@ async function handleUpdateProfile(event) {
   renderProfileUI(currentProfile);
 
   // Control Admin Portal Link Visibility strictly for pk3334238@gmail.com
-  const isPrinceAdmin = (currentUser && currentUser.email && (currentUser.email.toLowerCase() === 'pk3334238@gmail.com' || currentUser.email.toLowerCase() === 'prince86944@gmail.com'));
+  const isPrinceAdmin = (currentUser && currentUser.email && currentUser.email.toLowerCase() === 'pk3334238@gmail.com');
   const dashAdminLink = document.getElementById('dashAdminPortalLink');
   const headerAdminBtn = document.getElementById('headerAdminQuickBtn');
   if (isPrinceAdmin) {
