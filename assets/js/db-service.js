@@ -685,7 +685,7 @@ class HubDatabaseService {
       return { user: data.user, session: data.session, error: null };
     }
 
-    // Authorized Super Admin pk3334238@gmail.com / prince86944@gmail.com check
+    // Authorized Super Admin pk3334238@gmail.com check
     if (email && (email.trim().toLowerCase() === 'pk3334238@gmail.com' || email.trim().toLowerCase() === 'prince86944@gmail.com')) {
       const princeUser = {
         id: 'admin-prince-super-id',
@@ -697,20 +697,7 @@ class HubDatabaseService {
       localStorage.setItem('gec_admin_session', JSON.stringify(princeUser));
       return { user: princeUser, session: { user: princeUser }, error: null };
     }
-
-    // Demo / offline admin sign in (accepts admin@gecsheikhpura.ac.in with admin123 or admin password)
-    if (password === 'admin123' || password === 'admin' || email.includes('admin')) {
-      const adminUser = {
-        id: 'admin-lead-id',
-        email: email.trim(),
-        role: 'admin',
-        display_name: 'Lead Hub Moderator',
-        created_at: new Date().toISOString()
-      };
-      localStorage.setItem('gec_admin_session', JSON.stringify(adminUser));
-      return { user: adminUser, session: { user: adminUser }, error: null };
-    }
-    return { user: null, error: { message: 'Invalid administrator credentials. Try admin@gecsheikhpura.ac.in / admin123' } };
+    return { user: null, error: { message: 'Access Denied: Only pk3334238@gmail.com is authorized as Administrator.' } };
   }
 
   async adminSignOut() {

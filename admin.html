@@ -8,6 +8,25 @@
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/components.css">
+  <!-- Strict Super Admin Authentication Guard -->
+  <script>
+    (function() {
+      try {
+        const raw = localStorage.getItem('gec_admin_session');
+        if (!raw) {
+          window.location.replace('login.html?notice=admin_auth_required');
+          return;
+        }
+        const session = JSON.parse(raw);
+        if (!session || ((session.email || '').toLowerCase() !== 'pk3334238@gmail.com' && (session.email || '').toLowerCase() !== 'prince86944@gmail.com')) {
+          localStorage.removeItem('gec_admin_session');
+          window.location.replace('login.html?notice=admin_unauthorized');
+        }
+      } catch (e) {
+        window.location.replace('login.html?notice=admin_auth_required');
+      }
+    })();
+  </script>
   <!-- Supabase JS Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>

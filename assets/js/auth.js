@@ -248,17 +248,17 @@ function saveGoogleClientIdSetting() {
 window.saveGoogleClientIdSetting = saveGoogleClientIdSetting;
 
 /* ==========================================================================
-   Google Sign-In & Profile Onboarding Handlers (Firebase Auth Integration)
+   Google Sign-In via Official Firebase Auth SDK (Popup Flow)
    ========================================================================== */
-let activeGooglePopup = null;
-
 const firebaseConfig = {
-  apiKey: "AIzaSyBIvnhJLz_ucsxuFEnZeYSAq2L6vJ4DcKo",
-  authDomain: "apna-college-bihar.firebaseapp.com",
-  projectId: "apna-college-bihar",
-  storageBucket: "apna-college-bihar.firebasestorage.app",
-  messagingSenderId: "818059891079",
-  appId: "1:818059891079:web:395df6af749da04ae80322"
+  projectId: "beu-vision",
+  appId: "1:401950515540:web:6e5f6bed1048d2e1bea8c1",
+  databaseURL: "https://beu-vision-default-rtdb.firebaseio.com",
+  storageBucket: "beu-vision.firebasestorage.app",
+  apiKey: "AIzaSyACRMu_UkHnowxTpgPIrnS2min2O2N_LhY",
+  authDomain: "beu-vision.firebaseapp.com",
+  messagingSenderId: "401950515540",
+  measurementId: "G-LYFLRBHEM1"
 };
 
 let firebaseAuth = null;
@@ -284,91 +284,62 @@ async function handleContinueWithGoogle() {
   hideAuthAlert();
   initFirebaseClient();
 
-  if (firebaseAuth && googleAuthProvider) {
-    showAuthAlert('Opening official Google Sign-In popup via Firebase...', 'info');
-    try {
-      const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
-      if (result && result.user) {
-        const u = result.user;
-        const email = u.email || '';
-        const name = u.displayName || email.split('@')[0] || 'Student';
-        const photo = u.photoURL || '';
-
-        const isPrince = (email.toLowerCase() === 'pk3334238@gmail.com' || email.toLowerCase() === 'prince86944@gmail.com');
-
-        showAuthAlert(`✓ Authenticated as ${name} (${email}) via Google Firebase!`, 'success');
-
-        if (window.DB) {
-          await window.DB.signInWithGoogleDemo(email, name, photo);
-        }
-
-        setTimeout(() => {
-          window.location.href = isPrince ? 'admin.html' : 'dashboard.html';
-        }, 600);
-        return;
-      }
-    } catch (error) {
-      console.error("Firebase signInWithPopup error:", error);
-      if (error.code === 'auth/popup-closed-by-user') {
-        showAuthAlert('Google Sign-In popup was closed.', 'info');
-        return;
-      }
-      if (error.code === 'auth/unauthorized-domain') {
-        showAuthAlert(`Domain ${window.location.hostname} not authorized in Firebase Console yet. Please add it in Firebase Console -> Authentication -> Settings -> Authorized Domains. Opening chooser...`, 'warning');
-      } else {
-        showAuthAlert('Google Firebase popup: ' + (error.message || error.code), 'error');
-      }
-    }
+  if (!firebaseAuth || !googleAuthProvider) {
+    showAuthAlert('Initializing Google Firebase Auth... Please click again in a moment.', 'info');
+    return;
   }
 
-  // Fallback to Google Account Chooser modal if popup blocked or not authorized
-  const modal = document.getElementById('googleAuthModal');
-  if (modal) {
-    modal.style.display = 'flex';
-  } else {
-    selectGoogleAccount('pk3334238@gmail.com', 'Prince Kumar');
+  showAuthAlert('Opening official Google Sign-In popup...', 'info');
+
+  try {
+    const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
+    if (result && result.user) {
+      const u = result.user;
+      const email = (u.email || '').toLowerCase().trim();
+      const name = u.displayName || email.split('@')[0] || 'Student';
+      const photo = u.photoURL || '';
+
+      // Super Admin privileges strictly reserved for pk3334238@gmail.com
+      const isSuperAdmin = (email === 'pk3334238@gmail.com');
+
+      if (window.DB) {
+        await window.DB.signInWithGoogleDemo(email, name, photo);
+      }
+
+      if (isSuperAdmin) {
+        localStorage.setItem('gec_admin_session', JSON.stringify({
+          admin_id: 'adm_prince',
+          email: 'pk3334238@gmail.com',
+          role: 'Super Admin',
+          full_name: 'Prince Kumar',
+          login_time: new Date().toISOString()
+        }));
+        showAuthAlert(`👑 Welcome Prince Kumar! Super Admin verified. Opening Admin Panel...`, 'success');
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 600);
+      } else {
+        localStorage.removeItem('gec_admin_session');
+        showAuthAlert(`✓ Welcome, ${name}! Signed in with Google. Opening student dashboard...`, 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 600);
+      }
+      return;
+    }
+  } catch (error) {
+    console.error("Firebase signInWithPopup error:", error);
+    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+      showAuthAlert('Google Sign-In popup was closed.', 'info');
+    } else if (error.code === 'auth/unauthorized-domain') {
+      showAuthAlert(`Domain ${window.location.hostname} not authorized in Firebase Console yet.`, 'error');
+    } else {
+      showAuthAlert('Google Sign-In: ' + (error.message || error.code), 'error');
+    }
   }
 }
 window.handleContinueWithGoogle = handleContinueWithGoogle;
-
-function closeGoogleAuthModal() {
-  const modal = document.getElementById('googleAuthModal');
-  if (modal) modal.style.display = 'none';
-}
-window.closeGoogleAuthModal = closeGoogleAuthModal;
-
-async function selectGoogleAccount(email, name) {
-  closeGoogleAuthModal();
-  hideAuthAlert();
-  const isPrince = (email || '').toLowerCase() === 'pk3334238@gmail.com' || (email || '').toLowerCase() === 'prince86944@gmail.com';
-  const displayName = isPrince ? 'Prince Kumar' : (name || email.split('@')[0]);
-  
-  showAuthAlert(`Signing in with Google (${email}) via Firebase...`, 'info');
-  await handleDirectGoogleLogin(email, displayName);
-}
-window.selectGoogleAccount = selectGoogleAccount;
-
-async function submitCustomGoogleAccount() {
-  const input = document.getElementById('inputCustomGoogleEmail');
-  const email = (input ? input.value.trim() : '');
-  if (!email || !email.includes('@')) {
-    alert('Please enter a valid Gmail address (e.g. name@gmail.com)');
-    return;
-  }
-  const name = email.split('@')[0];
-  await selectGoogleAccount(email, name);
-}
-window.submitCustomGoogleAccount = submitCustomGoogleAccount;
-
-async function handlePrinceGoogleSignIn() {
-  await selectGoogleAccount('pk3334238@gmail.com', 'Prince Kumar');
-}
-window.handlePrinceGoogleSignIn = handlePrinceGoogleSignIn;
-
-async function handleGoogleSignIn() {
-  handleContinueWithGoogle();
-}
-window.handleGoogleSignIn = handleGoogleSignIn;
+window.handleGoogleSignIn = handleContinueWithGoogle;
 
 async function handleCustomGoogleLogin() {
   const nameInput = document.getElementById('customStudentName');
