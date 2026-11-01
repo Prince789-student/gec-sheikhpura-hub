@@ -30,8 +30,50 @@
       }
     }
   </script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0b132b;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .loading-container {
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .loading-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      object-fit: cover;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3.5px solid rgba(255,255,255,0.15);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
 </head>
 <body>
+  <div id="loading" class="loading-container">
+    <img src="assets/images/college_crest.jpg" class="loading-logo" alt="GEC Sheikhpura Logo" onerror="this.style.display='none'">
+    <div class="spinner"></div>
+    <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.5px;">GEC SHK Student</div>
+    <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Loading student portal...</div>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

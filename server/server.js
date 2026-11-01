@@ -12,7 +12,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security & Middleware
-app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
 app.use(compression());
 app.use(express.json());
 
@@ -443,11 +447,28 @@ app.post('/api/auth/verify', (req, res) => {
   });
 });
 
+// Serve root static files (HTML, CSS, JS, assets, and /app/ Flutter web)
+const rootStaticDir = path.join(__dirname, '..');
+app.use(express.static(rootStaticDir, { extensions: ['html'] }));
+
+// Catch-all for SPA navigation if /app/ routes are accessed
+app.get('/app/*', (req, res) => {
+  res.sendFile(path.join(rootStaticDir, 'app', 'index.html'));
+});
+
+// Root fallback to index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(rootStaticDir, 'index.html'));
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`=======================================================`);
-  console.log(`  GEC Sheikhpura Hub API Server running on port ${PORT}`);
-  console.log(`  Health Check: http://localhost:${PORT}/health`);
-  console.log(`  Listings API: http://localhost:${PORT}/api/listings`);
+  console.log(`  GEC Sheikhpura Hub Local Server LIVE`);
+  console.log(`  Frontend Web:    http://localhost:${PORT}`);
+  console.log(`  Mobile App Web:  http://localhost:${PORT}/app/`);
+  console.log(`  Admin Panel:     http://localhost:${PORT}/admin.html`);
+  console.log(`  Backend API:     http://localhost:${PORT}/api`);
+  console.log(`  Health Check:    http://localhost:${PORT}/health`);
   console.log(`=======================================================`);
 });
