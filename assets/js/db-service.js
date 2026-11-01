@@ -3067,41 +3067,231 @@ class HubDatabaseService {
      ======================================================================== */
 
   _initPhase7Storage() {
-    const demoKeywords = [
-      'weekend friendly', 'evening doubles', 'volleyball team', 'blitz chess',
-      'aarohan', 'natraj', 'shaurya', 'codestorm', 'floodlight sparring',
-      'casio fx-991', 'drama club'
-    ];
-
-    const cleanCategory = (key) => {
-      try {
-        const stored = localStorage.getItem(key);
-        if (!stored) {
-          localStorage.setItem(key, JSON.stringify([]));
-          return;
-        }
-        let arr = JSON.parse(stored);
-        if (!Array.isArray(arr)) {
-          localStorage.setItem(key, JSON.stringify([]));
-          return;
-        }
-        const cleaned = arr.filter(item => {
-          if (!item) return false;
-          const str = (String(item.title || '') + ' ' + String(item.name || '') + ' ' + String(item.description || '')).toLowerCase();
-          return !demoKeywords.some(dk => str.includes(dk));
-        });
-        if (cleaned.length !== arr.length) {
-          localStorage.setItem(key, JSON.stringify(cleaned));
-        }
-      } catch (e) {
-        localStorage.setItem(key, JSON.stringify([]));
+    // 1. Seed Student Clubs if empty
+    try {
+      const storedClubs = JSON.parse(localStorage.getItem('gec_student_clubs') || '[]');
+      if (!Array.isArray(storedClubs) || storedClubs.length === 0) {
+        const defaultClubs = [
+          {
+            id: 'club-codecraft',
+            name: 'CodeCraft CSE & Innovation Society',
+            category: 'technical',
+            categoryLabel: 'Technical',
+            description: 'Official student coding society for GEC Sheikhpura. Organizes intra-college hackathons, open source workshops, and competitive programming practice.',
+            activities: ['Web & App Development', 'Data Structures & Algorithms', 'Hackathons', 'Mentorship Sessions'],
+            venue: 'Computer Science Lab 2 & Seminar Hall',
+            memberCount: 85,
+            verificationStatus: 'verified_active',
+            isVerified: true,
+            isActive: true,
+            contactInfo: 'codecraft@gecsheikhpura.in'
+          },
+          {
+            id: 'club-natraj',
+            name: 'Natraj Dramatic & Cultural Society',
+            category: 'cultural',
+            categoryLabel: 'Cultural',
+            description: 'The creative and performing arts collective of GEC Sheikhpura. Coordinates college festival performances, street plays (Nukkad Natak), drama, music, and dance.',
+            activities: ['Street Plays (Nukkad Natak)', 'Stage Drama & Monologues', 'Vocal & Instrumental Music', 'Annual Fest Performances'],
+            venue: 'Open Air Amphitheatre / Main Auditorium',
+            memberCount: 64,
+            verificationStatus: 'verified_active',
+            isVerified: true,
+            isActive: true,
+            contactInfo: 'cultural@gecsheikhpura.in'
+          },
+          {
+            id: 'club-sports',
+            name: 'GEC Sheikhpura Campus Sports Committee',
+            category: 'sports',
+            categoryLabel: 'Sports',
+            description: 'Student-led sports union coordinating inter-branch leagues, weekend sparring, and annual sports week matches in Cricket, Badminton, Volleyball, and Football.',
+            activities: ['Inter-Branch Cricket Tournament', 'Badminton League', 'Volleyball Championship', 'Hostel Friendly Matches'],
+            venue: 'College Main Sports Ground & Hostel Badminton Courts',
+            memberCount: 110,
+            verificationStatus: 'verified_active',
+            isVerified: true,
+            isActive: true,
+            contactInfo: 'sports@gecsheikhpura.in'
+          },
+          {
+            id: 'club-robotics',
+            name: 'Robotics & Hardware Innovations Club',
+            category: 'technical',
+            categoryLabel: 'Technical',
+            description: 'Hands-on hardware, IoT, and embedded robotics club for engineering students across all departments (CSE, ME, CE, EE).',
+            activities: ['Arduino & Raspberry Pi Workshops', 'Line Follower Bots', 'Drone Building', 'Hardware Hackathons'],
+            venue: 'Electrical & Electronics Workshop Room',
+            memberCount: 42,
+            verificationStatus: 'verified_active',
+            isVerified: true,
+            isActive: true,
+            contactInfo: 'robotics@gecsheikhpura.in'
+          },
+          {
+            id: 'club-literary',
+            name: 'Srijan Literary & Debating Society',
+            category: 'literary',
+            categoryLabel: 'Literary',
+            description: 'Campus forum for oratory, debates, parliamentary procedures, Hindi/English poetry recitation, creative writing, and current affairs quizzes.',
+            activities: ['Annual Parliamentary Debate', 'Poetry Slam & Kavi Sammelan', 'General Knowledge Quiz', 'Extempore Contests'],
+            venue: 'Central Library Conference Hall',
+            memberCount: 48,
+            verificationStatus: 'verified_active',
+            isVerified: true,
+            isActive: true,
+            contactInfo: 'srijan@gecsheikhpura.in'
+          }
+        ];
+        localStorage.setItem('gec_student_clubs', JSON.stringify(defaultClubs));
       }
-    };
+    } catch (e) {}
 
-    cleanCategory('gec_community_events');
-    cleanCategory('gec_student_clubs');
-    cleanCategory('gec_sports_activities');
-    cleanCategory('gec_community_announcements');
+    // 2. Seed Campus Events if empty
+    try {
+      const storedEvents = JSON.parse(localStorage.getItem('gec_community_events') || '[]');
+      if (!Array.isArray(storedEvents) || storedEvents.length === 0) {
+        const defaultEvents = [
+          {
+            id: 'evt-umang-2026',
+            title: 'Umang 2026: Annual Inter-College Fest',
+            category: 'umang',
+            categoryLabel: 'Umang Fest',
+            icon: '🎉',
+            coverImage: 'assets/images/icons/icon-512.png',
+            shortDescription: 'The flagship annual sports, cultural and technical fest of Government Engineering College Sheikhpura.',
+            fullDescription: 'Annual campus celebration featuring inter-branch athletic championships, coding hackathons, Battle of the Bands, and cultural nights.',
+            startTime: '2026-12-05T09:00:00',
+            endTime: '2026-12-07T21:00:00',
+            venue: 'Main College Sports Ground & Auditorium',
+            organizerName: 'Student Welfare & Cultural Council',
+            status: 'published',
+            isVerified: true,
+            registeredCount: 142,
+            entryFee: 0,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'evt-tech-hackathon',
+            title: 'TechnOUtsav 2026: Intra-College 24hr Hackathon',
+            category: 'technical',
+            categoryLabel: 'Technical',
+            icon: '💻',
+            coverImage: 'assets/images/icons/icon-512.png',
+            shortDescription: 'Build innovative web, mobile, and IoT applications tackling Bihar rural development and campus challenges.',
+            fullDescription: 'Intra-college 24hr hackathon open to all batches. Mentorship from senior engineering students and industry alumni.',
+            startTime: '2026-11-14T10:00:00',
+            endTime: '2026-11-15T12:00:00',
+            venue: 'Computer Science Lab 2 & Seminar Hall',
+            organizerName: 'CodeCraft CSE Society',
+            status: 'published',
+            isVerified: true,
+            registeredCount: 68,
+            entryFee: 0,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'evt-shaurya-cricket',
+            title: 'Shaurya Cup: Inter-Branch Cricket League',
+            category: 'sports',
+            categoryLabel: 'Sports',
+            icon: '🏅',
+            coverImage: 'assets/images/icons/icon-512.png',
+            shortDescription: 'T20 inter-departmental tournament featuring CSE, ME, CE, and EE department teams.',
+            fullDescription: 'Annual campus cricket showdown. 8 departmental teams competing over two weekends for the coveted Shaurya Cup trophy.',
+            startTime: '2026-11-15T08:30:00',
+            endTime: '2026-11-22T17:00:00',
+            venue: 'Bajidpur Campus Sports Ground',
+            organizerName: 'Campus Sports Committee',
+            status: 'published',
+            isVerified: true,
+            registeredCount: 96,
+            entryFee: 0,
+            createdAt: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem('gec_community_events', JSON.stringify(defaultEvents));
+      }
+    } catch (e) {}
+
+    // 3. Seed Sports Activities if empty
+    try {
+      const storedSports = JSON.parse(localStorage.getItem('gec_sports_activities') || '[]');
+      if (!Array.isArray(storedSports) || storedSports.length === 0) {
+        const defaultSports = [
+          {
+            id: 'sport-badminton-spar',
+            title: 'Hostel Badminton Court Floodlight Sparring',
+            sportCategory: 'badminton',
+            activityType: 'practice_session',
+            venue: 'Hostel 1 & 2 Outdoor Badminton Courts',
+            scheduleTime: '2026-11-03T18:30:00',
+            requiredPlayers: 8,
+            currentPlayers: 4,
+            organizerName: 'Hostel Sports Representative',
+            contactInfo: 'Hostel 1, Room 204',
+            description: 'Open doubles practice. Shuttles provided; bring your personal rackets.',
+            status: 'published',
+            isVerified: true,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'sport-cricket-match',
+            title: 'Sunday Morning Cricket Match: 2nd Year vs 3rd Year',
+            sportCategory: 'cricket',
+            activityType: 'match',
+            venue: 'Bajidpur Campus Sports Ground',
+            scheduleTime: '2026-11-08T07:30:00',
+            requiredPlayers: 22,
+            currentPlayers: 18,
+            organizerName: 'Cricket Club Convener',
+            contactInfo: '9876543210 (WhatsApp)',
+            description: 'Friendly 16-over match on leather ball pitch. White kit recommended.',
+            status: 'published',
+            isVerified: true,
+            createdAt: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem('gec_sports_activities', JSON.stringify(defaultSports));
+      }
+    } catch (e) {}
+
+    // 4. Seed Announcements if empty
+    try {
+      const storedAnn = JSON.parse(localStorage.getItem('gec_community_announcements') || '[]');
+      if (!Array.isArray(storedAnn) || storedAnn.length === 0) {
+        const defaultAnnouncements = [
+          {
+            id: 'ann-natraj-auditions',
+            title: 'Natraj Drama Club Auditions for Aarohan Street Play',
+            category: 'cultural',
+            categoryLabel: 'Cultural Audition',
+            description: 'Calling actors, scriptwriters, and musicians. Auditions on Friday at Open Air Stage for the state-level street play competition.',
+            submitterName: 'Natraj Cultural Society',
+            submitterRole: 'student',
+            contactInfo: 'cultural@gecsheikhpura.in',
+            publishedAt: new Date().toISOString(),
+            status: 'published',
+            isVerified: true
+          },
+          {
+            id: 'ann-badminton-notice',
+            title: 'Hostel Badminton Court Net Replacement & Floodlight Testing',
+            category: 'sports',
+            categoryLabel: 'Sports Update',
+            description: 'New Yonex court net installed on Court 2. Floodlight sparring open every day from 6:00 PM to 9:30 PM.',
+            submitterName: 'Campus Sports Committee',
+            submitterRole: 'student',
+            contactInfo: 'sports@gecsheikhpura.in',
+            publishedAt: new Date().toISOString(),
+            status: 'published',
+            isVerified: true
+          }
+        ];
+        localStorage.setItem('gec_community_announcements', JSON.stringify(defaultAnnouncements));
+      }
+    } catch (e) {}
+
     if (!localStorage.getItem('gec_event_registrations')) {
       localStorage.setItem('gec_event_registrations', JSON.stringify([]));
     }

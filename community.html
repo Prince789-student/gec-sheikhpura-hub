@@ -12,6 +12,110 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="components/footer.css">
+
+  <script>
+    // 1. Unregister stale service worker on localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(r) { r.unregister(); });
+        });
+      }
+    }
+
+    // 2. Instant Tab Switcher (available immediately before scripts finish loading)
+    window.activateCommunityTab = function(targetId, updateUrl) {
+      if (updateUrl === undefined) updateUrl = true;
+      var tabs = document.querySelectorAll('[data-community-tab]');
+      var panels = document.querySelectorAll('.community-tab-panel');
+      tabs.forEach(function(t) {
+        if (t.getAttribute('data-community-tab') === targetId) {
+          t.classList.add('active');
+          t.setAttribute('aria-selected', 'true');
+        } else {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        }
+      });
+      panels.forEach(function(p) {
+        if (p.id === targetId) {
+          p.classList.add('active');
+          p.style.display = 'block';
+        } else {
+          p.classList.remove('active');
+          p.style.display = 'none';
+        }
+      });
+      if (updateUrl) {
+        try {
+          var tabParam = targetId.replace('Tab', '');
+          window.history.pushState({ tab: tabParam }, '', window.location.pathname + '?tab=' + tabParam);
+        } catch(e) {}
+      }
+      if (targetId === 'eventsTab' && window.loadEventsSection) window.loadEventsSection();
+      else if (targetId === 'clubsTab' && window.loadClubsSection) window.loadClubsSection();
+      else if (targetId === 'sportsTab' && window.loadSportsSection) window.loadSportsSection();
+      else if (targetId === 'announcementsTab' && window.loadAnnouncementsSection) window.loadAnnouncementsSection();
+    };
+
+    // 3. Instant Modal Openers & Closers
+    window.openSubmitEventModal = function() {
+      var m = document.getElementById('submitEventModal');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeSubmitEventModal = function() {
+      var m = document.getElementById('submitEventModal');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openSuggestClubModal = function() {
+      var m = document.getElementById('suggestClubModal');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeSuggestClubModal = function() {
+      var m = document.getElementById('suggestClubModal');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openPostAnnouncementModal = function() {
+      var m = document.getElementById('postAnnouncementModal');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closePostAnnouncementModal = function() {
+      var m = document.getElementById('postAnnouncementModal');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openHostSportsModal = function() {
+      var m = document.getElementById('hostSportsModal');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeHostSportsModal = function() {
+      var m = document.getElementById('hostSportsModal');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.closeEventRegisterModal = function() {
+      var m = document.getElementById('eventRegisterModal');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.closeEventDetailModal = function() {
+      var m = document.getElementById('eventDetailModal');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+
+    // 4. Global Backdrop & Escape Listeners
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('open');
+        e.target.style.display = 'none';
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open, .modal-overlay[style*="flex"]').forEach(function(m) {
+          m.classList.remove('open');
+          m.style.display = 'none';
+        });
+      }
+    });
+  </script>
 </head>
 <body>
   <!-- Top Disclaimer Bar -->
@@ -211,16 +315,16 @@
       <div class="community-tabs-bar">
         <!-- Tab Navigation Pills -->
         <div class="community-tabs-pills" role="tablist">
-          <button type="button" class="community-tab-btn active" data-community-tab="eventsTab" role="tab" aria-selected="true">
+          <button type="button" class="community-tab-btn active" data-community-tab="eventsTab" role="tab" aria-selected="true" onclick="activateCommunityTab('eventsTab')">
             🎪 College Events (<span id="eventsCountBadge">0</span>)
           </button>
-          <button type="button" class="community-tab-btn" data-community-tab="clubsTab" role="tab" aria-selected="false">
+          <button type="button" class="community-tab-btn" data-community-tab="clubsTab" role="tab" aria-selected="false" onclick="activateCommunityTab('clubsTab')">
             🎭 Clubs &amp; Societies
           </button>
-          <button type="button" class="community-tab-btn" data-community-tab="sportsTab" role="tab" aria-selected="false">
+          <button type="button" class="community-tab-btn" data-community-tab="sportsTab" role="tab" aria-selected="false" onclick="activateCommunityTab('sportsTab')">
             ⚽ Sports &amp; Recreation
           </button>
-          <button type="button" class="community-tab-btn" data-community-tab="announcementsTab" role="tab" aria-selected="false">
+          <button type="button" class="community-tab-btn" data-community-tab="announcementsTab" role="tab" aria-selected="false" onclick="activateCommunityTab('announcementsTab')">
             📢 Campus Announcements
           </button>
         </div>

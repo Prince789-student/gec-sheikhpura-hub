@@ -449,7 +449,15 @@ app.post('/api/auth/verify', (req, res) => {
 
 // Serve root static files (HTML, CSS, JS, assets, and /app/ Flutter web)
 const rootStaticDir = path.join(__dirname, '..');
-app.use(express.static(rootStaticDir, { extensions: ['html'] }));
+app.use(express.static(rootStaticDir, {
+  extensions: ['html'],
+  setHeaders: (res, filePath) => {
+    // Disable caching on localhost to guarantee instantaneous updates
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+  }
+}));
 
 // Catch-all for SPA navigation if /app/ routes are accessed
 app.get('/app/*', (req, res) => {

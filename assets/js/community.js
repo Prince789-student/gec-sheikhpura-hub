@@ -10,24 +10,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Purge any legacy demo sports/clubs/events from browser storage
-  const keys = ['gec_sports_activities', 'gec_student_clubs', 'gec_community_events', 'gec_community_announcements'];
-  const mockKeywords = [
-    'weekend friendly', 'evening doubles', 'volleyball team', 'blitz chess', 
-    'aarohan', 'natraj', 'shaurya', 'floodlight sparring', 'lost casio', 'casio fx'
-  ];
-  keys.forEach(k => {
-    try {
-      const val = localStorage.getItem(k);
-      if (val) {
-        const lower = val.toLowerCase();
-        if (mockKeywords.some(mk => lower.includes(mk))) {
-          localStorage.setItem(k, JSON.stringify([]));
-        }
-      }
-    } catch(e) {}
-  });
-
   initCommunityPage();
 });
 
