@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -698,11 +698,22 @@
         roomNo: document.getElementById('laundryRoomNo').value.trim(),
         locationDetails: document.getElementById('laundryHostel').value + ' - ' + document.getElementById('laundryRoomNo').value.trim(),
         notes: document.getElementById('laundryNotes').value.trim(),
-        status: 'Pending Pickup'
+        status: 'Pending Pickup',
+        createdAt: new Date().toISOString()
       };
 
+      // Always save locally so orders are never lost
       try {
-        const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/laundry/orders', {
+        const localOrders = JSON.parse(localStorage.getItem('gec_laundry_orders_local') || '[]');
+        localOrders.unshift(order);
+        localStorage.setItem('gec_laundry_orders_local', JSON.stringify(localOrders));
+      } catch (e) {}
+
+      try {
+        const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+          ? '/api/laundry/orders' 
+          : 'https://gec-sheikhpura-backend.onrender.com/api/laundry/orders';
+        const res = await fetch(apiEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(order)

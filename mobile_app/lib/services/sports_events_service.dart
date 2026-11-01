@@ -7,7 +7,12 @@ class SportsEventsService {
   static final SportsEventsService instance = SportsEventsService._();
   SportsEventsService._();
 
-  static const String _apiBase = 'https://gec-sheikhpura-backend.onrender.com/api';
+  static String get _apiBase {
+    if (kIsWeb) {
+      return '${Uri.base.origin}/api';
+    }
+    return 'https://gec-sheikhpura-backend.onrender.com/api';
+  }
 
   // In-memory caches for fast UI response
   final List<StudentEvent> cachedEvents = [];

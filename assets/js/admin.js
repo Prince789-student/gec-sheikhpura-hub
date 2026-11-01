@@ -3712,16 +3712,23 @@ window.loadAdminLaundryOrders = async function() {
   const countBadge = document.getElementById('tabLaundryCount');
   if (!tbody) return;
 
+  const localStored = JSON.parse(localStorage.getItem('gec_laundry_orders_local') || '[]');
   try {
-    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/laundry/orders?role=laundry_manager');
+    const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? '/api/laundry/orders?role=laundry_manager'
+      : 'https://gec-sheikhpura-backend.onrender.com/api/laundry/orders?role=laundry_manager';
+    const res = await fetch(apiEndpoint);
     if (res.ok) {
       const data = await res.json();
-      allAdminLaundryOrders = data.orders || [];
+      const serverOrders = data.orders || [];
+      const orderIds = new Set(serverOrders.map(o => o.id));
+      const extraLocal = localStored.filter(o => !orderIds.has(o.id));
+      allAdminLaundryOrders = [...serverOrders, ...extraLocal];
     } else {
-      allAdminLaundryOrders = JSON.parse(localStorage.getItem('gec_laundry_orders_local') || '[]');
+      allAdminLaundryOrders = localStored;
     }
   } catch (e) {
-    allAdminLaundryOrders = JSON.parse(localStorage.getItem('gec_laundry_orders_local') || '[]');
+    allAdminLaundryOrders = localStored;
   }
 
   if (countBadge) countBadge.textContent = allAdminLaundryOrders.length;
@@ -3819,7 +3826,10 @@ window.filterAdminLaundryOrders = function() {
 
 window.updateLaundryStatus = async function(orderId, newStatus) {
   try {
-    await fetch(`https://gec-sheikhpura-backend.onrender.com/api/laundry/orders/${orderId}`, {
+    const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? `/api/laundry/orders/${orderId}`
+      : `https://gec-sheikhpura-backend.onrender.com/api/laundry/orders/${orderId}`;
+    await fetch(apiEndpoint, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus })
@@ -3836,7 +3846,10 @@ window.updateLaundryStatus = async function(orderId, newStatus) {
 window.deleteLaundryOrder = async function(orderId) {
   if (!confirm(`Are you sure you want to delete laundry order #${orderId.slice(-6)}?`)) return;
   try {
-    await fetch(`https://gec-sheikhpura-backend.onrender.com/api/laundry/orders/${orderId}`, {
+    const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? `/api/laundry/orders/${orderId}`
+      : `https://gec-sheikhpura-backend.onrender.com/api/laundry/orders/${orderId}`;
+    await fetch(apiEndpoint, {
       method: 'DELETE'
     });
   } catch (e) {}
@@ -3864,7 +3877,10 @@ window.loadAdminStaffRoles = async function() {
   if (!tbody) return;
 
   try {
-    const res = await fetch('https://gec-sheikhpura-backend.onrender.com/api/admin/roles');
+    const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? '/api/admin/roles'
+      : 'https://gec-sheikhpura-backend.onrender.com/api/admin/roles';
+    const res = await fetch(apiEndpoint);
     if (res.ok) {
       const data = await res.json();
       allStaffRoles = data.roles || [];
@@ -3950,7 +3966,10 @@ window.handleAssignStaffRole = async function(event) {
   const roleObj = { email, name, role: roleLabel, permissions };
 
   try {
-    await fetch('https://gec-sheikhpura-backend.onrender.com/api/admin/roles', {
+    const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? '/api/admin/roles'
+      : 'https://gec-sheikhpura-backend.onrender.com/api/admin/roles';
+    await fetch(apiEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(roleObj)
@@ -3980,7 +3999,10 @@ window.deleteStaffRole = async function(email) {
   if (!confirm(`Revoke admin/staff permissions for ${email}?`)) return;
 
   try {
-    await fetch(`https://gec-sheikhpura-backend.onrender.com/api/admin/roles/${encodeURIComponent(email)}`, {
+    const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? `/api/admin/roles/${encodeURIComponent(email)}`
+      : `https://gec-sheikhpura-backend.onrender.com/api/admin/roles/${encodeURIComponent(email)}`;
+    await fetch(apiEndpoint, {
       method: 'DELETE'
     });
   } catch (e) {}

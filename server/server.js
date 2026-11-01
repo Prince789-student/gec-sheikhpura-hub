@@ -46,16 +46,7 @@ app.use(cors({
 // In-Memory Database for Live Student Hub
 let listings = [];
 
-let notices = [
-  {
-    id: 'not_1',
-    title: 'Revised B.Tech Mid-Term Exam Schedule Announced',
-    date: '30 Oct 2026',
-    category: 'Examination',
-    url: 'https://beu-bih.ac.in',
-    isImportant: true
-  }
-];
+let notices = [];
 
 let events = [];
 

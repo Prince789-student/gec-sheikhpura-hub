@@ -9,7 +9,12 @@ class DataService {
   static final DataService instance = DataService._();
   DataService._();
 
-  static const String apiBase = 'https://gec-sheikhpura-backend.onrender.com';
+  static String get apiBase {
+    if (kIsWeb) {
+      return Uri.base.origin;
+    }
+    return 'https://gec-sheikhpura-backend.onrender.com';
+  }
 
   // SharedPreferences keys
   static const String _bookmarksKey = 'gec_saved_bookmarks';
