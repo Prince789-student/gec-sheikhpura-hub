@@ -402,129 +402,41 @@ document.addEventListener('DOMContentLoaded', checkMobileRedirectAuth);
 
 async function handleContinueWithGoogle() {
   hideAuthAlert();
+  initFirebaseClient();
 
-  const clientId = getGoogleClientId();
-  const redirectUri = window.location.origin + '/login.html';
-  const nonce = Math.random().toString(36).substring(2) + Date.now().toString(36);
-  const width = 500;
-  const height = 650;
-  const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
-  const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
-  const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token%20id_token&scope=${encodeURIComponent('openid email profile')}&prompt=select_account&nonce=${encodeURIComponent(nonce)}`;
-
-  // If on production Vercel, attempt Google OAuth popup
-  if (window.location.hostname.endsWith('vercel.app')) {
-    try {
-      const win = window.open(googleOAuthUrl, 'GoogleAuthPopup', `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`);
-      if (win && !win.closed && typeof win.closed !== 'undefined') {
-        win.focus();
-        showAuthAlert('Google Sign-In popup opened. Please select your account...', 'info');
-        return;
-      }
-    } catch (e) {
-      console.warn("Popup error:", e);
-    }
+  if (!firebaseAuth || !googleAuthProvider) {
+    showAuthAlert('Connecting to Firebase Authentication, please wait...', 'info');
+    setTimeout(() => {
+      handleContinueWithGoogle();
+    }, 300);
+    return;
   }
 
-  // Instant Google Account Chooser Modal (works everywhere - localhost & production without popup blocker issues)
-  showGoogleAccountModalFallback(googleOAuthUrl);
+  showAuthAlert('Opening Google Sign-In with Firebase...', 'info');
+
+  try {
+    const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
+    if (result && result.user) {
+      showAuthAlert('✓ Google sign-in successful! Processing account...', 'success');
+      await processFirebaseAuthenticatedUser(result.user);
+    }
+  } catch (error) {
+    console.error('Firebase signInWithPopup error:', error);
+    if (error.code === 'auth/popup-closed-by-user') {
+      showAuthAlert('Google Sign-In popup was closed before completing. Click "Continue with Google" to try again.', 'info');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      // User clicked multiple times, ignore duplicate request
+    } else if (error.code === 'auth/popup-blocked') {
+      showAuthAlert('Browser blocked the popup window. Please allow popups for this site and click Continue with Google again.', 'error');
+    } else if (error.code === 'auth/unauthorized-domain') {
+      showAuthAlert(`Domain (${window.location.hostname}) is not authorized in Firebase Console. Please add it to Authorized Domains in Firebase Auth settings.`, 'error');
+    } else {
+      showAuthAlert(`Sign-in error: ${error.message || error.code}`, 'error');
+    }
+  }
 }
 window.handleContinueWithGoogle = handleContinueWithGoogle;
 window.handleGoogleSignIn = handleContinueWithGoogle;
-
-function showGoogleAccountModalFallback(oauthUrl) {
-  let modal = document.getElementById('googleDirectAuthModal');
-  if (modal) modal.remove();
-
-  modal = document.createElement('div');
-  modal.id = 'googleDirectAuthModal';
-  modal.className = 'modal-overlay open show active';
-  modal.style.cssText = 'display: flex; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 10000; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px);';
-  modal.innerHTML = `
-    <div class="modal-box-card" style="max-width: 440px; width: 100%; padding: 1.5rem; border-radius: 16px; background: var(--bg-card, #ffffff); box-shadow: 0 10px 30px rgba(0,0,0,0.25); border: 1px solid var(--border-light, #e2e8f0); color: var(--text-main, #1e293b);">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid var(--border-light, #e2e8f0); padding-bottom: 0.75rem;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Select Google Account</h3>
-        </div>
-        <button type="button" onclick="document.getElementById('googleDirectAuthModal').remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted, #64748b); line-height: 1;">&times;</button>
-      </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted, #64748b); margin-bottom: 1rem;">
-        Choose your Google account to sign in to <strong>GEC Sheikhpura Hub</strong>:
-      </p>
-      
-      <!-- 1-Click Fast Accounts -->
-      <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.25rem;">
-        <button type="button" class="google-acc-btn" onclick="processDirectGoogleSelect('pk3334238@gmail.com', 'Prince Kumar')" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1.5px solid #dbeafe; border-radius: 10px; background: #f8fafc; cursor: pointer; text-align: left; transition: all 0.2s ease; width: 100%;">
-          <div style="width: 38px; height: 38px; border-radius: 50%; background: #2563eb; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 1.05rem;">P</div>
-          <div style="flex: 1; overflow: hidden;">
-            <div style="font-weight: 700; font-size: 0.92rem; color: #1e293b;">Prince Kumar <span style="font-size: 0.7rem; background: #fef3c7; color: #b45309; padding: 1px 6px; border-radius: 4px; font-weight: 800;">ADMIN</span></div>
-            <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">pk3334238@gmail.com</div>
-          </div>
-          <span style="color: #2563eb; font-weight: 700; font-size: 0.85rem;">Continue →</span>
-        </button>
-
-        <button type="button" class="google-acc-btn" onclick="processDirectGoogleSelect('student.gec@gmail.com', 'Student User')" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: #ffffff; cursor: pointer; text-align: left; transition: all 0.2s ease; width: 100%;">
-          <div style="width: 38px; height: 38px; border-radius: 50%; background: #059669; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 1.05rem;">S</div>
-          <div style="flex: 1; overflow: hidden;">
-            <div style="font-weight: 700; font-size: 0.92rem; color: #1e293b;">Student Account <span style="font-size: 0.7rem; background: #d1fae5; color: #047857; padding: 1px 6px; border-radius: 4px; font-weight: 800;">STUDENT</span></div>
-            <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">student.gec@gmail.com</div>
-          </div>
-          <span style="color: #059669; font-weight: 700; font-size: 0.85rem;">Continue →</span>
-        </button>
-
-        ${oauthUrl ? `
-        <button type="button" class="google-acc-btn" onclick="window.open('${oauthUrl}', 'GoogleAuth', 'width=500,height=650'); document.getElementById('googleDirectAuthModal').remove();" style="display: flex; align-items: center; gap: 12px; padding: 9px 14px; border: 1px dashed #94a3b8; border-radius: 10px; background: #f8fafc; cursor: pointer; text-align: left; transition: all 0.2s ease; width: 100%;">
-          <div style="width: 38px; height: 38px; border-radius: 50%; background: #ffffff; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center;">
-            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          </div>
-          <div style="flex: 1;">
-            <div style="font-weight: 600; font-size: 0.88rem; color: #334155;">Open Google Accounts Window</div>
-            <div style="font-size: 0.75rem; color: #64748b;">accounts.google.com OAuth popup</div>
-          </div>
-          <span style="color: #64748b; font-size: 0.8rem;">↗</span>
-        </button>
-        ` : ''}
-      </div>
-
-      <!-- Custom Google Email Input -->
-      <div style="border-top: 1px solid var(--border-light, #e2e8f0); padding-top: 0.85rem;">
-        <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 0.4rem; color: var(--text-main, #334155);">Or enter your Google Email address:</label>
-        <div style="display: flex; gap: 0.5rem;">
-          <input type="email" id="directStudentEmailInput" placeholder="your.name@gmail.com" class="form-control" style="flex: 1; font-size: 0.875rem; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-medium, #cbd5e1);">
-          <button type="button" class="btn btn-primary" onclick="submitDirectStudentEmail()" style="font-size: 0.85rem; white-space: nowrap; padding: 0.6rem 1rem; border-radius: 8px; background: var(--color-primary, #1e3a8a); color: #fff; font-weight: 700; border: none; cursor: pointer;">Sign In</button>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-window.showGoogleAccountModalFallback = showGoogleAccountModalFallback;
-
-async function processDirectGoogleSelect(email, name) {
-  const modal = document.getElementById('googleDirectAuthModal');
-  if (modal) modal.remove();
-  showAuthAlert('Signing in with Google as ' + name + '...', 'info');
-  await processFirebaseAuthenticatedUser({
-    uid: 'google_' + btoa(email).replace(/=/g, '').slice(0, 16),
-    email: email,
-    displayName: name,
-    photoURL: ''
-  });
-}
-window.processDirectGoogleSelect = processDirectGoogleSelect;
-
-async function submitDirectStudentEmail() {
-  const inp = document.getElementById('directStudentEmailInput');
-  const email = (inp ? inp.value.trim() : '');
-  if (!email || !email.includes('@')) {
-    alert('Please enter a valid Google email address.');
-    return;
-  }
-  const name = email.split('@')[0];
-  await processDirectGoogleSelect(email, name);
-}
-window.submitDirectStudentEmail = submitDirectStudentEmail;
 
 async function handleCustomGoogleLogin() {
   const nameInput = document.getElementById('customStudentName');
