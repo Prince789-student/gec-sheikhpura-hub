@@ -77,7 +77,7 @@ class GrievanceFormScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Official Redressal Portal',
+                              'Student Grievance & Help Desk',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
@@ -100,7 +100,7 @@ class GrievanceFormScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   const Text(
-                    'All complaints regarding hostel accommodation, student disputes, mess food hygiene, anti-ragging incidents, or personal data concerns are officially recorded and tracked through our official Google Redressal Form.',
+                    'All complaints regarding hostel accommodation, student disputes, mess food hygiene, anti-ragging incidents, or personal data concerns are recorded and tracked through our Student Redressal Form.',
                     style: TextStyle(fontSize: 13, height: 1.5),
                   ),
                 ],
@@ -132,7 +132,7 @@ class GrievanceFormScreen extends StatelessWidget {
                   const Icon(Icons.assignment, size: 48, color: AppTheme.accentSky),
                   const SizedBox(height: 12),
                   const Text(
-                    'Official Grievance Google Form',
+                    'Grievance Redressal Form',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -141,7 +141,7 @@ class GrievanceFormScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Tap below to open and submit your official grievance ticket directly to the Grievance Officer.',
+                    'Tap below to open and submit your grievance ticket to the grievance redressal team.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.4),
                   ),

@@ -4540,7 +4540,7 @@ class HubDatabaseService {
     return {
       active: true,
       level: 'info',
-      message: '🏛️ Official GEC Sheikhpura 2026 Academic & Campus Life Portal — BEU Syllabus, Verified Housing & Local Student Directory',
+      message: '🎓 GEC Sheikhpura Student Life Hub — Student Housing, Local Services, Campus Directory & Community Portal',
       linkUrl: 'notices.html',
       linkText: 'View Live Circulars →'
     };

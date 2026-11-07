@@ -882,14 +882,16 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
                         style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppTheme.successGreen),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, size: 14, color: AppTheme.warningAmber),
-                        const SizedBox(width: 2),
-                        Text('${food.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                      ],
-                    ),
+                    if (food.rating > 0) ...[
+                      const SizedBox(width: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.star, size: 14, color: AppTheme.warningAmber),
+                          const SizedBox(width: 2),
+                          Text('${food.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
                 IconButton(

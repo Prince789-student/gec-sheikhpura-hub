@@ -371,7 +371,7 @@ class _AuthScreenState extends State<AuthScreen> {
               Icon(Icons.verified_user, size: 14, color: AppTheme.primaryNavy),
               SizedBox(width: 6),
               Text(
-                'Official Google Authentication',
+                'Secure Google Authentication',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy),
               ),
             ],
@@ -480,19 +480,6 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           ],
                         ),
-                ),
-              ),
-
-              const SizedBox(height: 14),
-              TextButton(
-                onPressed: _isLoading ? null : _showManualEmailDialog,
-                child: Text(
-                  'Or sign in with Google email manually',
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: isDark ? Colors.white60 : AppTheme.primaryNavy.withValues(alpha: 0.8),
-                    decoration: TextDecoration.underline,
-                  ),
                 ),
               ),
             ],

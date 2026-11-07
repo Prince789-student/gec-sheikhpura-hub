@@ -103,7 +103,7 @@ class _AcademicsScreenState extends State<AcademicsScreen> with SingleTickerProv
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Apna College Bihar Partner', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accentSky)),
-                                Text('Official Academic Study Platform', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                                Text('Dedicated Academic Study Platform', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                               ],
                             ),
                           ),

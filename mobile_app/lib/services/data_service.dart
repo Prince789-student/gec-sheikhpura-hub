@@ -76,7 +76,7 @@ class DataService {
                     deliveryAvailable: true,
                     menuSummary: amenitiesStr.isNotEmpty ? amenitiesStr : 'Fresh meals twice daily',
                     phone: contact,
-                    rating: 4.8,
+                    rating: 0.0,
                   ),
                 );
               }

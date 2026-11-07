@@ -210,7 +210,7 @@
           </div>
           <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">Sign in with Google</h1>
           <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-            Official login for BEU Bihar Engineering students. Access verified rooms, messes, and your Student ID Card.
+            Sign in with your Google account to access student rooms, mess services, campus community, and your profile.
           </p>
 
           <!-- Single Official Continue with Google Button -->
@@ -227,180 +227,6 @@
 
         <!-- Alert Notification Box -->
         <div id="authAlert" style="display: none; padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; font-size: 0.875rem;"></div>
-
-        <!-- 2. OPTIONAL COLLAPSIBLE CLASSIC EMAIL/PASSWORD -->
-        <details style="margin-top: 1.25rem; border-top: 1px solid var(--border-light); padding-top: 0.85rem;">
-          <summary style="font-size: 0.8125rem; color: var(--text-muted); cursor: pointer; text-align: center; user-select: none;">
-            Alternative: Sign in with classic email &amp; password ▾
-          </summary>
-          <div style="margin-top: 1rem;">
-            <!-- Auth Tabs -->
-            <div class="auth-tabs" role="tablist">
-              <button type="button" class="auth-tab-btn active" id="tabBtnSignIn" onclick="switchAuthTab('signin')" role="tab" aria-selected="true">
-                Sign In
-              </button>
-              <button type="button" class="auth-tab-btn" id="tabBtnPhone" onclick="switchAuthTab('phone')" role="tab" aria-selected="false">
-                📱 Phone OTP
-              </button>
-              <button type="button" class="auth-tab-btn" id="tabBtnSignUp" onclick="switchAuthTab('signup')" role="tab" aria-selected="false">
-                Create Account
-              </button>
-              <button type="button" class="auth-tab-btn" id="tabBtnReset" onclick="switchAuthTab('reset')" role="tab" aria-selected="false">
-                Reset
-              </button>
-            </div>
-
-            <!-- 1. SIGN IN FORM -->
-            <form id="signInForm" onsubmit="handleSignIn(event)">
-              <div class="form-group">
-                <label class="form-label" for="signInEmail">Student Email</label>
-                <input type="email" id="signInEmail" class="form-control" placeholder="Enter your email" required autocomplete="email">
-              </div>
-
-              <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                  <label class="form-label" for="signInPassword" style="margin-bottom: 0;">Password</label>
-                  <button type="button" onclick="switchAuthTab('reset')" style="background: none; border: none; color: var(--color-accent); font-size: 0.8125rem; cursor: pointer; text-decoration: underline;">
-                    Forgot password?
-                  </button>
-                </div>
-                <input type="password" id="signInPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
-              </div>
-
-              <button type="submit" class="btn btn-primary" id="signInSubmitBtn" style="width: 100%; margin-top: 0.5rem;">
-                Sign In with Email
-              </button>
-            </form>
-
-            <!-- 2. CREATE ACCOUNT FORM -->
-            <form id="signUpForm" onsubmit="handleSignUp(event)" style="display: none;">
-              <div class="form-group">
-                <label class="form-label" for="signUpDisplayName">Full Name / Display Name</label>
-                <input type="text" id="signUpDisplayName" class="form-control" placeholder="Enter your full name" required>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="signUpEmail">Email Address</label>
-                <input type="email" id="signUpEmail" class="form-control" placeholder="name@example.com" required autocomplete="email">
-                <small style="color: var(--text-subtle); font-size: 0.75rem; display: block; margin-top: 0.25rem;">We never share your email address publicly.</small>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="signUpPassword">Create Password</label>
-                <input type="password" id="signUpPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password">
-              </div>
-
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                <div class="form-group">
-                  <label class="form-label" for="signUpBranch">Branch</label>
-                  <select id="signUpBranch" class="form-control">
-                    <option value="CSE">Computer Science (CSE)</option>
-                    <option value="CE">Civil Engg (CE)</option>
-                    <option value="EE">Electrical Engg (EE)</option>
-                    <option value="ME">Mechanical Engg (ME)</option>
-                    <option value="ECE">Electronics (ECE)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="signUpSemester">Semester</label>
-                  <select id="signUpSemester" class="form-control">
-                    <option value="1st Sem">1st Semester</option>
-                    <option value="2nd Sem">2nd Semester</option>
-                    <option value="3rd Sem" selected>3rd Semester</option>
-                    <option value="4th Sem">4th Semester</option>
-                    <option value="5th Sem">5th Semester</option>
-                    <option value="6th Sem">6th Semester</option>
-                    <option value="7th Sem">7th Semester</option>
-                    <option value="8th Sem">8th Semester</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="signUpBatch">Admission Batch</label>
-                <select id="signUpBatch" class="form-control">
-                  <option value="2025-2029">2025 - 2029 (Upcoming / 1st Yr)</option>
-                  <option value="2024-2028" selected>2024 - 2028 (Current 2nd Yr)</option>
-                  <option value="2023-2027">2023 - 2027 (Current 3rd Yr)</option>
-                  <option value="2022-2026">2022 - 2026 (Final Year)</option>
-                </select>
-              </div>
-
-              <button type="submit" class="btn btn-primary" id="signUpSubmitBtn" style="width: 100%; margin-top: 0.5rem;">
-                Create Student Account
-              </button>
-            </form>
-
-            <!-- 3. RESET PASSWORD FORM -->
-            <form id="resetForm" onsubmit="handlePasswordReset(event)" style="display: none;">
-              <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-                Enter your registered email address to receive password recovery instructions.
-              </p>
-
-              <div class="form-group">
-                <label class="form-label" for="resetEmail">Email Address</label>
-                <input type="email" id="resetEmail" class="form-control" placeholder="name@example.com" required autocomplete="email">
-              </div>
-
-              <button type="submit" class="btn btn-primary" id="resetSubmitBtn" style="width: 100%; margin-top: 0.5rem;">
-                Send Recovery Email
-              </button>
-
-              <div style="margin-top: 1rem; text-align: center;">
-                <button type="button" onclick="switchAuthTab('signin')" style="background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: underline;">
-                  ← Back to Sign In
-                </button>
-              </div>
-            </form>
-
-            <!-- 4. PHONE OTP AUTH FORM (Firebase Phone Authentication) -->
-            <form id="phoneForm" onsubmit="handleSendPhoneOtp(event)" style="display: none;">
-              <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
-                Sign in or register using your 10-digit mobile number with Firebase SMS OTP.
-              </p>
-
-              <div id="phoneStep1">
-                <div class="form-group">
-                  <label class="form-label" for="phoneInput">Mobile Number</label>
-                  <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; height: 42px; padding: 0 12px; background: var(--surface-2, #f3f4f6); border: 1px solid var(--border-light, #d1d5db); border-radius: var(--radius-sm, 6px); font-weight: 700; font-size: 0.9rem; color: var(--text-main);">+91</span>
-                    <input type="tel" id="phoneInput" class="form-control" placeholder="10-digit Mobile Number" pattern="[0-9]{10}" maxlength="10" required autocomplete="tel-national" style="flex: 1;">
-                  </div>
-                  <small style="color: var(--text-subtle); font-size: 0.75rem; display: block; margin-top: 0.35rem;">
-                    Firebase will send a 6-digit OTP SMS to verify your mobile number.
-                  </small>
-                </div>
-
-                <!-- Invisible Recaptcha container for Firebase Phone Auth -->
-                <div id="recaptcha-container"></div>
-
-                <button type="submit" class="btn btn-primary" id="btnSendPhoneOtp" style="width: 100%; margin-top: 0.5rem;">
-                  Send OTP via SMS
-                </button>
-              </div>
-
-              <div id="phoneStep2" style="display: none;">
-                <div class="form-group">
-                  <label class="form-label" for="phoneOtpCode">Enter 6-Digit OTP</label>
-                  <input type="text" id="phoneOtpCode" class="form-control" placeholder="123456" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" style="letter-spacing: 0.35rem; font-size: 1.3rem; text-align: center; font-weight: 700;">
-                  <small style="color: var(--text-subtle); font-size: 0.75rem; display: block; margin-top: 0.35rem; text-align: center;">
-                    Enter the code sent to your mobile.
-                  </small>
-                </div>
-
-                <button type="button" class="btn btn-primary" id="btnVerifyPhoneOtp" onclick="handleVerifyPhoneOtp()" style="width: 100%; margin-top: 0.5rem;">
-                  Verify OTP &amp; Sign In
-                </button>
-
-                <div style="margin-top: 1rem; text-align: center;">
-                  <button type="button" onclick="resetPhoneStep()" style="background: none; border: none; color: var(--color-accent); font-size: 0.8125rem; cursor: pointer; text-decoration: underline;">
-                    ← Change Mobile Number
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </details>
       </div>
 
       <!-- Public Browsing Assurance -->
@@ -418,10 +244,10 @@
   <div id="profileOnboardModal" class="modal-overlay" style="display: none;">
     <div class="modal-box-card">
       <div style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 1rem;">
-        <span style="display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--color-accent); background: var(--bg-muted); padding: 0.2rem 0.5rem; border-radius: 4px; margin-bottom: 0.35rem;">🎓 Required Student Verification</span>
+        <span style="display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--color-accent); background: var(--bg-muted); padding: 0.2rem 0.5rem; border-radius: 4px; margin-bottom: 0.35rem;">🎓 Student Profile Setup</span>
         <h2 style="font-size: 1.35rem; margin: 0 0 0.25rem 0;">Complete Your Student Profile</h2>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
-          Welcome! Please verify your official college credentials to activate your student life account, view verified contact numbers, and access your student profile card.
+          Welcome! Complete your student details to activate your student account, bookmark campus services, and access your student profile card.
         </p>
       </div>
 

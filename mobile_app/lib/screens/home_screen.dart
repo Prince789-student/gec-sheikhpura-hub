@@ -97,16 +97,14 @@ class HomeScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                          ),
+                          color: const Color(0xFF0F766E),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
-                          'OFFICIAL',
+                          'STUDENT HUB',
                           style: TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.w800,
                             fontSize: 8.5,
                             letterSpacing: 0.5,
                           ),
