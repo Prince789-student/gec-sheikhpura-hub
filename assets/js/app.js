@@ -594,6 +594,58 @@ function initNavigation() {
       }
     });
   }
+
+  // Desktop Header Navigation Dropdowns - Click to open and stick
+  const dropdownTriggers = document.querySelectorAll('.nav-dropdown .dropdown-trigger');
+  dropdownTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const parentDropdown = trigger.closest('.nav-dropdown');
+      if (!parentDropdown) return;
+      const isOpen = parentDropdown.classList.contains('open');
+
+      // Close all other open dropdowns first
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => {
+        if (dd !== parentDropdown) {
+          dd.classList.remove('open', 'active');
+          const btn = dd.querySelector('.dropdown-trigger');
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Toggle current dropdown
+      if (isOpen) {
+        parentDropdown.classList.remove('open', 'active');
+        trigger.setAttribute('aria-expanded', 'false');
+      } else {
+        parentDropdown.classList.add('open', 'active');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => {
+        dd.classList.remove('open', 'active');
+        const btn = dd.querySelector('.dropdown-trigger');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+
+  // Close dropdowns on ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-dropdown.open').forEach(dd => {
+        dd.classList.remove('open', 'active');
+        const btn = dd.querySelector('.dropdown-trigger');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
 }
 
 /* ==========================================================================

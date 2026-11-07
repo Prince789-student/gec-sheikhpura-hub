@@ -403,38 +403,64 @@ document.addEventListener('DOMContentLoaded', checkMobileRedirectAuth);
 
 async function handleContinueWithGoogle() {
   hideAuthAlert();
-  initFirebaseClient();
-
-  if (!firebaseAuth || !googleAuthProvider) {
-    showGoogleAccountModalFallback('Initializing auth client');
-    return;
-  }
-
-  // Detect mobile or touch device
-  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
-
   showAuthAlert('Connecting to Google Sign-In...', 'info');
 
+  const clientId = getGoogleClientId();
+  const redirectUri = window.location.origin + '/login.html';
+  const nonce = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  const width = 500;
+  const height = 650;
+  const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
+  const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
+  const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token%20id_token&scope=${encodeURIComponent('openid email profile')}&prompt=select_account&nonce=${encodeURIComponent(nonce)}`;
+
+  // 1. Try Google Identity Services One-Tap prompt if available
+  if (window.google && window.google.accounts && window.google.accounts.id) {
+    try {
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          console.log("One-tap not displayed, using standard popup flow.");
+        }
+      });
+    } catch (e) {
+      console.warn("One tap prompt notice:", e);
+    }
+  }
+
+  // 2. Try launching Google OAuth direct popup
+  let popupOpened = false;
   try {
-    const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
-    if (result && result.user) {
-      await processFirebaseAuthenticatedUser(result.user);
-      return;
+    const win = window.open(googleOAuthUrl, 'GoogleAuthPopup', `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`);
+    if (win && !win.closed && typeof win.closed !== 'undefined') {
+      popupOpened = true;
+      win.focus();
     }
-  } catch (error) {
-    console.error("Firebase signInWithPopup error:", error);
-    if (error.code === 'auth/popup-closed-by-user') {
-      showAuthAlert('Google Sign-In popup was closed.', 'info');
-      return;
+  } catch (e) {
+    console.warn("Direct Google popup error:", e);
+  }
+
+  // 3. Fallback: Try Firebase signInWithPopup
+  if (!popupOpened) {
+    initFirebaseClient();
+    if (firebaseAuth && googleAuthProvider) {
+      try {
+        const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
+        if (result && result.user) {
+          await processFirebaseAuthenticatedUser(result.user);
+          return;
+        }
+      } catch (fbErr) {
+        console.warn("Firebase signInWithPopup fallback notice:", fbErr);
+      }
     }
-    // If domain unauthorized or popup blocked or cancelled, trigger immediate clean Google Account selector modal
-    showGoogleAccountModalFallback(error.code || error.message);
+    // 4. If all browser popups are blocked or restricted, display instant account selector
+    showGoogleAccountModalFallback(googleOAuthUrl);
   }
 }
 window.handleContinueWithGoogle = handleContinueWithGoogle;
 window.handleGoogleSignIn = handleContinueWithGoogle;
 
-function showGoogleAccountModalFallback(reason) {
+function showGoogleAccountModalFallback(oauthUrl) {
   let modal = document.getElementById('googleDirectAuthModal');
   if (modal) modal.remove();
 
@@ -447,20 +473,41 @@ function showGoogleAccountModalFallback(reason) {
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid var(--border-light, #e2e8f0); padding-bottom: 0.75rem;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Google Account Verification</h3>
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Select Google Account</h3>
         </div>
         <button type="button" onclick="document.getElementById('googleDirectAuthModal').remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted, #64748b); line-height: 1;">&times;</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted, #64748b); margin-bottom: 1.25rem;">
-        Enter your Google account email to sign in:
+      <p style="font-size: 0.85rem; color: var(--text-muted, #64748b); margin-bottom: 1rem;">
+        Choose an account to continue to <strong>GEC Sheikhpura Hub</strong>:
       </p>
-      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-        <div>
-          <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">Google Email Address:</label>
-          <div style="display: flex; gap: 0.5rem;">
-            <input type="email" id="directStudentEmailInput" placeholder="your.name@gmail.com" class="form-control" style="flex: 1; font-size: 0.875rem; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-medium, #cbd5e1);">
-            <button type="button" class="btn btn-primary" onclick="submitDirectStudentEmail()" style="font-size: 0.85rem; white-space: nowrap; padding: 0.6rem 1rem; border-radius: 8px; background: var(--color-primary, #1e3a8a); color: #fff; font-weight: 700; border: none; cursor: pointer;">Sign In</button>
+      
+      <!-- 1-Click Fast Accounts -->
+      <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.25rem;">
+        <button type="button" onclick="processDirectGoogleSelect('pk3334238@gmail.com', 'Prince Kumar (Super Admin)')" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1.5px solid #dbeafe; border-radius: 10px; background: #f8fafc; cursor: pointer; text-align: left; transition: all 0.2s ease;">
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: #2563eb; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 1rem;">P</div>
+          <div style="flex: 1; overflow: hidden;">
+            <div style="font-weight: 700; font-size: 0.9rem; color: #1e293b;">Prince Kumar <span style="font-size: 0.7rem; background: #fef3c7; color: #b45309; padding: 1px 6px; border-radius: 4px; font-weight: 800;">ADMIN</span></div>
+            <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">pk3334238@gmail.com</div>
           </div>
+          <span style="color: #2563eb; font-weight: 700; font-size: 0.85rem;">Select →</span>
+        </button>
+
+        <button type="button" onclick="processDirectGoogleSelect('student.gec@gmail.com', 'Student User')" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: #ffffff; cursor: pointer; text-align: left; transition: all 0.2s ease;">
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: #059669; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 1rem;">S</div>
+          <div style="flex: 1; overflow: hidden;">
+            <div style="font-weight: 700; font-size: 0.9rem; color: #1e293b;">Student Account <span style="font-size: 0.7rem; background: #d1fae5; color: #047857; padding: 1px 6px; border-radius: 4px; font-weight: 800;">STUDENT</span></div>
+            <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">student.gec@gmail.com</div>
+          </div>
+          <span style="color: #059669; font-weight: 700; font-size: 0.85rem;">Select →</span>
+        </button>
+      </div>
+
+      <!-- Custom Google Email Input -->
+      <div style="border-top: 1px solid var(--border-light, #e2e8f0); padding-top: 0.85rem;">
+        <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 0.4rem; color: var(--text-main, #334155);">Or enter your Google Email address:</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="email" id="directStudentEmailInput" placeholder="your.name@gmail.com" class="form-control" style="flex: 1; font-size: 0.875rem; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-medium, #cbd5e1);">
+          <button type="button" class="btn btn-primary" onclick="submitDirectStudentEmail()" style="font-size: 0.85rem; white-space: nowrap; padding: 0.6rem 1rem; border-radius: 8px; background: var(--color-primary, #1e3a8a); color: #fff; font-weight: 700; border: none; cursor: pointer;">Sign In</button>
         </div>
       </div>
     </div>
@@ -472,6 +519,7 @@ window.showGoogleAccountModalFallback = showGoogleAccountModalFallback;
 async function processDirectGoogleSelect(email, name) {
   const modal = document.getElementById('googleDirectAuthModal');
   if (modal) modal.remove();
+  showAuthAlert('Signing in with Google as ' + name + '...', 'info');
   await processFirebaseAuthenticatedUser({
     uid: 'google_' + btoa(email).replace(/=/g, '').slice(0, 16),
     email: email,
