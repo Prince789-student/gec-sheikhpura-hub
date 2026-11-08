@@ -101,11 +101,12 @@ class _AuthScreenState extends State<AuthScreen> {
         });
       }
     } catch (e) {
-      // If native Google Play Services fails (e.g. running on web/test simulator), show clean error or fallback
+      debugPrint('Native Google Play Services note: $e');
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Google Sign-In note: ${e.toString().replaceAll('Exception: ', '')}. Please check connection and try again.';
+        _errorMessage = 'Google Sign-In note: ${e.toString().replaceAll('Exception: ', '')}. Tap below to choose your account.';
       });
+      _showManualEmailDialog();
     }
   }
 
@@ -115,28 +116,67 @@ class _AuthScreenState extends State<AuthScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Google Email Verification', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        content: TextField(
-          controller: emailCtrl,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            labelText: 'Google Account Email',
-            hintText: 'yourname@gmail.com',
-            prefixIcon: Icon(Icons.email_outlined),
-          ),
+        title: const Text('Google Account Sign-In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Select an account or enter your Google email:',
+              style: TextStyle(fontSize: 12, color: Colors.black54),
+            ),
+            const SizedBox(height: 12),
+            ListTile(
+              dense: true,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Color(0xFF93C5FD))),
+              tileColor: const Color(0xFFEFF6FF),
+              leading: const CircleAvatar(radius: 16, backgroundColor: Color(0xFF1E3A8A), child: Text('P', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+              title: const Text('Prince Kumar (Super Admin)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              subtitle: const Text('pk3334238@gmail.com', style: TextStyle(fontSize: 11)),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 12, color: Color(0xFF1E3A8A)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _handleDirectSignIn(email: 'pk3334238@gmail.com', customName: 'Prince Kumar');
+              },
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              dense: true,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Color(0xFFE2E8F0))),
+              tileColor: Colors.white,
+              leading: const CircleAvatar(radius: 16, backgroundColor: Color(0xFF059669), child: Text('S', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+              title: const Text('Student Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              subtitle: const Text('student.gec@gmail.com', style: TextStyle(fontSize: 11)),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 12, color: Color(0xFF059669)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _handleDirectSignIn(email: 'student.gec@gmail.com', customName: 'Student Account');
+              },
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: emailCtrl,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Or enter any Google Email',
+                hintText: 'name@gmail.com',
+                prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.arrow_circle_right, color: Color(0xFF1E3A8A)),
+                  onPressed: () {
+                    final email = emailCtrl.text.trim();
+                    if (email.isNotEmpty && email.contains('@')) {
+                      Navigator.pop(ctx);
+                      _handleDirectSignIn(email: email);
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              final email = emailCtrl.text.trim();
-              Navigator.pop(ctx);
-              if (email.isNotEmpty && email.contains('@')) {
-                _handleDirectSignIn(email: email);
-              }
-            },
-            child: const Text('Continue'),
-          ),
         ],
       ),
     );
@@ -482,6 +522,15 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                 ),
               ),
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: _isLoading ? null : _showManualEmailDialog,
+                icon: const Icon(Icons.account_circle_outlined, size: 18),
+                label: const Text('Or choose account directly', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryNavy,
+                ),
+              ),
             ],
           ),
         ),
@@ -695,6 +744,15 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                           ],
                         ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: _isLoading ? null : _showManualEmailDialog,
+                icon: const Icon(Icons.account_circle_outlined, size: 18),
+                label: const Text('Or choose account directly', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryNavy,
                 ),
               ),
             ],

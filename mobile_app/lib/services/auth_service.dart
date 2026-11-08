@@ -13,7 +13,10 @@ class AuthService {
 
   final ValueNotifier<UserModel?> currentUser = ValueNotifier<UserModel?>(null);
 
+  static const String _webClientId = '748172575005-400n0tange3otfpelk47uhvre79a70s2.apps.googleusercontent.com';
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: kIsWeb ? _webClientId : null,
     scopes: ['email', 'profile'],
   );
 
@@ -49,9 +52,10 @@ class AuthService {
       }
 
       final email = account.email.trim();
-      final name = (account.displayName != null && account.displayName!.trim().isNotEmpty)
-          ? account.displayName!.trim()
-          : email.split('@')[0];
+      final displayName = account.displayName;
+      final name = (displayName != null && displayName.trim().isNotEmpty)
+          ? displayName.trim()
+          : (email.isNotEmpty ? email.split('@')[0] : 'Student');
       final photo = account.photoUrl;
 
       // Check if user profile is already saved locally in DB
