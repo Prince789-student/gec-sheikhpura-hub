@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 
@@ -12,6 +13,16 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isPeopleApiDisabled = false;
+
+  void _openPeopleApiConsole() async {
+    final uri = Uri.parse('https://console.developers.google.com/apis/api/people.googleapis.com/overview?project=748172575005');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {}
+  }
 
   // Google Sign-In & Profile Step State
   bool _showProfileStep = false;
@@ -102,9 +113,17 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } catch (e) {
       debugPrint('Native Google Play Services note: $e');
+      final errText = e.toString();
+      final isPeopleApi = errText.contains('People API') || errText.contains('people.googleapis.com');
+
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Google Sign-In note: ${e.toString().replaceAll('Exception: ', '')}. Tap below to choose your account.';
+        _isPeopleApiDisabled = isPeopleApi;
+        if (isPeopleApi) {
+          _errorMessage = 'People API is not enabled in Google Cloud Project 748172575005. Please enable it in Google Cloud Console or select your account directly below:';
+        } else {
+          _errorMessage = 'Google Sign-In note: ${errText.replaceAll('Exception: ', '')}. Tap below to choose your account.';
+        }
       });
       _showManualEmailDialog();
     }
@@ -422,23 +441,46 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (_errorMessage != null)
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: AppTheme.dangerRed.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppTheme.dangerRed.withValues(alpha: 0.3)),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.error_outline, color: AppTheme.dangerRed, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _errorMessage!,
-                    style: const TextStyle(color: AppTheme.dangerRed, fontSize: 13),
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.error_outline, color: AppTheme.dangerRed, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: AppTheme.dangerRed, fontSize: 13, height: 1.4),
+                      ),
+                    ),
+                  ],
                 ),
+                if (_isPeopleApiDisabled) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _openPeopleApiConsole,
+                      icon: const Icon(Icons.open_in_new, size: 16),
+                      label: const Text('Enable People API in Google Cloud Console', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E3A8A),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
