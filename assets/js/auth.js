@@ -282,6 +282,24 @@ let googleAuthProvider = null;
 let phoneRecaptchaVerifier = null;
 let phoneConfirmationResult = null;
 
+let hasAuthListenerAttached = false;
+function attachAuthListener() {
+  if (hasAuthListenerAttached || !firebaseAuth) return;
+  hasAuthListenerAttached = true;
+  try {
+    firebaseAuth.onAuthStateChanged(async (user) => {
+      if (user && (sessionStorage.getItem('gec_signing_in') === 'true' || sessionStorage.getItem('gec_auth_redirect') === 'true')) {
+        sessionStorage.removeItem('gec_signing_in');
+        sessionStorage.removeItem('gec_auth_redirect');
+        showAuthAlert('✓ Google account verified! Setting up your session...', 'success');
+        await processFirebaseAuthenticatedUser(user);
+      }
+    });
+  } catch (e) {
+    console.warn("Could not attach onAuthStateChanged listener:", e);
+  }
+}
+
 function initFirebaseClient() {
   if (typeof firebase !== 'undefined') {
     try {
@@ -301,6 +319,7 @@ function initFirebaseClient() {
       firebaseAuth = firebase.auth();
       googleAuthProvider = new firebase.auth.GoogleAuthProvider();
       googleAuthProvider.setCustomParameters({ prompt: 'select_account' });
+      attachAuthListener();
     } catch (e) {
       console.warn("Firebase Auth setup notice:", e);
     }
@@ -318,26 +337,30 @@ async function processFirebaseAuthenticatedUser(u) {
   // Super Admin privileges strictly reserved for pk3334238@gmail.com
   const isSuperAdmin = (email === 'pk3334238@gmail.com');
 
-  if (window.DB) {
-    const userSession = {
-      id: u.uid || ('usr-' + Math.random().toString(36).substr(2, 9)),
-      email: email || (phone ? `${phone.replace(/[^0-9]/g, '')}@student.gecsheikhpura.ac.in` : 'student@gecsheikhpura.ac.in'),
-      phone: phone,
-      display_name: isSuperAdmin ? 'Prince Kumar' : name,
-      role: isSuperAdmin ? 'super_admin' : 'student',
-      is_admin: isSuperAdmin,
-      created_at: new Date().toISOString()
-    };
-    localStorage.setItem('gec_student_session', JSON.stringify(userSession));
+  const userSession = {
+    id: u.uid || ('usr-' + Math.random().toString(36).substr(2, 9)),
+    email: email || (phone ? `${phone.replace(/[^0-9]/g, '')}@student.gecsheikhpura.ac.in` : 'student@gecsheikhpura.ac.in'),
+    phone: phone,
+    display_name: isSuperAdmin ? 'Prince Kumar' : name,
+    role: isSuperAdmin ? 'super_admin' : 'student',
+    is_admin: isSuperAdmin,
+    created_at: new Date().toISOString()
+  };
+  localStorage.setItem('gec_student_session', JSON.stringify(userSession));
 
+  if (window.DB) {
     // Sync profile to Cloud Firestore
     if (typeof window.DB.saveUserProfileFirestore === 'function') {
-      await window.DB.saveUserProfileFirestore(userSession.id, {
-        name: userSession.display_name,
-        display_name: userSession.display_name,
-        email: userSession.email,
-        phone: phone || ''
-      });
+      try {
+        await window.DB.saveUserProfileFirestore(userSession.id, {
+          name: userSession.display_name,
+          display_name: userSession.display_name,
+          email: userSession.email,
+          phone: phone || ''
+        });
+      } catch (e) {
+        console.warn("Could not sync profile to firestore:", e);
+      }
     }
   }
 
@@ -360,7 +383,7 @@ async function processFirebaseAuthenticatedUser(u) {
     showAuthAlert(`👑 Welcome Prince Kumar! Super Admin verified. Opening Admin Panel...`, 'success');
     setTimeout(() => {
       window.location.href = 'admin.html';
-    }, 600);
+    }, 500);
   } else if (staffRole) {
     localStorage.setItem('gec_admin_session', JSON.stringify({
       admin_id: 'adm_' + (staffRole.id || Math.random().toString(36).substring(2, 8)),
@@ -373,13 +396,13 @@ async function processFirebaseAuthenticatedUser(u) {
     showAuthAlert(`🛡️ Welcome ${name}! Staff access verified (${staffRole.role}). Opening Admin Panel...`, 'success');
     setTimeout(() => {
       window.location.href = 'admin.html';
-    }, 600);
+    }, 500);
   } else {
     localStorage.removeItem('gec_admin_session');
     showAuthAlert(`✓ Welcome, ${name}! Signed in successfully. Opening student dashboard...`, 'success');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
-    }, 600);
+    }, 500);
   }
 }
 
@@ -390,7 +413,9 @@ async function checkMobileRedirectAuth() {
     try {
       const result = await firebaseAuth.getRedirectResult();
       if (result && result.user) {
-        showAuthAlert('✓ Mobile Google Sign-In verified! Setting up your session...', 'info');
+        sessionStorage.removeItem('gec_signing_in');
+        sessionStorage.removeItem('gec_auth_redirect');
+        showAuthAlert('✓ Google Sign-In verified! Setting up your session...', 'success');
         await processFirebaseAuthenticatedUser(result.user);
       }
     } catch (e) {
@@ -409,22 +434,42 @@ async function handleContinueWithGoogle() {
     return;
   }
 
+  sessionStorage.setItem('gec_signing_in', 'true');
+
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if (isMobile) {
+    showAuthAlert('Connecting with Google...', 'info');
+    sessionStorage.setItem('gec_auth_redirect', 'true');
+    try {
+      await firebaseAuth.signInWithRedirect(googleAuthProvider);
+      return;
+    } catch (mobileErr) {
+      console.warn("Mobile signInWithRedirect notice:", mobileErr);
+    }
+  }
+
   showAuthAlert('Opening Google Sign-In with Firebase popup...', 'info');
 
   try {
     const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
     if (result && result.user) {
+      sessionStorage.removeItem('gec_signing_in');
       showAuthAlert('✓ Google Sign-In successful! Verifying account...', 'success');
       await processFirebaseAuthenticatedUser(result.user);
     }
   } catch (error) {
     console.error('Firebase signInWithPopup error:', error);
-    if (error.code === 'auth/popup-closed-by-user') {
-      showAuthAlert('Google Sign-In popup was closed before completing. Click "Continue with Google" to try again.', 'info');
+    if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+      showAuthAlert('Popup not available. Redirecting directly to Google Sign-In...', 'info');
+      sessionStorage.setItem('gec_auth_redirect', 'true');
+      try {
+        await firebaseAuth.signInWithRedirect(googleAuthProvider);
+      } catch (redirectError) {
+        console.error('Firebase signInWithRedirect error:', redirectError);
+        showAuthAlert(`Sign-in error: ${redirectError.message || redirectError.code}`, 'error');
+      }
     } else if (error.code === 'auth/cancelled-popup-request') {
       // Ignored
-    } else if (error.code === 'auth/popup-blocked') {
-      showAuthAlert('Browser blocked the popup window. Please allow popups for this site and click Continue with Google again.', 'error');
     } else if (error.code === 'auth/unauthorized-domain') {
       showAuthAlert(`Domain (${window.location.hostname}) is not authorized in Firebase Console. Please add it to Authorized Domains in Firebase Auth settings.`, 'error');
     } else {
