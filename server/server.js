@@ -11,11 +11,12 @@ const sportsEventsRouter = require('./sports_events_router');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security & Middleware
+// Security & Middleware - Allow Firebase Auth Popup to communicate with window.opener
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: false,
-  crossOriginEmbedderPolicy: false
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false
 }));
 app.use(compression());
 app.use(express.json());

@@ -404,91 +404,36 @@ async function handleContinueWithGoogle() {
   hideAuthAlert();
   initFirebaseClient();
 
-  // Render fast options immediately so user is NEVER blocked by popup blockers or closed popups
-  showPopupFallbackOptions();
+  if (!firebaseAuth || !googleAuthProvider) {
+    showAuthAlert('Initializing Firebase Google Authentication, please wait...', 'info');
+    return;
+  }
 
-  if (firebaseAuth && googleAuthProvider) {
-    try {
-      const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
-      if (result && result.user) {
-        showAuthAlert('✓ Google sign-in successful! Processing account...', 'success');
-        await processFirebaseAuthenticatedUser(result.user);
-      }
-    } catch (error) {
-      console.warn('Firebase signInWithPopup notice:', error);
-      showPopupFallbackOptions(error);
+  showAuthAlert('Opening Google Sign-In with Firebase popup...', 'info');
+
+  try {
+    const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
+    if (result && result.user) {
+      showAuthAlert('✓ Google Sign-In successful! Verifying account...', 'success');
+      await processFirebaseAuthenticatedUser(result.user);
+    }
+  } catch (error) {
+    console.error('Firebase signInWithPopup error:', error);
+    if (error.code === 'auth/popup-closed-by-user') {
+      showAuthAlert('Google Sign-In popup was closed before completing. Click "Continue with Google" to try again.', 'info');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      // Ignored
+    } else if (error.code === 'auth/popup-blocked') {
+      showAuthAlert('Browser blocked the popup window. Please allow popups for this site and click Continue with Google again.', 'error');
+    } else if (error.code === 'auth/unauthorized-domain') {
+      showAuthAlert(`Domain (${window.location.hostname}) is not authorized in Firebase Console. Please add it to Authorized Domains in Firebase Auth settings.`, 'error');
+    } else {
+      showAuthAlert(`Sign-in error: ${error.message || error.code}`, 'error');
     }
   }
 }
 window.handleContinueWithGoogle = handleContinueWithGoogle;
 window.handleGoogleSignIn = handleContinueWithGoogle;
-
-function showPopupFallbackOptions(error) {
-  const alertBox = document.getElementById('authAlert');
-  if (!alertBox) return;
-
-  const reason = (error && error.code === 'auth/popup-closed-by-user')
-    ? 'Google popup was closed.'
-    : ((error && error.code === 'auth/popup-blocked')
-      ? 'Browser blocked popup.'
-      : 'Select your Google account below:');
-
-  alertBox.className = 'alert-box alert-warning';
-  alertBox.style.display = 'block';
-  alertBox.style.background = '#f8fafc';
-  alertBox.style.color = '#1e293b';
-  alertBox.style.border = '1.5px solid #cbd5e1';
-  alertBox.style.padding = '0.9rem 1rem';
-  alertBox.style.borderRadius = '12px';
-  alertBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.06)';
-
-  alertBox.innerHTML = `
-    <div style="font-weight: 700; margin-bottom: 0.35rem; font-size: 0.92rem; color: #1e3a8a;">
-      Google Account Verification
-    </div>
-    <div style="font-size: 0.82rem; margin-bottom: 0.75rem; color: #64748b;">
-      Click below to sign in directly with your Google account:
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-      <button type="button" id="btnQuickPrinceAdmin" onclick="processQuickUser('pk3334238@gmail.com', 'Prince Kumar')" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0.7rem 1rem; background: #1e3a8a; color: #ffffff; border: none; border-radius: 8px; font-weight: 700; font-size: 0.88rem; cursor: pointer; box-shadow: 0 2px 6px rgba(30,58,138,0.25);">
-        👑 Continue as Prince Kumar (Super Admin)
-      </button>
-      <button type="button" id="btnQuickStudentUser" onclick="processQuickUser('student.gec@gmail.com', 'Student Account')" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0.7rem 1rem; background: #ffffff; color: #1e293b; border: 1.5px solid #94a3b8; border-radius: 8px; font-weight: 700; font-size: 0.88rem; cursor: pointer;">
-        🎓 Continue as Student Account
-      </button>
-      <div style="display: flex; gap: 6px; margin-top: 4px;">
-        <input type="email" id="customAlertEmail" placeholder="or enter any yourname@gmail.com" style="flex: 1; padding: 0.55rem 0.75rem; font-size: 0.85rem; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background: #ffffff;">
-        <button type="button" id="btnQuickCustomSubmit" onclick="processQuickEmailInput()" style="padding: 0.55rem 1rem; background: #059669; color: #ffffff; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
-          Sign In
-        </button>
-      </div>
-    </div>
-  `;
-}
-window.showPopupFallbackOptions = showPopupFallbackOptions;
-
-async function processQuickUser(email, name) {
-  showAuthAlert(`✓ Signing in as ${name || email}...`, 'success');
-  await processFirebaseAuthenticatedUser({
-    uid: 'google_' + btoa(email).replace(/=/g, '').slice(0, 16),
-    email: email,
-    displayName: name || email.split('@')[0],
-    photoURL: ''
-  });
-}
-window.processQuickUser = processQuickUser;
-
-async function processQuickEmailInput() {
-  const inp = document.getElementById('customAlertEmail');
-  const email = inp ? inp.value.trim() : '';
-  if (!email || !email.includes('@')) {
-    alert('Please enter a valid Google email address.');
-    return;
-  }
-  const name = email.split('@')[0];
-  await processQuickUser(email, name);
-}
-window.processQuickEmailInput = processQuickEmailInput;
 
 async function handleCustomGoogleLogin() {
   const nameInput = document.getElementById('customStudentName');
