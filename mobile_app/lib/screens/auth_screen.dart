@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 
@@ -13,16 +13,6 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   String? _errorMessage;
-  bool _isPeopleApiDisabled = false;
-
-  void _openPeopleApiConsole() async {
-    final uri = Uri.parse('https://console.developers.google.com/apis/api/people.googleapis.com/overview?project=748172575005');
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    } catch (_) {}
-  }
 
   // Google Sign-In & Profile Step State
   bool _showProfileStep = false;
@@ -68,6 +58,12 @@ class _AuthScreenState extends State<AuthScreen> {
 
   // --- 1. Native Google Sign-In (Opens Device Account Picker on Phone) ---
   Future<void> _handleNativeGoogleSignIn() async {
+    // On Web, open Google Account Chooser directly for 1-tap sign-in
+    if (kIsWeb) {
+      _showManualEmailDialog();
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -76,7 +72,6 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       final googleUser = await AuthService.instance.signInWithNativeGoogle();
       if (googleUser == null) {
-        // User closed or dismissed the Google account chooser
         setState(() => _isLoading = false);
         return;
       }
@@ -85,7 +80,6 @@ class _AuthScreenState extends State<AuthScreen> {
         _isLoading = false;
       });
 
-      // Pre-fill profile name from Google account
       if (_nameCtrl.text.isEmpty) {
         _nameCtrl.text = googleUser.displayName;
       }
@@ -93,7 +87,6 @@ class _AuthScreenState extends State<AuthScreen> {
       if (googleUser.dob.isNotEmpty) _dobCtrl.text = googleUser.dob;
       if (googleUser.phone.isNotEmpty) _phoneCtrl.text = googleUser.phone;
 
-      // If user already has registration and phone saved in local storage, login immediately
       if (googleUser.isAdmin || (googleUser.regNo.isNotEmpty && googleUser.phone.isNotEmpty)) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -106,24 +99,15 @@ class _AuthScreenState extends State<AuthScreen> {
           Navigator.pop(context);
         }
       } else {
-        // Prompt student to enter Registration Number, DOB, Phone & Branch
         setState(() {
           _showProfileStep = true;
         });
       }
     } catch (e) {
       debugPrint('Native Google Play Services note: $e');
-      final errText = e.toString();
-      final isPeopleApi = errText.contains('People API') || errText.contains('people.googleapis.com');
-
       setState(() {
         _isLoading = false;
-        _isPeopleApiDisabled = isPeopleApi;
-        if (isPeopleApi) {
-          _errorMessage = 'People API is not enabled in Google Cloud Project 748172575005. Please enable it in Google Cloud Console or select your account directly below:';
-        } else {
-          _errorMessage = 'Google Sign-In note: ${errText.replaceAll('Exception: ', '')}. Tap below to choose your account.';
-        }
+        _errorMessage = 'Google Sign-In note: ${e.toString().replaceAll('Exception: ', '')}. Tap below to choose your account.';
       });
       _showManualEmailDialog();
     }
@@ -441,46 +425,23 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (_errorMessage != null)
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: AppTheme.dangerRed.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(color: AppTheme.dangerRed.withValues(alpha: 0.3)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.error_outline, color: AppTheme.dangerRed, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _errorMessage!,
-                        style: const TextStyle(color: AppTheme.dangerRed, fontSize: 13, height: 1.4),
-                      ),
-                    ),
-                  ],
-                ),
-                if (_isPeopleApiDisabled) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _openPeopleApiConsole,
-                      icon: const Icon(Icons.open_in_new, size: 16),
-                      label: const Text('Enable People API in Google Cloud Console', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1E3A8A),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
+                const Icon(Icons.error_outline, color: AppTheme.dangerRed, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: AppTheme.dangerRed, fontSize: 13),
                   ),
-                ],
+                ),
               ],
             ),
           ),
